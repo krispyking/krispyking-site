@@ -1,51 +1,103 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo } from 'react'
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps'
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
-// ISO 3166-1 numeric codes for visited countries
-const VISITED = new Set([
-  '826', // UK
-  '372', // Ireland
-  '250', // France
-  '724', // Spain
-  '620', // Portugal
-  '380', // Italy
-  '276', // Germany
-  '528', // Netherlands
-  '56',  // Belgium
-  '756', // Switzerland
-  '40',  // Austria
-  '300', // Greece
-  '203', // Czech Republic
-  '616', // Poland
-  '840', // USA
-  '484', // Mexico
-  '764', // Thailand
-  '704', // Vietnam
-  '392', // Japan
-  '410', // South Korea
-  '408', // North Korea
-  '156', // China
-  '702', // Singapore
-  '458', // Malaysia
-  '360', // Indonesia
-  '608', // Philippines
-  '356', // India
-  '36',  // Australia
-  '554', // New Zealand
-  '784', // UAE
-  '710', // South Africa
-  '404', // Kenya
-  '76',  // Brazil
-  '32',  // Argentina
-])
+// ISO 3166-1 numeric code → year first visited (null = pre-passport data, always shown)
+const COUNTRY_FIRST_YEAR: Record<string, number | null> = {
+  '250': null,  // France
+  '380': null,  // Italy
+  '528': null,  // Netherlands
+  '356': 1999,  // India
+  '404': 1999,  // Kenya
+  '710': 1999,  // South Africa
+  '764': 1999,  // Thailand
+  '834': 1999,  // Tanzania
+  '36':  2000,  // Australia
+  '68':  2000,  // Bolivia
+  '152': 2000,  // Chile
+  '258': 2000,  // French Polynesia
+  '360': 2000,  // Indonesia
+  '418': 2000,  // Laos
+  '458': 2000,  // Malaysia
+  '604': 2000,  // Peru
+  '702': 2000,  // Singapore
+  '780': 2000,  // Trinidad & Tobago
+  '826': 2000,  // United Kingdom
+  '840': 2000,  // United States
+  '192': 2004,  // Cuba
+  '646': 2004,  // Rwanda
+  '800': 2004,  // Uganda
+  '158': 2008,  // Taiwan
+  '344': 2008,  // Hong Kong
+  '392': 2008,  // Japan
+  '446': 2008,  // Macau
+  '608': 2008,  // Philippines
+  '116': 2009,  // Cambodia
+  '704': 2009,  // Vietnam
+  '716': 2010,  // Zimbabwe
+  '410': 2011,  // South Korea
+  '156': 2012,  // China
+  '408': 2013,  // North Korea
+  '76':  2014,  // Brazil
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  '250': 'France', '380': 'Italy', '528': 'Netherlands',
+  '356': 'India', '404': 'Kenya', '710': 'South Africa',
+  '764': 'Thailand', '834': 'Tanzania',
+  '36': 'Australia', '68': 'Bolivia', '152': 'Chile',
+  '258': 'French Polynesia', '360': 'Indonesia', '418': 'Laos',
+  '458': 'Malaysia', '604': 'Peru', '702': 'Singapore',
+  '780': 'Trinidad & Tobago', '826': 'United Kingdom', '840': 'United States',
+  '192': 'Cuba', '646': 'Rwanda', '800': 'Uganda',
+  '158': 'Taiwan', '344': 'Hong Kong', '392': 'Japan',
+  '446': 'Macau', '608': 'Philippines',
+  '116': 'Cambodia', '704': 'Vietnam', '716': 'Zimbabwe',
+  '410': 'South Korea', '156': 'China', '408': 'North Korea', '76': 'Brazil',
+}
+
+const MILESTONES: Record<number, string> = {
+  1999: 'Africa & India',
+  2000: '+12 countries — SE Asia & Americas',
+  2004: 'East Africa · Cuba',
+  2008: 'East Asia',
+  2009: 'Indochina',
+  2010: 'Zimbabwe',
+  2011: 'South Korea',
+  2012: 'China',
+  2013: '🇰🇵 Pyongyang',
+  2014: 'Brazil',
+}
+
+const MIN_YEAR = 1999
+const MAX_YEAR = 2026
 
 export default function Travel() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
-  const [tooltip, setTooltip] = useState('')
+  const [selectedYear, setSelectedYear] = useState(MAX_YEAR)
+  const [tooltip, setTooltip] = useState<{ name: string; year: number | null } | null>(null)
+
+  const visitedCodes = useMemo(() => {
+    const codes = new Set<string>()
+    for (const [iso, yr] of Object.entries(COUNTRY_FIRST_YEAR)) {
+      if (yr === null || yr <= selectedYear) codes.add(iso)
+    }
+    return codes
+  }, [selectedYear])
+
+  const newThisYear = useMemo(() => {
+    const codes = new Set<string>()
+    for (const [iso, yr] of Object.entries(COUNTRY_FIRST_YEAR)) {
+      if (yr === selectedYear) codes.add(iso)
+    }
+    return codes
+  }, [selectedYear])
+
+  const trackPct = ((selectedYear - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100
+  const milestone = MILESTONES[selectedYear]
 
   return (
     <section id="travel" className="py-24 px-6 bg-bg-secondary">
@@ -55,11 +107,68 @@ export default function Travel() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-12"
+          className="mb-10"
         >
           <h2 className="font-serif text-4xl sm:text-5xl font-bold text-text-primary mb-3">
-            30+ Countries. Zero Regrets.
+            35 Countries. Zero Regrets.
           </h2>
+          <p className="text-text-secondary text-lg">
+            Drag the timeline to watch the map fill up.
+          </p>
+        </motion.div>
+
+        {/* Year Slider */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="rounded-2xl border border-border p-6 mb-6"
+          style={{ background: '#1a2235' }}
+        >
+          <div className="flex items-baseline justify-between mb-5">
+            <div className="flex items-baseline gap-3">
+              <span className="font-serif text-5xl font-bold text-accent">{selectedYear}</span>
+              <span className="text-text-secondary text-sm">
+                {selectedYear === MAX_YEAR ? '— all time' : ''}
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="font-serif text-4xl font-bold text-text-primary">
+                {visitedCodes.size}
+              </span>
+              <span className="text-text-secondary text-sm ml-1">countries</span>
+            </div>
+          </div>
+
+          <input
+            type="range"
+            min={MIN_YEAR}
+            max={MAX_YEAR}
+            step={1}
+            value={selectedYear}
+            onChange={e => setSelectedYear(Number(e.target.value))}
+            className="w-full"
+            style={{
+              background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${trackPct}%, #374151 ${trackPct}%, #374151 100%)`,
+            }}
+          />
+
+          <div className="flex justify-between mt-2 text-xs text-text-secondary select-none">
+            <span>{MIN_YEAR}</span>
+            {milestone && (
+              <span className="text-accent font-medium text-center px-2">{milestone}</span>
+            )}
+            <span>Now</span>
+          </div>
+
+          {newThisYear.size > 0 && (
+            <p className="mt-4 text-sm text-accent border-t border-border/50 pt-4">
+              +{newThisYear.size} new in {selectedYear}:{' '}
+              <span className="text-text-secondary">
+                {[...newThisYear].map(iso => COUNTRY_NAMES[iso]).filter(Boolean).join(' · ')}
+              </span>
+            </p>
+          )}
         </motion.div>
 
         {/* World Map */}
@@ -67,7 +176,7 @@ export default function Travel() {
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="rounded-2xl overflow-hidden border border-border mb-4"
+          className="rounded-2xl overflow-hidden border border-border mb-3"
           style={{ background: '#0d1526' }}
         >
           <ComposableMap
@@ -79,39 +188,54 @@ export default function Travel() {
               {({ geographies }) =>
                 geographies.map((geo) => {
                   const id = String(geo.id)
-                  const visited = VISITED.has(id)
+                  const visited = visitedCodes.has(id)
+                  const isNew = newThisYear.has(id)
+                  const fill = isNew ? '#fde68a' : visited ? '#f59e0b' : '#1f2937'
                   return (
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill={visited ? '#f59e0b' : '#1f2937'}
+                      fill={fill}
                       stroke="#0a0f1a"
                       strokeWidth={0.4}
                       style={{
                         default: { outline: 'none' },
-                        hover: { outline: 'none', fill: visited ? '#fbbf24' : '#374151' },
+                        hover: {
+                          outline: 'none',
+                          fill: visited ? '#fde68a' : '#374151',
+                          cursor: visited ? 'pointer' : 'default',
+                        },
                         pressed: { outline: 'none' },
                       }}
                       onMouseEnter={() => {
-                        const name = geo.properties?.name as string | undefined
-                        if (name) setTooltip(name)
+                        if (!visited) return
+                        const name =
+                          COUNTRY_NAMES[id] ||
+                          (geo.properties?.name as string | undefined) ||
+                          id
+                        setTooltip({ name, year: COUNTRY_FIRST_YEAR[id] ?? null })
                       }}
-                      onMouseLeave={() => setTooltip('')}
+                      onMouseLeave={() => setTooltip(null)}
                     />
                   )
                 })
               }
             </Geographies>
           </ComposableMap>
-          {tooltip && (
-            <div className="text-center py-2 text-xs text-text-secondary border-t border-border">
-              {tooltip}
-            </div>
-          )}
+          <div className="border-t border-border py-2 px-4 min-h-[32px] flex items-center justify-center">
+            {tooltip ? (
+              <span className="text-xs text-text-secondary">
+                <span className="text-text-primary">{tooltip.name}</span>
+                {tooltip.year ? ` · first visited ${tooltip.year}` : ' · visited (pre-records)'}
+              </span>
+            ) : (
+              <span className="text-xs text-text-secondary">Hover a country for details</span>
+            )}
+          </div>
         </motion.div>
 
         <p className="text-xs text-text-secondary mb-12 text-center">
-          Amber = visited · Hover for country name
+          Data from passport records · Lighter = first visited at selected year
         </p>
 
         {/* Featured Adventure */}
