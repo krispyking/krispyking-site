@@ -5,7 +5,7 @@ export default function Footer() {
       <p className="text-sm text-text-secondary mb-4">
         Hong Kong · Built with curiosity, caffeine, and approximately 52 AI agents.
       </p>
-      <p className="text-xs text-text-secondary mb-4">© 2025 Chris Ransford</p>
+      <p className="text-xs text-text-secondary mb-4">© 2026 Chris Ransford</p>
       <a
         href="https://www.chrisransford.com"
         target="_blank"

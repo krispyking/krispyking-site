@@ -3,13 +3,6 @@ import { useRef } from 'react'
 
 const PROJECTS = [
   {
-    icon: '🤖',
-    title: 'OpenClaw',
-    desc: 'A fleet of 52 AI agents running autonomously across my projects. Research, operations, sales, legal, marketing — each agent has a soul file, a memory, and a job to do. This is my main creative obsession right now.',
-    url: null,
-    badge: 'AI / Infrastructure',
-  },
-  {
     icon: '☕',
     title: 'Sijahtra',
     desc: 'Luxury wild Kopi Luwak sourced from the Gayo Highlands, Sumatra. Positioned at the very top end of the market. Full e-commerce with gift options.',
@@ -55,7 +48,7 @@ const PROJECTS = [
     icon: '🔒',
     title: 'MyPrivacyTool',
     desc: "Privacy awareness platform. Know what data you're giving away and who has it.",
-    url: null,
+    url: 'https://www.myprivacytool.io',
     badge: 'Privacy / Consumer',
   },
 ]
