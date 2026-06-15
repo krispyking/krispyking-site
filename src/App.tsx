@@ -2,8 +2,8 @@ import Hero from './components/Hero'
 import About from './components/About'
 import Hobbies from './components/Hobbies'
 import Travel from './components/Travel'
-import Projects from './components/Projects'
 import AIJourney from './components/AIJourney'
+import Projects from './components/Projects'
 import Connect from './components/Connect'
 import Footer from './components/Footer'
 
@@ -14,8 +14,8 @@ export default function App() {
       <About />
       <Hobbies />
       <Travel />
-      <Projects />
       <AIJourney />
+      <Projects />
       <Connect />
       <Footer />
     </main>
