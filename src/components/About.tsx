@@ -4,7 +4,7 @@ import { useRef } from 'react'
 
 const STATS = [
   { value: '52', label: 'AI Agents in my fleet' },
-  { value: '30+', label: 'Countries visited' },
+  { value: '40', label: 'Countries visited' },
   { value: '20+', label: 'Years in APAC tech' },
   { value: '1', label: 'Football match in North Korea' },
 ]

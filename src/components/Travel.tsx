@@ -65,6 +65,22 @@ const COUNTRY_NAMES: Record<string, string> = {
   '410': 'South Korea', '408': 'North Korea', '76': 'Brazil',
 }
 
+const COUNTRY_CONTINENT: Record<string, string> = {
+  '72': 'Africa', '508': 'Africa', '710': 'Africa', '894': 'Africa',
+  '504': 'Africa', '716': 'Africa', '404': 'Africa', '454': 'Africa',
+  '834': 'Africa', '646': 'Africa', '800': 'Africa',
+  '356': 'Asia',   '764': 'Asia',   '360': 'Asia',   '418': 'Asia',
+  '458': 'Asia',   '702': 'Asia',   '344': 'Asia',   '156': 'Asia',
+  '392': 'Asia',   '446': 'Asia',   '608': 'Asia',   '158': 'Asia',
+  '116': 'Asia',   '704': 'Asia',   '410': 'Asia',   '408': 'Asia',
+  '250': 'Europe', '380': 'Europe', '528': 'Europe', '826': 'Europe',
+  '68':  'Americas', '152': 'Americas', '604': 'Americas', '780': 'Americas',
+  '840': 'Americas', '192': 'Americas', '76': 'Americas',
+  '36':  'Pacific', '258': 'Pacific',
+}
+
+const CONTINENTS = ['Africa', 'Asia', 'Europe', 'Americas', 'Pacific']
+
 // Number of recorded visits per country (from passport records + Excel)
 const COUNTRY_VISIT_COUNT: Record<string, number> = {
   '250': 2,  '380': 1,  '528': 1,
@@ -123,6 +139,15 @@ export default function Travel() {
     }
     return codes
   }, [selectedYear])
+
+  const continentCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const iso of visitedCodes) {
+      const c = COUNTRY_CONTINENT[iso]
+      if (c) counts[c] = (counts[c] || 0) + 1
+    }
+    return counts
+  }, [visitedCodes])
 
   const trackPct = ((selectedYear - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100
   const milestone = MILESTONES[selectedYear]
@@ -273,8 +298,15 @@ export default function Travel() {
           </div>
         </motion.div>
 
+        <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center mb-3">
+          {CONTINENTS.map(c => continentCounts[c] ? (
+            <span key={c} className="text-xs text-text-secondary">
+              <span className="text-accent font-semibold">{continentCounts[c]}</span> {c}
+            </span>
+          ) : null)}
+        </div>
         <p className="text-xs text-text-secondary mb-12 text-center">
-          Data from passport records · Lighter = first visited at selected year
+          Data from passport records · Colour intensity = visit frequency
         </p>
 
         {/* Featured Adventure */}

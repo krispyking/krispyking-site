@@ -22,11 +22,6 @@ const SOCIALS = [
     icon: '⌨️',
     url: 'https://github.com/krispyking',
   },
-  {
-    label: 'Email',
-    icon: '✉️',
-    url: 'mailto:cransford@gmail.com',
-  },
 ]
 
 export default function Connect() {
@@ -63,6 +58,10 @@ export default function Connect() {
               But I am genuinely interested in curious people doing interesting things.
             </p>
             <p>If you've read this far, you're probably one of them.</p>
+            <p>
+              Best way to reach me is a LinkedIn DM or a reply on X — I read everything
+              and respond to people who are actually interesting.
+            </p>
           </motion.div>
 
           <motion.div
@@ -75,8 +74,8 @@ export default function Connect() {
               <motion.a
                 key={s.label}
                 href={s.url}
-                target={s.url.startsWith('mailto') ? undefined : '_blank'}
-                rel={s.url.startsWith('mailto') ? undefined : 'noopener noreferrer'}
+                target="_blank"
+                rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 12 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.4, delay: 0.2 + i * 0.07 }}

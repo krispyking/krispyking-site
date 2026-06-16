@@ -1,13 +1,29 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 
-const PROJECTS = [
+type Status = 'Live' | 'Beta' | 'Concept'
+
+const STATUS_STYLES: Record<Status, string> = {
+  Live:    'text-emerald-400 border-emerald-400/30 bg-emerald-400/5',
+  Beta:    'text-amber-400 border-amber-400/30 bg-amber-400/5',
+  Concept: 'text-gray-400 border-gray-400/30 bg-gray-400/5',
+}
+
+const PROJECTS: {
+  icon: string
+  title: string
+  desc: string
+  url?: string
+  badge: string
+  status: Status
+}[] = [
   {
     icon: '☕',
     title: 'Sijahtra',
     desc: 'Luxury wild Kopi Luwak sourced from the Gayo Highlands, Sumatra. Positioned at the very top end of the market. Full e-commerce with gift options.',
     url: 'https://www.sijahtra.com',
     badge: 'E-Commerce / Luxury',
+    status: 'Live',
   },
   {
     icon: '🏠',
@@ -15,6 +31,7 @@ const PROJECTS = [
     desc: '3D real estate platform. Property search reimagined with immersive spatial experiences.',
     url: 'https://fractalhomes.app',
     badge: 'PropTech / 3D',
+    status: 'Beta',
   },
   {
     icon: '🎮',
@@ -22,6 +39,7 @@ const PROJECTS = [
     desc: 'Location-based augmented reality gaming. Decode your city. Connect 4 in the real world.',
     url: 'https://theargame.krispyking.com',
     badge: 'AR / Gaming',
+    status: 'Beta',
   },
   {
     icon: '🐬',
@@ -29,6 +47,7 @@ const PROJECTS = [
     desc: "Using Google's DolphinGemma AI to decode dolphin vocalisations. Because why not try to talk to dolphins.",
     url: 'https://dolphinsintuition.krispyking.com',
     badge: 'AI / Research',
+    status: 'Beta',
   },
   {
     icon: '🔍',
@@ -36,13 +55,14 @@ const PROJECTS = [
     desc: 'AI-powered CRM platform. Full fleet of specialist agents running ops, support, legal, marketing, and analytics.',
     url: 'https://www.locateamate.com',
     badge: 'AI / CRM',
+    status: 'Live',
   },
   {
     icon: '🥽',
     title: 'HoloDive',
-    desc: 'AI underwater goggle concept. Real-time species identification, dive logging, and underwater navigation. Waitlist open.',
-    url: 'https://www.chrisransford.com',
+    desc: 'AI underwater goggle concept. Real-time species identification, dive logging, and underwater navigation. Waitlist coming soon.',
     badge: 'AI / Hardware / Concept',
+    status: 'Concept',
   },
   {
     icon: '🔒',
@@ -50,6 +70,7 @@ const PROJECTS = [
     desc: "Privacy awareness platform. Know what data you're giving away and who has it.",
     url: 'https://www.myprivacytool.io',
     badge: 'Privacy / Consumer',
+    status: 'Beta',
   },
 ]
 
@@ -85,7 +106,12 @@ export default function Projects() {
               className="rounded-2xl p-6 border-t-2 border-t-accent border border-border hover:border-accent transition-colors group flex flex-col"
               style={{ background: '#1a2235' }}
             >
-              <span className="text-3xl mb-3 block">{p.icon}</span>
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-3xl">{p.icon}</span>
+                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${STATUS_STYLES[p.status]}`}>
+                  {p.status}
+                </span>
+              </div>
               <h3 className="font-serif text-lg font-semibold text-text-primary mb-2 group-hover:text-accent transition-colors">
                 {p.title}
               </h3>
