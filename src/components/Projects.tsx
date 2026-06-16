@@ -72,6 +72,20 @@ const PROJECTS: {
     badge: 'Privacy / Consumer',
     status: 'Beta',
   },
+  {
+    icon: '🏢',
+    title: '12E Block 5',
+    desc: 'AI-managed residential property at Park Island, Hong Kong. A dedicated agent handles tenant management, lease reviews, maintenance scheduling, and admin — fully autonomous, human-in-the-loop for key decisions.',
+    badge: 'PropTech / AI Agent',
+    status: 'Live',
+  },
+  {
+    icon: '🧊',
+    title: '14 The Cube',
+    desc: 'Hong Kong property asset with a dedicated AI brand custodian. The agent maintains brand guidelines, manages all external-facing content, and keeps documentation current — no brief required.',
+    badge: 'PropTech / AI Agent',
+    status: 'Live',
+  },
 ]
 
 export default function Projects() {
