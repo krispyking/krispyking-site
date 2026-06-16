@@ -42,7 +42,7 @@ const COUNTRY_FIRST_YEAR: Record<string, number | null> = {
   '158': 2008,  // Taiwan
   '116': 2009,  // Cambodia
   '704': 2009,  // Vietnam
-  '716': 2010,  // Zimbabwe
+  '716': 1995,  // Zimbabwe
   '410': 2011,  // South Korea
   '408': 2013,  // North Korea
   '76':  2014,  // Brazil
@@ -67,13 +67,12 @@ const COUNTRY_NAMES: Record<string, string> = {
 
 const MILESTONES: Record<number, string> = {
   1993: 'Southern Africa',
-  1995: 'Morocco',
+  1995: 'Morocco · Zimbabwe',
   1999: 'India · East Africa',
   2000: '+12 countries — SE Asia & Americas',
   2004: 'Cuba · East Africa',
   2008: 'East Asia · China',
   2009: 'Indochina',
-  2010: 'Zimbabwe',
   2011: 'South Korea',
   2013: '🇰🇵 Pyongyang',
   2014: 'Brazil',
