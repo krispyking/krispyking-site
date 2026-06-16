@@ -9,9 +9,14 @@ const COUNTRY_FIRST_YEAR: Record<string, number | null> = {
   '250': null,  // France
   '380': null,  // Italy
   '528': null,  // Netherlands
+  '72':  1993,  // Botswana
+  '508': 1993,  // Mozambique
+  '710': 1993,  // South Africa
+  '894': 1993,  // Zambia
+  '504': 1995,  // Morocco
   '356': 1999,  // India
   '404': 1999,  // Kenya
-  '710': 1999,  // South Africa
+  '454': 1999,  // Malawi
   '764': 1999,  // Thailand
   '834': 1999,  // Tanzania
   '36':  2000,  // Australia
@@ -29,49 +34,52 @@ const COUNTRY_FIRST_YEAR: Record<string, number | null> = {
   '192': 2004,  // Cuba
   '646': 2004,  // Rwanda
   '800': 2004,  // Uganda
-  '158': 2008,  // Taiwan
   '344': 2008,  // Hong Kong
+  '156': 2008,  // China
   '392': 2008,  // Japan
   '446': 2008,  // Macau
   '608': 2008,  // Philippines
+  '158': 2008,  // Taiwan
   '116': 2009,  // Cambodia
   '704': 2009,  // Vietnam
   '716': 2010,  // Zimbabwe
   '410': 2011,  // South Korea
-  '156': 2012,  // China
   '408': 2013,  // North Korea
   '76':  2014,  // Brazil
 }
 
 const COUNTRY_NAMES: Record<string, string> = {
   '250': 'France', '380': 'Italy', '528': 'Netherlands',
-  '356': 'India', '404': 'Kenya', '710': 'South Africa',
+  '72': 'Botswana', '508': 'Mozambique', '710': 'South Africa',
+  '894': 'Zambia', '504': 'Morocco',
+  '356': 'India', '404': 'Kenya', '454': 'Malawi',
   '764': 'Thailand', '834': 'Tanzania',
   '36': 'Australia', '68': 'Bolivia', '152': 'Chile',
   '258': 'French Polynesia', '360': 'Indonesia', '418': 'Laos',
   '458': 'Malaysia', '604': 'Peru', '702': 'Singapore',
   '780': 'Trinidad & Tobago', '826': 'United Kingdom', '840': 'United States',
   '192': 'Cuba', '646': 'Rwanda', '800': 'Uganda',
-  '158': 'Taiwan', '344': 'Hong Kong', '392': 'Japan',
-  '446': 'Macau', '608': 'Philippines',
+  '344': 'Hong Kong', '156': 'China', '392': 'Japan',
+  '446': 'Macau', '608': 'Philippines', '158': 'Taiwan',
   '116': 'Cambodia', '704': 'Vietnam', '716': 'Zimbabwe',
-  '410': 'South Korea', '156': 'China', '408': 'North Korea', '76': 'Brazil',
+  '410': 'South Korea', '408': 'North Korea', '76': 'Brazil',
 }
 
 const MILESTONES: Record<number, string> = {
-  1999: 'Africa & India',
+  1993: 'Southern Africa',
+  1995: 'Morocco',
+  1999: 'India · East Africa',
   2000: '+12 countries — SE Asia & Americas',
-  2004: 'East Africa · Cuba',
-  2008: 'East Asia',
+  2004: 'Cuba · East Africa',
+  2008: 'East Asia · China',
   2009: 'Indochina',
   2010: 'Zimbabwe',
   2011: 'South Korea',
-  2012: 'China',
   2013: '🇰🇵 Pyongyang',
   2014: 'Brazil',
 }
 
-const MIN_YEAR = 1999
+const MIN_YEAR = 1993
 const MAX_YEAR = 2026
 
 export default function Travel() {
@@ -110,7 +118,7 @@ export default function Travel() {
           className="mb-10"
         >
           <h2 className="font-serif text-4xl sm:text-5xl font-bold text-text-primary mb-3">
-            35 Countries. Zero Regrets.
+            40 Countries. Zero Regrets.
           </h2>
           <p className="text-text-secondary text-lg">
             Drag the timeline to watch the map fill up.
