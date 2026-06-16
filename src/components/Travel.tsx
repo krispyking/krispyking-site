@@ -65,6 +65,27 @@ const COUNTRY_NAMES: Record<string, string> = {
   '410': 'South Korea', '408': 'North Korea', '76': 'Brazil',
 }
 
+// Number of recorded visits per country (from passport records + Excel)
+const COUNTRY_VISIT_COUNT: Record<string, number> = {
+  '250': 2,  '380': 1,  '528': 1,
+  '72':  1,  '508': 1,  '710': 5,  '894': 1,  '504': 1,
+  '716': 3,  '356': 2,  '404': 1,  '454': 1,
+  '764': 13, '834': 1,
+  '36':  1,  '68':  1,  '152': 2,  '258': 1,  '360': 9,
+  '418': 3,  '458': 12, '604': 1,  '702': 3,  '780': 1,
+  '826': 1,  '840': 9,
+  '192': 1,  '646': 1,  '800': 1,
+  '344': 2,  '156': 4,  '392': 3,  '446': 15, '608': 9,
+  '158': 2,  '116': 1,  '704': 2,  '410': 3,  '408': 1,  '76': 1,
+}
+
+function visitColor(count: number): string {
+  if (count >= 10) return '#78350f'  // 10+ visits — very dark amber
+  if (count >= 4)  return '#b45309'  // 4–9 visits — dark amber
+  if (count >= 2)  return '#d97706'  // 2–3 visits — medium amber
+  return '#f59e0b'                    // 1 visit — standard amber
+}
+
 const MILESTONES: Record<number, string> = {
   1993: 'Southern Africa',
   1995: 'Morocco · Zimbabwe',
@@ -85,7 +106,7 @@ export default function Travel() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const [selectedYear, setSelectedYear] = useState(MAX_YEAR)
-  const [tooltip, setTooltip] = useState<{ name: string; year: number | null } | null>(null)
+  const [tooltip, setTooltip] = useState<{ name: string; year: number | null; visits: number } | null>(null)
 
   const visitedCodes = useMemo(() => {
     const codes = new Set<string>()
@@ -197,7 +218,8 @@ export default function Travel() {
                   const id = String(geo.id)
                   const visited = visitedCodes.has(id)
                   const isNew = newThisYear.has(id)
-                  const fill = isNew ? '#fde68a' : visited ? '#f59e0b' : '#1f2937'
+                  const visits = COUNTRY_VISIT_COUNT[id] ?? 1
+                  const fill = isNew ? '#fde68a' : visited ? visitColor(visits) : '#1f2937'
                   return (
                     <Geography
                       key={geo.rsmKey}
@@ -220,7 +242,7 @@ export default function Travel() {
                           COUNTRY_NAMES[id] ||
                           (geo.properties?.name as string | undefined) ||
                           id
-                        setTooltip({ name, year: COUNTRY_FIRST_YEAR[id] ?? null })
+                        setTooltip({ name, year: COUNTRY_FIRST_YEAR[id] ?? null, visits })
                       }}
                       onMouseLeave={() => setTooltip(null)}
                     />
@@ -229,15 +251,25 @@ export default function Travel() {
               }
             </Geographies>
           </ComposableMap>
-          <div className="border-t border-border py-2 px-4 min-h-[32px] flex items-center justify-center">
-            {tooltip ? (
-              <span className="text-xs text-text-secondary">
-                <span className="text-text-primary">{tooltip.name}</span>
-                {tooltip.year ? ` · first visited ${tooltip.year}` : ' · visited (pre-records)'}
-              </span>
-            ) : (
-              <span className="text-xs text-text-secondary">Hover a country for details</span>
-            )}
+          <div className="border-t border-border py-2 px-4 min-h-[32px] flex items-center justify-between">
+            <span className="text-xs text-text-secondary">
+              {tooltip ? (
+                <>
+                  <span className="text-text-primary">{tooltip.name}</span>
+                  {tooltip.year ? ` · first visited ${tooltip.year}` : ' · visited (pre-records)'}
+                  {tooltip.visits > 1 ? ` · ${tooltip.visits} visits recorded` : ''}
+                </>
+              ) : (
+                'Hover a country for details'
+              )}
+            </span>
+            <span className="text-xs text-text-secondary flex items-center gap-3 select-none">
+              <span>Visits:</span>
+              <span><span style={{ color: '#f59e0b' }}>■</span> 1</span>
+              <span><span style={{ color: '#d97706' }}>■</span> 2–3</span>
+              <span><span style={{ color: '#b45309' }}>■</span> 4–9</span>
+              <span><span style={{ color: '#78350f' }}>■</span> 10+</span>
+            </span>
           </div>
         </motion.div>
 
