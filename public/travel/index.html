@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KrispyKing ✈ Cathay Travel Planner</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',sans-serif;background:#0a0f1e;color:#e8eaf6;min-height:100vh}
+  header{background:linear-gradient(135deg,#00264d,#004080);padding:24px 32px;display:flex;align-items:center;gap:16px;border-bottom:2px solid #00b4d8}
+  header svg{flex-shrink:0}
+  header h1{font-size:1.6rem;font-weight:700;color:#fff}
+  header span{font-size:0.9rem;color:#90caf9;margin-left:auto}
+  .container{max-width:1300px;margin:0 auto;padding:24px 16px}
+
+  /* DATE SLIDER */
+  .date-slider-wrap{background:#0d1b2a;border:1px solid #1a3a5c;border-radius:12px;padding:16px 20px;margin-bottom:24px}
+  .date-slider-label{font-size:0.85rem;color:#546e7a;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .date-slider{display:flex;gap:8px;overflow-x:auto;scroll-behavior:smooth;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+  .date-slider::-webkit-scrollbar{height:4px}
+  .date-slider::-webkit-scrollbar-thumb{background:#1a3a5c;border-radius:4px}
+  .date-chip{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:10px 16px;border-radius:10px;border:2px solid #1a3a5c;background:#162032;cursor:pointer;transition:all 0.2s;min-width:80px;user-select:none}
+  .date-chip:hover{border-color:#2a5080;background:#1a2a44}
+  .date-chip.active{border-color:#00b4d8;background:linear-gradient(135deg,#00264d,#004080);box-shadow:0 0 12px rgba(0,180,216,0.3)}
+  .date-chip .day-name{font-size:0.75rem;font-weight:700;color:#90caf9;text-transform:uppercase;letter-spacing:0.5px}
+  .date-chip.active .day-name{color:#fff}
+  .date-chip .day-num{font-size:1.4rem;font-weight:700;color:#fff;line-height:1.2}
+  .date-chip .month{font-size:0.7rem;color:#546e7a;text-transform:uppercase}
+  .date-chip.active .month{color:#90caf9}
+  .date-chip.today .day-name{color:#00b4d8}
+  .date-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .date-nav button{background:#162032;border:1px solid #1a3a5c;color:#90caf9;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:0.85rem;transition:all 0.2s}
+  .date-nav button:hover{background:#1a2a44;border-color:#00b4d8}
+  .selected-date-display{font-size:1rem;font-weight:700;color:#fff;flex:1;text-align:center}
+
+  /* STATS BAR */
+  .stats-bar{background:linear-gradient(135deg,#00264d,#003366);border:1px solid #00b4d8;border-radius:12px;padding:18px 28px;margin-bottom:24px;display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap}
+  .stat{text-align:center}
+  .stat .stat-num{font-size:2.2rem;font-weight:800;color:#00b4d8;line-height:1}
+  .stat .stat-label{font-size:0.78rem;color:#90caf9;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+
+  /* MAP */
+  .section-title{font-size:1.1rem;font-weight:700;color:#90caf9;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  #map{width:100%;height:420px;border-radius:14px;border:1px solid #1a3a5c;margin-bottom:24px;z-index:1}
+  .map-tip{background:#162032!important;border:1px solid #00b4d8!important;color:#fff!important;font-size:0.82rem!important;font-weight:600!important;border-radius:6px!important;box-shadow:none!important}
+  .map-tip::before{border-top-color:#00b4d8!important}
+  .wx-map-icon{background:none!important;border:none!important}
+
+  /* CARDS — single column, wide */
+  .grid{display:flex;flex-direction:column;gap:12px}
+  .card{background:#0d1b2a;border:1px solid #1a3a5c;border-radius:14px;overflow:hidden;transition:transform 0.2s,border-color 0.2s;cursor:pointer}
+  .card:hover,.card.active{transform:translateX(4px);border-color:#00b4d8}
+  .card.pick-highlight{border-color:#00e676;box-shadow:0 0 12px rgba(0,230,118,0.3)}
+  .card-inner{display:flex;align-items:stretch}
+  .card-left{background:linear-gradient(135deg,#00264d,#003366);padding:16px 20px;min-width:180px;display:flex;flex-direction:column;justify-content:flex-start;padding-top:20px;gap:4px;border-right:2px solid #1a3a5c}
+  .card-left .dest{font-size:1.15rem;font-weight:700;color:#fff}
+  .card-left .iata{background:#00b4d8;color:#fff;border-radius:6px;padding:2px 8px;font-size:0.78rem;font-weight:700;align-self:flex-start}
+  .card-left .country{font-size:0.75rem;color:#546e7a;margin-top:2px}
+  .card-mid{flex:1;padding:12px 20px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .card-right{min-width:280px;padding:10px 16px;border-left:1px solid #1a3a5c;display:flex;flex-direction:column;justify-content:center}
+  .flight-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;font-size:0.9rem}
+  .flight-row .fn{color:#90caf9;font-weight:600;min-width:64px;display:flex;align-items:center;gap:5px}
+  .carrier-logo{height:16px;width:auto;vertical-align:middle;border-radius:2px}
+  .carrier-tag{font-size:0.58rem;padding:1px 5px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px}
+  .carrier-cx{background:#006564;color:#fff}
+  .carrier-uo{background:#dc2f6e;color:#fff}
+  .carrier-ow{background:#7b5ea7;color:#fff}
+  .carrier-other{background:#37474f;color:#b0bec5}
+  .live-badge{font-size:0.62rem;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:auto;white-space:nowrap}
+  .live-ontime{background:#1b5e20;color:#69f0ae}
+  .live-active{background:#01579b;color:#4fc3f7}
+  .live-landed{background:#1b5e20;color:#a5d6a7}
+  .live-minor{background:#e65100;color:#ffcc80}
+  .live-delayed{background:#b71c1c;color:#ef9a9a}
+  .live-cancelled{background:#b71c1c;color:#fff}
+  .live-indicator{font-size:0.78rem;color:#4fc3f7;display:flex;align-items:center;gap:6px}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:#4fc3f7;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .flight-row .times{color:#e8eaf6;font-weight:500}
+  .flight-row .freq{color:#b0bec5;font-size:0.78rem}
+  @media(max-width:900px){
+    .card-inner{flex-direction:column}
+    .card-left{min-width:auto;border-right:none;border-bottom:2px solid #1a3a5c}
+    .card-right{min-width:auto;border-left:none;border-top:1px solid #1a3a5c}
+  }
+  .weather-section{margin-top:10px;padding-top:10px;border-top:1px solid #1a3a5c}
+  .wx-loading{color:#546e7a;font-size:0.82rem}
+  .wx-forecast{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
+  .wx-forecast::-webkit-scrollbar{height:3px}
+  .wx-forecast::-webkit-scrollbar-thumb{background:#1a3a5c;border-radius:3px}
+  .wx-day{flex-shrink:0;text-align:center;padding:4px 6px;border-radius:6px;background:#162032;min-width:52px}
+  .wx-day .wx-d{font-size:0.62rem;color:#546e7a;text-transform:uppercase}
+  .wx-day .wx-emoji{font-size:1.6rem;display:block;text-align:center;line-height:1;filter:brightness(1.2)}
+  .wx-day .wx-t{font-size:0.72rem;font-weight:700;color:#fff}
+  .wx-rank-section{margin-top:10px;padding-top:10px;border-top:1px solid #1a3a5c}
+  .wx-rank-title{font-size:0.68rem;color:#ffab00;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;font-weight:700}
+  .wx-rank-list{display:flex;gap:6px;flex-wrap:wrap}
+  .wx-rank-item{display:flex;align-items:center;gap:4px;background:#1a2a3a;border-radius:8px;padding:3px 8px;font-size:0.74rem}
+  .wx-rank-num{background:linear-gradient(135deg,#ffab00,#ff6d00);color:#000;font-weight:800;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.62rem}
+  .wx-rank-name{color:#fff;font-weight:600}
+  .wx-rank-temp{color:#80cbc4}
+  .wx-rank-item:first-child{background:linear-gradient(135deg,#1a3a2a,#1a4a3a);border:1px solid #00e676}
+  .wx-rank-item:first-child .wx-rank-num{background:linear-gradient(135deg,#ffd600,#ff9100)}
+
+  /* TRAVEL CONTENT */
+  .travel-section{padding:14px 20px;border-top:1px solid #1a3a5c;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .travel-col h4{font-size:0.78rem;font-weight:700;color:#00b4d8;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 8px}
+  .travel-col .t-item{font-size:0.8rem;color:#cfd8dc;margin-bottom:5px;line-height:1.35}
+  .travel-col .itinerary-text{font-size:0.78rem;color:#b0bec5;line-height:1.4}
+  @media(max-width:900px){.travel-section{grid-template-columns:1fr}}
+  .wx-day .wx-lo{font-size:0.62rem;color:#546e7a}
+  .wx-day-active{border:2px solid #00b4d8;background:#0d2844!important;box-shadow:0 0 8px rgba(0,180,216,0.3)}
+  .wx-selected-day{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;background:linear-gradient(90deg,#0d2844,#162032);border-radius:8px;border:1px solid #1a3a5c}
+  .wx-selected-day img{width:44px;height:44px}
+  .wx-sel-info{flex:1}
+  .wx-sel-temp{font-size:1.1rem;font-weight:700;color:#fff}
+  .wx-sel-desc{font-size:0.78rem;color:#90caf9}
+  .wx-summary{margin-top:8px;font-size:0.75rem;line-height:1.5;color:#b0bec5}
+  .wx-summary strong{color:#90caf9;font-weight:600}
+  .wx-period{display:flex;align-items:center;gap:6px;padding:3px 0}
+  .wx-period-label{min-width:70px;font-weight:600;color:#90caf9;font-size:0.72rem}
+  .wx-period-detail{color:#b0bec5;font-size:0.72rem}
+  .wx-period-icon{width:20px;height:20px}
+  .dur-bar-wrap{flex:1;max-width:180px;display:flex;align-items:center;gap:6px}
+  .dur-bar{height:4px;border-radius:2px;min-width:8px;transition:width 0.4s}
+  .dur-label{font-size:0.72rem;color:#b0bec5;white-space:nowrap}
+  .flight-block{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1a3a5c}
+  .flight-block:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .leave-home-row{display:flex;align-items:center;gap:10px;font-size:0.78rem;color:#90caf9;padding:5px 10px;background:#162032;border-radius:6px;margin-top:4px;flex-wrap:wrap}
+  .leave-home-row.tight{background:#3e1a1a;color:#ff8a80}
+  .lh-step{display:flex;align-items:center;gap:3px;white-space:nowrap}
+  .lh-step .lh-t{font-weight:700;color:#fff}
+  .lh-step .lh-l{color:#546e7a;font-size:0.68rem}
+  .leave-home-row .lh-home .lh-t{color:#00e676}
+  .leave-home-row.tight .lh-home .lh-t{color:#ff5252}
+  .lh-sep{color:#1a3a5c;font-size:0.7rem}
+  .lh-flight-dur{display:inline-flex;align-items:center;gap:4px}
+  .lh-dur-bar{height:4px;border-radius:2px;min-width:6px;display:inline-block;vertical-align:middle}
+  .lh-dur-label{font-size:0.72rem;color:#b0bec5;font-weight:600}
+  .lh-bus{color:#90caf9}
+  .lh-counter{color:#546e7a;font-size:0.7rem;margin-left:auto}
+  .no-flight-msg{padding:4px 0;color:#546e7a;font-style:italic;font-size:0.88rem}
+  .badge{display:inline-block;background:#1a3a5c;color:#90caf9;border-radius:4px;padding:1px 6px;font-size:0.72rem;font-weight:600;margin-left:4px}
+  .flight-count{font-size:0.78rem;color:#00b4d8;font-weight:600;margin-top:2px}
+
+  /* RETURN PANEL */
+  .return-panel{background:#0d1b2a;border:1px solid #00b4d8;border-radius:14px;padding:20px 24px;margin-top:24px;display:none}
+  .return-panel h3{font-size:1rem;font-weight:700;color:#00b4d8;margin-bottom:12px}
+  .return-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1a3a5c;font-size:0.88rem}
+  .return-row:last-child{border-bottom:none}
+  .return-row .fn{color:#90caf9;font-weight:600;min-width:64px}
+  .return-row .times{color:#e8eaf6}
+  .return-row .freq{color:#b0bec5;font-size:0.78rem}
+
+  footer{text-align:center;padding:20px;color:#455a64;font-size:0.78rem;border-top:1px solid #1a3a5c;margin-top:32px}
+  @media(max-width:600px){
+    header{padding:14px 16px;flex-wrap:wrap;gap:8px}
+    header svg{width:30px;height:30px}
+    header h1{font-size:1rem;width:100%;order:-1}
+    header span{font-size:0.75rem;margin-left:0}
+    .live-indicator{font-size:0.68rem;margin-left:auto}
+    .container{padding:12px 8px}
+    .date-slider-wrap{padding:10px 12px}
+    .date-chip{padding:8px 8px;min-width:56px}
+    .date-chip .day-num{font-size:1.1rem}
+    .date-chip .day-name{font-size:0.65rem}
+    .stats-bar{padding:12px 16px;gap:20px}
+    .stat .stat-num{font-size:1.6rem}
+    .stat .stat-label{font-size:0.68rem}
+    #map{height:280px;border-radius:10px}
+    .card{border-radius:10px}
+    .card-left{padding:12px 14px;min-width:auto;border-right:none;border-bottom:2px solid #1a3a5c}
+    .card-mid{padding:10px 12px}
+    .card-right{min-width:auto;padding:8px 12px;border-left:none;border-top:1px solid #1a3a5c}
+    .flight-row{flex-wrap:wrap;gap:6px;font-size:0.82rem}
+    .flight-row .fn{min-width:auto}
+    .lh-flight-dur{order:3;width:100%}
+    .lh-dur-bar{max-width:120px}
+    .leave-home-row{font-size:0.68rem;gap:4px;padding:4px 8px}
+    .lh-step .lh-l{font-size:0.58rem}
+    .lh-sep{font-size:0.6rem}
+    .travel-section{padding:10px 12px;grid-template-columns:1fr;gap:10px}
+    .wx-forecast{gap:3px}
+    .wx-day{min-width:46px;padding:3px 4px}
+    .wx-day .wx-emoji{font-size:1.3rem}
+    .wx-day .wx-d{font-size:0.55rem}
+    .wx-day .wx-t{font-size:0.65rem}
+    .wx-selected-day{flex-wrap:wrap;gap:6px;padding:6px}
+    .wx-sel-temp{font-size:0.95rem}
+    .return-panel{padding:14px 16px;border-radius:10px}
+    .return-row{flex-wrap:wrap;gap:6px;font-size:0.8rem}
+    .return-row .fn{min-width:auto}
+    .live-badge{font-size:0.55rem;padding:1px 4px}
+    .wx-rank-list{gap:4px}
+    .wx-rank-item{padding:2px 6px;font-size:0.68rem}
+  }
+  /* AIRCRAFT / SEAT INFO */
+  .ac-info{display:flex;align-items:center;gap:8px;font-size:0.72rem;margin-top:3px;padding:3px 6px;flex-wrap:wrap}
+  .ac-type{color:#80deea;font-weight:600;display:flex;align-items:center;gap:4px}
+  .ac-type span{font-size:0.68rem}
+  .cabin-chips{display:flex;gap:4px;flex-wrap:wrap}
+  .cabin-chip{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:4px;font-weight:700;font-size:0.65rem;letter-spacing:0.3px}
+  .cc-f{background:#3d1a4a;color:#ce93d8}
+  .cc-j{background:#0d3d5a;color:#81d4fa}
+  .cc-w{background:#1a3a1a;color:#a5d6a7}
+  .cc-y{background:#1a2a3a;color:#90caf9}
+  .ac-book{margin-left:auto;font-size:0.65rem;color:#00b4d8;text-decoration:none;border:1px solid #1a4a6a;border-radius:4px;padding:1px 7px;white-space:nowrap;transition:all 0.2s}
+  .ac-book:hover{background:#00b4d8;color:#000;border-color:#00b4d8}
+  .ac-loading{color:#37474f;font-style:italic}
+
+  @media(max-width:380px){
+    header h1{font-size:0.9rem}
+    .card-left .dest{font-size:1rem}
+    .flight-row{font-size:0.75rem}
+    .leave-home-row{font-size:0.62rem;gap:3px}
+    .wx-day{min-width:40px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#004080"/><text x="20" y="27" text-anchor="middle" font-size="20" fill="#00b4d8">✈</text></svg>
+  <h1>KrispyKing ✈ Cathay Travel Planner</h1>
+  <span>HKG Departures</span>
+  <div class="live-indicator"><span class="live-dot"></span><span id="liveCount">Connecting to AirLabs…</span></div>
+</header>
+
+<div class="container">
+
+  <div class="date-slider-wrap">
+    <div class="date-slider-label">🗓 Select departure date from Hong Kong</div>
+    <div class="date-nav">
+      <button id="prevWeek">◀ Prev</button>
+      <div class="selected-date-display" id="selectedDateDisplay"></div>
+      <button id="nextWeek">Next ▶</button>
+    </div>
+    <div class="date-slider" id="dateSlider"></div>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat"><div class="stat-num" id="statFlights">0</div><div class="stat-label">Flights</div></div>
+    <div class="stat"><div class="stat-num" id="statDests">0</div><div class="stat-label">Destinations</div></div>
+    <div class="stat"><div class="stat-num" id="statNoFlight">0</div><div class="stat-label">No Service</div></div>
+  </div>
+
+  <div id="weatherPick" style="background:linear-gradient(135deg,#003322,#00443a);border:1px solid #00b4d8;border-radius:12px;padding:14px 20px;margin-bottom:16px;display:none;cursor:pointer" onclick="document.querySelector('.card.pick-highlight')?.scrollIntoView({behavior:'smooth',block:'center'})">
+    <div style="font-size:0.72rem;color:#90caf9;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">☀️ Best Weather Pick</div>
+    <div id="weatherPickBody" style="font-size:1.05rem;color:#fff;font-weight:700"></div>
+    <div id="weatherPickSub" style="font-size:0.82rem;color:#80cbc4;margin-top:4px"></div>
+  </div>
+
+  <div class="section-title">🗺 Destination Map</div>
+  <div id="map"></div>
+
+  <div class="section-title" id="flightsTitle">✈ Available Flights</div>
+  <div class="grid" id="flightGrid"></div>
+
+  <div class="return-panel" id="returnPanel">
+    <h3 id="returnTitle">Return Flights</h3>
+    <div id="returnList"></div>
+  </div>
+
+</div>
+
+<footer>KrispyKing Cathay Travel Planner · Data accurate as of May 2026 · Powered by Cathay Pacific timetables</footer>
+
+<script>
+const DESTINATIONS = [
+  {name:"Penang",iata:"PEN",country:"Malaysia",lat:5.4144,lng:100.3292,tz:8,
+    outbound:[{fn:"CX633",dep:"08:15",arr:"12:00",days:[7,1,2]},{fn:"CX621",dep:"15:30",arr:"19:10",days:[3,5,6]}],
+    inbound:[{fn:"CX622",dep:"07:30",arr:"11:30",days:[6,7]},{fn:"CX634",dep:"13:00",arr:"17:10",days:[7,1,2]}],
+    attractions:["🏛 Kek Lok Si Temple — largest Buddhist temple in SE Asia","🎨 Penang Street Art — George Town UNESCO murals","🌿 Penang Hill — funicular railway with panoramic views"],
+    itinerary:"D1: George Town street art walk + Khoo Kongsi clan house. D2: Kek Lok Si Temple + Penang Hill sunset. D3: Batu Ferringhi beach + spice garden + night market. D4: Chew Jetty + hawker food tour (Gurney Drive) + fly home.",
+    hotels:["Eastern & Oriental Hotel — heritage 5-star on the seafront","Shangri-La Rasa Sayang — beachfront resort Batu Ferringhi","Parkroyal Penang Resort — beachfront in Batu Ferringhi"]},
+  {name:"Phuket",iata:"HKT",country:"Thailand",lat:8.1132,lng:98.3017,tz:7,
+    outbound:[{fn:"CX771",dep:"08:05",arr:"10:50",days:[2,3,5,6]},{fn:"CX773",dep:"14:45",arr:"17:20",days:[7,1]}],
+    inbound:[{fn:"CX770",dep:"11:50",arr:"16:50",days:[2,3,5,6]}],
+    attractions:["🏖 Phi Phi Islands — speedboat day trip, crystal water","⛩ Big Buddha — 45m marble statue with island views","🌅 Promthep Cape — best sunset viewpoint in Phuket"],
+    itinerary:"D1: Patong Beach + Old Phuket Town walking tour. D2: Phi Phi Islands speedboat day trip. D3: Big Buddha + Chalong Temple + Promthep Cape sunset. D4: Kata beach morning + Thai cooking class + fly home.",
+    hotels:["Trisara — ultra-luxury private pool villas","The Nai Harn — clifftop 5-star overlooking beach","COMO Point Yamu — design-led resort on Cape Yamu"]},
+  {name:"Phnom Penh",iata:"KTI",country:"Cambodia",lat:11.5694,lng:104.9211,tz:7,
+    outbound:[{fn:"CX607",dep:"08:35",arr:"10:15",days:[1,2,3,5,6]}],
+    inbound:[{fn:"CX608",dep:"11:25",arr:"15:15",days:[1,2,3,5,6]},{fn:"CX600",dep:"18:30",arr:"22:15",days:[1,2,3,5,6,7]}],
+    attractions:["👑 Royal Palace & Silver Pagoda — Khmer royal complex","🏛 Tuol Sleng Genocide Museum — powerful historical site","🛕 Wat Phnom — hilltop temple, city's namesake"],
+    itinerary:"D1: Royal Palace + Silver Pagoda + riverside promenade. D2: Tuol Sleng Museum + Killing Fields + Russian Market. D3: Day trip to Silk Island + Mekong sunset cruise. D4: Wat Phnom + Central Market + fly home.",
+    hotels:["Raffles Hotel Le Royal — colonial-era grand hotel","Rosewood Phnom Penh — modern luxury tower on riverside","The Plantation — boutique urban resort with pool"]},
+  {name:"Bali",iata:"DPS",country:"Indonesia",lat:-8.6717,lng:115.2339,tz:8,
+    outbound:[{fn:"CX785",dep:"10:00",arr:"15:00",days:[2,3,5,6,7]}],
+    inbound:[{fn:"CX784",dep:"16:15",arr:"21:25",days:[2,3,5,6,7]},{fn:"CX782",dep:"18:50",arr:"00:05+1",days:[1,2,3,5]}],
+    attractions:["🛕 Uluwatu Temple — clifftop sea temple + Kecak dance","🌾 Tegallalang Rice Terraces — iconic stepped paddies","🐒 Ubud Monkey Forest — sacred forest sanctuary"],
+    itinerary:"D1: Seminyak beach + sunset at Tanah Lot temple. D2: Ubud — Monkey Forest + rice terraces + art market. D3: Uluwatu Temple + Kecak dance + Jimbaran seafood dinner. D4: Nusa Dua morning + spa + fly home.",
+    hotels:["COMO Shambhala Estate — Ubud wellness retreat in jungle","The Mulia — Nusa Dua beachfront 5-star","Alila Villas Uluwatu — clifftop infinity-pool villas"]},
+  {name:"Fukuoka",iata:"FUK",country:"Japan",lat:33.5904,lng:130.4017,tz:9,
+    outbound:[{fn:"CX512",dep:"08:15",arr:"11:40",days:[1,2,3,5,6,7]},{fn:"CX588",dep:"11:00",arr:"14:25",days:[1,2,3,5,6,7]}],
+    inbound:[{fn:"CX513",dep:"14:00",arr:"17:20",days:[1,2,3,5,6,7]},{fn:"CX589",dep:"16:40",arr:"20:05",days:[1,2,3,5,6,7]}],
+    attractions:["🍜 Yatai Stalls — riverside open-air ramen stands","⛩ Dazaifu Tenmangu — famous shrine + plum gardens","🏯 Fukuoka Castle Ruins — Ohori Park, cherry blossoms"],
+    itinerary:"D1: Canal City + Tenjin shopping + Yatai ramen stalls. D2: Dazaifu day trip — Tenmangu shrine + National Museum. D3: Ohori Park + Fukuoka Tower + Hakata Machiya folk museum. D4: Yanagawa boat cruise + Hakata station ramen street + fly home.",
+    hotels:["Hotel Okura Fukuoka — classic 5-star at Hakata","WITH THE STYLE — boutique design hotel Hakata","The Ritz-Carlton Fukuoka — newest luxury landmark"]},
+  {name:"Kathmandu",iata:"KTM",country:"Nepal",lat:27.7172,lng:85.3240,tz:5.75,
+    outbound:[{fn:"CX603",dep:"18:55",arr:"21:45",days:[1,2,3,5,6,7]}],
+    inbound:[{fn:"CX640",dep:"23:00",arr:"06:00+1",days:[1,2,3,5,6,7]}],
+    attractions:["🛕 Boudhanath Stupa — one of the largest stupas in the world","🏔 Nagarkot — sunrise over the Himalayas and Everest","🏛 Patan Durbar Square — ancient Newari architecture"],
+    itinerary:"D1: Kathmandu Durbar Square + Swayambhunath (Monkey Temple). D2: Boudhanath + Pashupatinath temple complex. D3: Nagarkot sunrise + Bhaktapur ancient city. D4: Patan Durbar Square + Thamel shopping + fly home.",
+    hotels:["Dwarika's Hotel — Newari heritage masterpiece","Hyatt Regency Kathmandu — resort near Boudhanath","Hotel Yak & Yeti — historic palace hotel in Durbar Marg"]},
+  {name:"Dhaka",iata:"DAC",country:"Bangladesh",lat:23.7644,lng:90.3889,tz:6,
+    outbound:[{fn:"CX667",dep:"22:55",arr:"01:00+1",days:[1,6]}],
+    inbound:[{fn:"CX662",dep:"02:10",arr:"08:10",days:[2,5,7]}],
+    attractions:["🕌 Lalbagh Fort — 17th-century Mughal fort complex","🛶 Sadarghat River Terminal — chaotic boat terminal on Buriganga","🏛 Ahsan Manzil (Pink Palace) — Nawab-era riverside palace"],
+    itinerary:"D1: Old Dhaka walk — Lalbagh Fort + Star Mosque + Shankhari Bazaar. D2: Sadarghat boat ride + Ahsan Manzil + Armenian Church. D3: Sonargaon day trip — ancient capital + folk art museum. D4: National Museum + New Market + fly home.",
+    hotels:["InterContinental Dhaka — top international 5-star","The Westin Dhaka — modern luxury in Gulshan","Pan Pacific Sonargaon — heritage hotel in Motijheel"]},
+  {name:"Xi'an",iata:"XIY",country:"China",lat:34.2611,lng:108.9422,tz:8,
+    outbound:[{fn:"CX946",dep:"11:10",arr:"14:30",days:[2,3,5,6,7]}],
+    inbound:[{fn:"CX947",dep:"15:50",arr:"19:05",days:[2,3,5,6,7]}],
+    attractions:["🏛 Terracotta Warriors — 8,000 life-size clay soldiers","🏯 Ancient City Wall — best-preserved wall in China, bikeable","🕌 Muslim Quarter — vibrant night food market"],
+    itinerary:"D1: Ancient City Wall bike ride + Muslim Quarter food tour. D2: Terracotta Warriors full day + Huaqing Palace hot springs. D3: Big Wild Goose Pagoda + Shaanxi History Museum + Tang Dynasty show. D4: Great Mosque + calligraphy street + fly home.",
+    hotels:["Sofitel Legend People's Grand — 1950s landmark hotel","The Westin Xi'an — modern 5-star near city wall","JW Marriott Xi'an — luxury in Qujiang New District"]},
+  {name:"Chengdu",iata:"TFU",country:"China",lat:30.5728,lng:104.0668,tz:8,
+    outbound:[{fn:"CX986",dep:"10:00",arr:"12:35",days:[1,2,3,5,6,7]}],
+    inbound:[{fn:"CX987",dep:"13:55",arr:"16:50",days:[1,2,3,5,6,7]}],
+    attractions:["🐼 Chengdu Panda Base — giant panda breeding centre","🌶 Jinli Ancient Street — Sichuan food + craft stalls","⛩ Leshan Giant Buddha — 71m carved cliff Buddha (day trip)"],
+    itinerary:"D1: Panda Base (early morning) + Wuhou Shrine + Jinli Street. D2: Leshan Giant Buddha day trip — boat + hiking. D3: Wide & Narrow Alleys + People's Park tea + Sichuan opera face-changing show. D4: Dujiangyan irrigation site + hotpot lunch + fly home.",
+    hotels:["The Temple House — chic courtyard boutique in Taikoo Li","Waldorf Astoria Chengdu — art-deco tower in city centre","The Ritz-Carlton Chengdu — central luxury with club lounge"]},
+  {name:"Nanjing",iata:"NKG",country:"China",lat:32.0608,lng:118.7789,tz:8,
+    outbound:[{fn:"CX356",dep:"10:25",arr:"13:00",days:[2,5,6,7]}],
+    inbound:[{fn:"CX357",dep:"14:15",arr:"17:05",days:[2,5,6,7]}],
+    attractions:["🏛 Sun Yat-sen Mausoleum — grand hilltop memorial","🏯 Confucius Temple (Fuzimiao) — night market on Qinhuai River","🌸 Ming Xiaoling Mausoleum — UNESCO Ming dynasty tomb"],
+    itinerary:"D1: Confucius Temple area + Qinhuai River night cruise. D2: Sun Yat-sen Mausoleum + Ming Xiaoling + Purple Mountain. D3: Nanjing Massacre Memorial + Xuanwu Lake + city wall walk. D4: Presidential Palace + Laomendong street + fly home.",
+    hotels:["Fairmont Nanjing — panoramic views in Jianye","The Ritz-Carlton Nanjing — Deji Plaza luxury","Intercontinental Nanjing — lakeside resort in Zhongshan"]},
+  {name:"Zhengzhou",iata:"CGO",country:"China",lat:34.7640,lng:113.6840,tz:8,
+    outbound:[{fn:"CX952",dep:"12:45",arr:"15:20",days:[6,7,1,2,3]}],
+    inbound:[{fn:"CX957",dep:"16:30",arr:"19:25",days:[6,7,1,2,3]}],
+    attractions:["🥋 Shaolin Temple — birthplace of kung fu","🏛 Henan Provincial Museum — Bronze Age artifacts","🏞 Longmen Grottoes (Luoyang day trip) — 100,000+ Buddhist carvings"],
+    itinerary:"D1: Henan Museum + Erqi Memorial Tower + local hui cuisine. D2: Shaolin Temple full day — kung fu show + Pagoda Forest. D3: Luoyang day trip — Longmen Grottoes + White Horse Temple. D4: Yellow River scenic area + Zhengzhou Shang ruins + fly home.",
+    hotels:["JW Marriott Zhengzhou — CBD 5-star","Hilton Zhengzhou — modern luxury in Zhengdong","Sofitel Zhengzhou — French-managed central hotel"]},
+  {name:"Chongqing",iata:"CKG",country:"China",lat:29.5630,lng:106.5516,tz:8,
+    outbound:[{fn:"CX928",dep:"13:35",arr:"16:10",days:[2,3,5,6,7]}],
+    inbound:[{fn:"CX929",dep:"17:10",arr:"20:00",days:[2,3,5,6,7]}],
+    attractions:["🌃 Hongya Cave — stilted riverside night-lit complex","🚡 Yangtze River Cableway — cross-river gondola","🌶 Jiefangbei — pedestrian CBD + hotpot street"],
+    itinerary:"D1: Jiefangbei + Hongya Cave at night + Yangtze cableway. D2: Dazu Rock Carvings UNESCO day trip. D3: Ciqikou Ancient Town + Eling Park skyline + hotpot dinner. D4: Three Gorges Museum + Chongqing Zoo + fly home.",
+    hotels:["JW Marriott Chongqing — Jiefangbei riverside 5-star","The Westin Chongqing — Jiefangbei central tower","Hyatt Regency Chongqing — modern luxury in Nan'an"]},
+
+  // ── EUROPE ──
+  {name:"London",iata:"LHR",country:"United Kingdom",lat:51.4700,lng:-0.4543,tz:1,
+    outbound:[
+      {fn:"CX257",dep:"08:05",arr:"14:05",days:[1,2,3,4,5,6,7]},
+      {fn:"CX253",dep:"13:25",arr:"19:25",days:[1,2,3,4,5,6,7]},
+      {fn:"CX251",dep:"22:45",arr:"05:45+1",days:[1,2,3,4,5,6,7]},
+      {fn:"CX255",dep:"23:15",arr:"06:15+1",days:[1,2,3,4,5,6,7]}],
+    inbound:[
+      {fn:"CX250",dep:"12:25",arr:"07:05+1",days:[1,2,3,4,5,6,7]},
+      {fn:"CX252",dep:"17:05",arr:"11:55+1",days:[1,2,3,4,5,6,7]},
+      {fn:"CX254",dep:"18:20",arr:"13:15+1",days:[1,2,3,4,5,6,7]},
+      {fn:"CX256",dep:"20:10",arr:"15:05+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏛 British Museum — world-class free museum with 8 million works","🎡 London Eye — Thames riverside panoramic wheel","👑 Tower of London — Crown Jewels + 1000 years of history"],
+    itinerary:"D1: Westminster — Big Ben + Parliament + Abbey + Buckingham Palace. D2: British Museum + Covent Garden + West End show. D3: Tower of London + Tower Bridge + Borough Market + South Bank. D4: Camden Market or Notting Hill + Harrods + fly home.",
+    hotels:["The Langham — classic luxury near Regent Street","Shangri-La at The Shard — panoramic Thames views","The Ned — stylish City of London landmark"]},
+
+  {name:"Paris",iata:"CDG",country:"France",lat:49.0097,lng:2.5479,tz:2,
+    outbound:[
+      {fn:"CX261",dep:"00:15",arr:"06:50",days:[1,2,3,4,5,6,7]},
+      {fn:"CX263",dep:"11:45",arr:"18:20",days:[1,4,6]}],
+    inbound:[
+      {fn:"CX260",dep:"13:10",arr:"06:45+1",days:[1,2,3,4,5,6,7]},
+      {fn:"CX262",dep:"21:15",arr:"15:00+1",days:[1,4,6]}],
+    attractions:["🗼 Eiffel Tower — iconic iron lattice tower, river Seine views","🖼 The Louvre — world's largest art museum, Mona Lisa","⛪ Sacré-Cœur — hilltop basilica with Paris panorama"],
+    itinerary:"D1: Eiffel Tower + Seine river cruise + Trocadéro. D2: Louvre + Tuileries Garden + Champs-Élysées + Arc de Triomphe. D3: Montmartre + Sacré-Cœur + Marais district + Notre-Dame. D4: Versailles day trip or Musée d'Orsay + fly home.",
+    hotels:["Le Meurice — palatial Tuileries-view 5-star","Shangri-La Paris — Eiffel Tower views, former palace","Hotel Plaza Athénée — Dior flagship, Avenue Montaigne"]},
+
+  {name:"Zurich",iata:"ZRH",country:"Switzerland",lat:47.4647,lng:8.5492,tz:2,
+    outbound:[
+      {fn:"CX383",dep:"01:00",arr:"07:15",days:[1,2,3,4,5,6,7]}],
+    inbound:[
+      {fn:"CX382",dep:"13:35",arr:"07:05+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏔 Lake Zurich — boat cruises with Alpine backdrop","🏛 Old Town (Altstadt) — medieval lanes + Grossmünster church","🚂 Jungfraujoch day trip — Top of Europe railway at 3,454m"],
+    itinerary:"D1: Old Town walk — Grossmünster + Lindenhof + Bahnhofstrasse shopping. D2: Day trip to Jungfraujoch or Lucerne + Chapel Bridge. D3: Lake Zurich cruise + Kunsthaus art museum + fondue dinner. D4: Uetliberg mountain viewpoint + chocolate shop + fly home.",
+    hotels:["The Dolder Grand — hillside luxury with city and lake views","Baur au Lac — lakeside grande dame since 1844","Widder Hotel — boutique in medieval Old Town"]},
+
+  // ── EAST ASIA (new) ──
+  {name:"Tokyo Narita",iata:"NRT",country:"Japan",lat:35.7647,lng:140.3864,tz:9,
+    outbound:[{fn:"CX520",dep:"10:40",arr:"15:40",days:[1,2,3,4,5,6,7]},{fn:"CX524",dep:"08:15",arr:"13:15",days:[1,2,3,4,5,6,7]},{fn:"CX500",dep:"15:10",arr:"20:30",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX505",dep:"14:30",arr:"18:30",days:[1,2,3,4,5,6,7]},{fn:"CX521",dep:"16:45",arr:"20:45",days:[1,2,3,4,5,6,7]},{fn:"CX501",dep:"21:40",arr:"01:20+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["⛩ Senso-ji Temple — Tokyo's oldest temple in Asakusa","🗼 Tokyo Tower & Shibuya Crossing — iconic city landmarks","🎌 Meiji Shrine — serene Shinto shrine in Harajuku forest"],
+    itinerary:"D1: Shibuya Crossing + Harajuku + Meiji Shrine + Omotesando. D2: Asakusa Senso-ji + Akihabara + teamLab Borderless. D3: Tsukiji Outer Market + Ginza + Tokyo Tower + Roppongi. D4: Shinjuku Gyoen + shopping + fly home.",
+    hotels:["Aman Tokyo — minimalist luxury in Otemachi tower","The Peninsula Tokyo — Marunouchi landmark 5-star","Park Hyatt Tokyo — Shinjuku skyline views, Lost in Translation"]},
+  {name:"Tokyo Haneda",iata:"HND",country:"Japan",lat:35.5494,lng:139.7798,tz:9,
+    outbound:[{fn:"CX542",dep:"16:25",arr:"21:15",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX543",dep:"10:10",arr:"14:20",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏙 Shinjuku & Kabukichō — neon nightlife district","🌸 Ueno Park — museums + cherry blossoms + zoo","🎎 Asakusa — traditional downtown Tokyo"],
+    itinerary:"D1: Shinjuku + Golden Gai + Robot Restaurant area. D2: Ueno Park museums + Yanaka old town + Akihabara. D3: Odaiba + teamLab + Rainbow Bridge views. D4: Tsukiji market breakfast + Ginza + fly home.",
+    hotels:["The Prince Gallery Tokyo Kioicho — panoramic luxury","Mandarin Oriental Tokyo — Nihonbashi elegance","Conrad Tokyo — Shiodome bay views"]},
+  {name:"Osaka",iata:"KIX",country:"Japan",lat:34.4347,lng:135.2440,tz:9,
+    outbound:[{fn:"CX506",dep:"10:45",arr:"15:15",days:[1,2,3,4,5,6,7]},{fn:"CX502",dep:"16:40",arr:"21:05",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX507",dep:"18:05",arr:"21:35",days:[1,2,3,4,5,6,7]},{fn:"CX503",dep:"22:05",arr:"01:20+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏯 Osaka Castle — iconic 16th-century castle + park","🍣 Dotonbori — neon street-food paradise","⛩ Fushimi Inari (Kyoto day trip) — 10,000 vermillion torii gates"],
+    itinerary:"D1: Dotonbori + Shinsaibashi + Namba street food. D2: Kyoto day trip — Fushimi Inari + Kinkaku-ji + Arashiyama bamboo. D3: Osaka Castle + Shinsekai + Kuromon Market. D4: Nara deer park day trip + fly home.",
+    hotels:["The Ritz-Carlton Osaka — Umeda landmark","Conrad Osaka — Nakanoshima riverside modern luxury","W Osaka — Shinsaibashi design hotel"]},
+  {name:"Seoul",iata:"ICN",country:"South Korea",lat:37.4602,lng:126.4407,tz:9,
+    outbound:[{fn:"CX434",dep:"07:55",arr:"12:40",days:[1,2,3,6,7]},{fn:"CX410",dep:"09:30",arr:"14:10",days:[1,2,3,4,5,6,7]},{fn:"CX418",dep:"14:05",arr:"18:35",days:[1,2,3,4,5,6,7]},{fn:"CX416",dep:"16:40",arr:"21:15",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX411",dep:"15:00",arr:"18:10",days:[1,2,3,4,5,6,7]},{fn:"CX435",dep:"13:40",arr:"16:40",days:[1,2,3,4,5,6,7]},{fn:"CX417",dep:"22:15",arr:"01:15+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏛 Gyeongbokgung Palace — grand Joseon-era royal palace","🛍 Myeongdong — K-beauty shopping + street food","🌆 N Seoul Tower — panoramic city views from Namsan"],
+    itinerary:"D1: Gyeongbokgung + Bukchon Hanok Village + Insadong. D2: Myeongdong + Namsan Tower + Hongdae nightlife. D3: DMZ tour or Lotte World + Gangnam + COEX. D4: Itaewon brunch + War Memorial + fly home.",
+    hotels:["The Shilla Seoul — iconic Korean luxury","Signiel Seoul — Lotte World Tower 76th-101st floors","Four Seasons Seoul — Gwanghwamun central luxury"]},
+  {name:"Taipei",iata:"TPE",country:"Taiwan",lat:25.0797,lng:121.2342,tz:8,
+    outbound:[{fn:"CX404",dep:"08:30",arr:"10:20",days:[1,2,3,4,5,6,7]},{fn:"CX400",dep:"13:10",arr:"15:10",days:[1,2,3,4,5,6,7]},{fn:"CX402",dep:"18:15",arr:"20:05",days:[1,2,3,4,5,6,7]},{fn:"CX406",dep:"21:30",arr:"23:20",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX401",dep:"11:10",arr:"13:00",days:[1,2,3,4,5,6,7]},{fn:"CX403",dep:"16:10",arr:"17:55",days:[1,2,3,4,5,6,7]},{fn:"CX405",dep:"21:10",arr:"22:55",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏙 Taipei 101 — once world's tallest, iconic skyline","🏛 National Palace Museum — world's largest Chinese art collection","🌙 Shilin Night Market — legendary street food market"],
+    itinerary:"D1: Taipei 101 + Xinyi district + Elephant Mountain sunset. D2: National Palace Museum + Beitou hot springs + Shilin Night Market. D3: Jiufen gold-mining village + Yehliu Geopark day trip. D4: Longshan Temple + Dihua Street + mango shaved ice + fly home.",
+    hotels:["Mandarin Oriental Taipei — Dunhua luxury","W Taipei — Xinyi district design hotel","Regent Taipei — Zhongshan classic 5-star"]},
+  {name:"Shanghai",iata:"PVG",country:"China",lat:31.1443,lng:121.8083,tz:8,
+    outbound:[{fn:"CX364",dep:"17:30",arr:"20:15",days:[1,2,3,4,5,6,7]},{fn:"CX362",dep:"19:20",arr:"22:05",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX365",dep:"09:35",arr:"12:30",days:[1,2,3,4,5,6,7]},{fn:"CX367",dep:"21:15",arr:"00:00+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🌃 The Bund — iconic waterfront colonial architecture","🏙 Lujiazui Skyline — Oriental Pearl + Shanghai Tower","🏛 Yu Garden — classical Chinese garden + bazaar"],
+    itinerary:"D1: The Bund + Nanjing Road + Yu Garden + Old City. D2: French Concession + Tianzifang + Xintiandi. D3: Shanghai Tower + Lujiazui + Huangpu River cruise. D4: Zhujiajiao water town day trip + fly home.",
+    hotels:["The Peninsula Shanghai — Bund-view art-deco palace","Waldorf Astoria Shanghai on the Bund — historic luxury","Mandarin Oriental Pudong — riverside modern luxury"]},
+  {name:"Beijing",iata:"PEK",country:"China",lat:40.0799,lng:116.6031,tz:8,
+    outbound:[{fn:"CX390",dep:"09:00",arr:"12:00",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX391",dep:"13:40",arr:"16:35",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏯 Forbidden City — imperial palace, 980 buildings","🐉 Great Wall at Mutianyu — less crowded restored section","⛩ Temple of Heaven — iconic Ming dynasty altar complex"],
+    itinerary:"D1: Tiananmen Square + Forbidden City + Jingshan Park sunset. D2: Great Wall at Mutianyu full day. D3: Temple of Heaven + Summer Palace + hutong rickshaw tour. D4: 798 Art District + Wangfujing snack street + fly home.",
+    hotels:["Aman at Summer Palace — beside the imperial garden","The Peninsula Beijing — Wangfujing landmark","NUO Hotel Beijing — contemporary Chinese luxury"]},
+  {name:"Sapporo",iata:"CTS",country:"Japan",lat:42.7752,lng:141.6925,tz:9,
+    outbound:[{fn:"CX580",dep:"09:15",arr:"14:35",days:[2,3,4,6,7]}],
+    inbound:[{fn:"CX581",dep:"15:35",arr:"20:20",days:[2,3,4,6,7]}],
+    attractions:["❄️ Niseko — world-class powder skiing","🍺 Sapporo Beer Museum — iconic brewery tour + tastings","🏔 Otaru Canal — charming port town + glasswork + sushi"],
+    itinerary:"D1: Odori Park + Sapporo TV Tower + Susukino ramen alley. D2: Otaru day trip — canal + sushi street + music box museum. D3: Niseko or Jozankei Onsen + Moerenuma Park. D4: Nijo Market breakfast + Hokkaido University campus + fly home.",
+    hotels:["JR Tower Hotel Nikko Sapporo — station-direct skyline hotel","The Lake Suite Ko no Sumika — lakeside luxury","Jozankei Tsuruga Resort Spa Mori no Uta — onsen resort"]},
+
+  // ── SOUTHEAST ASIA (new) ──
+  {name:"Singapore",iata:"SIN",country:"Singapore",lat:1.3644,lng:103.9915,tz:8,
+    outbound:[{fn:"CX711",dep:"17:00",arr:"20:55",days:[1,2,3,4,5,6,7]},{fn:"CX715",dep:"20:55",arr:"00:50+1",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX710",dep:"08:00",arr:"11:55",days:[1,2,3,4,5,6,7]},{fn:"CX714",dep:"01:15",arr:"05:05",days:[1,2,3,4,5,6,7]}],
+    attractions:["🌳 Gardens by the Bay — Supertree Grove + Cloud Forest","🎰 Marina Bay Sands — infinity pool skypark","🦁 Merlion Park — Singapore's iconic waterfront symbol"],
+    itinerary:"D1: Marina Bay Sands + Gardens by the Bay + Merlion. D2: Sentosa Island — Universal Studios or beach + cable car. D3: Chinatown + Little India + Kampong Glam + hawker food tour. D4: Botanic Gardens + Orchard Road shopping + fly home.",
+    hotels:["Marina Bay Sands — iconic infinity pool tower","Raffles Singapore — legendary colonial grande dame","Capella Singapore — Sentosa island resort by Foster + Partners"]},
+  {name:"Bangkok",iata:"BKK",country:"Thailand",lat:13.6900,lng:100.7501,tz:7,
+    outbound:[{fn:"CX705",dep:"08:00",arr:"09:55",days:[1,2,3,4,5,6,7]},{fn:"CX701",dep:"16:05",arr:"18:00",days:[1,2,3,4,5,6,7]},{fn:"CX703",dep:"12:30",arr:"14:25",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX700",dep:"08:05",arr:"12:10",days:[1,2,3,4,5,6,7]},{fn:"CX702",dep:"15:00",arr:"19:00",days:[1,2,3,4,5,6,7]},{fn:"CX706",dep:"23:00",arr:"02:55+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🛕 Grand Palace + Wat Phra Kaew — Thailand's holiest temple","🛶 Floating Markets — Damnoen Saduak or Amphawa","🏙 Chatuchak Weekend Market — 15,000+ stalls"],
+    itinerary:"D1: Grand Palace + Wat Pho reclining Buddha + Wat Arun sunset. D2: Chatuchak Market + Jim Thompson House + rooftop bar. D3: Floating market + Ayutthaya ancient ruins day trip. D4: Chinatown street food + MBK shopping + fly home.",
+    hotels:["Mandarin Oriental Bangkok — legendary riverside hotel","The Siam — art-deco riverside boutique","137 Pillars Suites & Residences — Sukhumvit luxury"]},
+  {name:"Manila",iata:"MNL",country:"Philippines",lat:14.5086,lng:121.0194,tz:8,
+    outbound:[{fn:"CX901",dep:"09:00",arr:"11:20",days:[1,2,3,4,5,6,7]},{fn:"CX903",dep:"16:15",arr:"18:45",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX902",dep:"12:20",arr:"14:30",days:[1,2,3,4,5,6,7]},{fn:"CX904",dep:"20:10",arr:"22:20",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏛 Intramuros — Spanish colonial walled city","🏖 El Nido (Palawan flight) — limestone lagoons","🌋 Taal Volcano — crater lake within a lake"],
+    itinerary:"D1: Intramuros + Fort Santiago + San Agustin Church + Manila Bay sunset. D2: Tagaytay day trip — Taal Volcano views + local cuisine. D3: BGC + Ayala Museum + Poblacion nightlife. D4: Binondo Chinatown food walk + SM Mall of Asia + fly home.",
+    hotels:["Raffles Makati — heritage luxury in Ayala","Shangri-La at the Fort — BGC modern 5-star","The Peninsula Manila — Makati classic landmark"]},
+  {name:"Ho Chi Minh City",iata:"SGN",country:"Vietnam",lat:10.8188,lng:106.6520,tz:7,
+    outbound:[{fn:"CX767",dep:"08:40",arr:"10:35",days:[1,2,3,4,5,6,7]},{fn:"CX769",dep:"15:35",arr:"17:30",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX766",dep:"11:35",arr:"15:20",days:[1,2,3,4,5,6,7]},{fn:"CX768",dep:"20:25",arr:"00:10+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏛 War Remnants Museum — powerful Vietnam War exhibits","🕌 Notre-Dame Cathedral + Central Post Office — French colonial","🛶 Cu Chi Tunnels — underground Viet Cong network"],
+    itinerary:"D1: Notre-Dame + Post Office + Reunification Palace + Ben Thanh Market. D2: Cu Chi Tunnels morning + Chinatown + Binh Tay Market. D3: Mekong Delta day trip — boat rides + floating markets. D4: War Remnants Museum + café culture + Bui Vien street + fly home.",
+    hotels:["The Reverie Saigon — opulent Italian-designed tower","Park Hyatt Saigon — Lam Son Square landmark","Hotel des Arts Saigon — modern art-filled boutique"]},
+  {name:"Hanoi",iata:"HAN",country:"Vietnam",lat:21.2187,lng:105.8044,tz:7,
+    outbound:[{fn:"CX741",dep:"09:35",arr:"10:50",days:[2,3,4,5,6,7]},{fn:"CX743",dep:"17:10",arr:"18:25",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX742",dep:"11:50",arr:"15:20",days:[2,3,4,5,6,7]},{fn:"CX744",dep:"19:05",arr:"22:35",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏛 Ho Chi Minh Mausoleum — preserved leader's resting place","🛶 Ha Long Bay (day trip) — limestone karst seascape","🎭 Old Quarter — 36 guild streets of artisan shops"],
+    itinerary:"D1: Hoan Kiem Lake + Old Quarter walking + water puppet show. D2: Ha Long Bay full day cruise — caves + kayaking. D3: Ho Chi Minh Complex + Temple of Literature + Train Street. D4: West Lake + Tran Quoc Pagoda + egg coffee + fly home.",
+    hotels:["Sofitel Legend Metropole — iconic French colonial landmark","JW Marriott Hanoi — lakeside modern luxury","Hotel de l'Opera — elegant theatre-district boutique"]},
+  {name:"Jakarta",iata:"CGK",country:"Indonesia",lat:-6.1256,lng:106.6558,tz:7,
+    outbound:[{fn:"CX719",dep:"15:50",arr:"19:45",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX718",dep:"08:15",arr:"14:15",days:[1,2,3,4,5,6,7]}],
+    attractions:["🕌 Istiqlal Mosque — largest mosque in SE Asia","🏛 National Monument (Monas) — 132m freedom tower","🎨 Old Town (Kota Tua) — Dutch colonial heritage quarter"],
+    itinerary:"D1: Monas + Istiqlal Mosque + National Museum. D2: Kota Tua + Thousand Islands boat trip. D3: Bogor Botanical Gardens day trip + Taman Mini Indonesia. D4: Grand Indonesia Mall + local street food tour + fly home.",
+    hotels:["The Raffles Jakarta — Kuningan embassy district luxury","Mandarin Oriental Jakarta — Thamrin central tower","The Langham Jakarta — SCBD modern luxury"]},
+  {name:"Kuala Lumpur",iata:"KUL",country:"Malaysia",lat:2.7456,lng:101.7099,tz:8,
+    outbound:[{fn:"CX725",dep:"16:30",arr:"20:30",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX730",dep:"08:15",arr:"12:25",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏙 Petronas Twin Towers — iconic 88-floor skybridge","🕌 Batu Caves — Hindu temple in limestone cavern","🛍 Central Market — art-deco heritage craft market"],
+    itinerary:"D1: Petronas Towers + KLCC Park + Bukit Bintang food street. D2: Batu Caves + Chinatown + Central Market + Merdeka Square. D3: Putrajaya + Genting Highlands day trip. D4: Islamic Arts Museum + Jalan Alor street food + fly home.",
+    hotels:["Mandarin Oriental KL — KLCC park-view luxury","The RuMa Hotel — Bukit Bintang design boutique","Four Seasons KL — Petronas Tower views"]},
+
+  // ── SOUTH ASIA (new) ──
+  {name:"Delhi",iata:"DEL",country:"India",lat:28.5562,lng:77.1000,tz:5.5,
+    outbound:[{fn:"CX695",dep:"17:40",arr:"21:05",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX694",dep:"22:30",arr:"06:30+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🕌 Red Fort — Mughal emperor's sandstone palace","🛕 Qutub Minar — 73m 12th-century victory tower","🏛 Humayun's Tomb — precursor to the Taj Mahal"],
+    itinerary:"D1: Red Fort + Chandni Chowk food walk + Jama Masjid. D2: Humayun's Tomb + Qutub Minar + Hauz Khas village. D3: Agra day trip — Taj Mahal + Agra Fort. D4: India Gate + Lotus Temple + Connaught Place + fly home.",
+    hotels:["The Imperial — Lutyens' Delhi colonial grand hotel","The Oberoi New Delhi — modern luxury at Humayun's Tomb","The Leela Palace — Chanakyapuri diplomatic luxury"]},
+  {name:"Mumbai",iata:"BOM",country:"India",lat:19.0896,lng:72.8656,tz:5.5,
+    outbound:[{fn:"CX697",dep:"18:00",arr:"21:25",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX660",dep:"01:10",arr:"09:35",days:[1,3,4,5,6,7]}],
+    attractions:["🚪 Gateway of India — harbour arch monument","🏛 Chhatrapati Shivaji Terminus — UNESCO Victorian Gothic station","🎬 Dharavi — vibrant community + Bollywood culture"],
+    itinerary:"D1: Gateway of India + Colaba Causeway + Marine Drive sunset. D2: Elephanta Caves boat trip + CST station + Crawford Market. D3: Dharavi walk + Haji Ali Dargah + Bandra street art. D4: Chor Bazaar + Mani Bhavan Gandhi Museum + fly home.",
+    hotels:["The Taj Mahal Palace — iconic harbour-view landmark","The Oberoi Mumbai — Nariman Point sea views","Four Seasons Mumbai — Worli modern luxury"]},
+  {name:"Colombo",iata:"CMB",country:"Sri Lanka",lat:7.1801,lng:79.8841,tz:5.5,
+    outbound:[{fn:"CX611",dep:"20:20",arr:"23:30",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX610",dep:"00:15",arr:"08:40",days:[1,2,3,4,5,6,7]}],
+    attractions:["🛕 Temple of the Tooth (Kandy) — sacred Buddhist relic","🐘 Pinnawala Elephant Orphanage — bathing elephants","🏖 Galle Fort — UNESCO Dutch colonial walled city"],
+    itinerary:"D1: Colombo — Gangaramaya Temple + Pettah Market + Galle Face sunset. D2: Kandy day trip — Temple of Tooth + Peradeniya Gardens. D3: Galle Fort — rampart walk + boutiques + lighthouse. D4: Mount Lavinia beach + Geoffrey Bawa architecture + fly home.",
+    hotels:["Shangri-La Colombo — harbour-front luxury tower","Galle Face Hotel — 1864 colonial seaside landmark","Amangalla (Galle) — Dutch fort heritage boutique"]},
+  {name:"Malé",iata:"MLE",country:"Maldives",lat:4.1918,lng:73.5290,tz:5,
+    outbound:[{fn:"CX601",dep:"17:15",arr:"21:25",days:[2,3,5,6]}],
+    inbound:[{fn:"CX602",dep:"23:35",arr:"08:55+1",days:[2,3,5,6]}],
+    attractions:["🏝 Overwater Villas — iconic Maldivian luxury","🤿 Coral Reefs — world-class snorkelling + diving","🐠 Whale Shark Point — South Ari Atoll encounters"],
+    itinerary:"D1: Arrive + resort check-in + sunset dolphin cruise. D2: Snorkelling safari — reef + manta point. D3: Spa morning + sandbank picnic + night fishing. D4: Sunrise yoga + seaplane transfer + fly home.",
+    hotels:["Soneva Fushi — barefoot luxury pioneer","One&Only Reethi Rah — private island resort","Cheval Blanc Randheli — LVMH island paradise"]},
+
+  // ── AUSTRALIA & NZ ──
+  {name:"Sydney",iata:"SYD",country:"Australia",lat:-33.9461,lng:151.1772,tz:10,
+    outbound:[{fn:"CX111",dep:"19:00",arr:"07:15+1",days:[1,2,3,4,5,6,7]},{fn:"CX181",dep:"00:45",arr:"12:55",days:[1,2,3,4,5,6,7]},{fn:"CX161",dep:"21:20",arr:"09:35+1",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX110",dep:"09:00",arr:"17:10",days:[1,2,3,4,5,6,7]},{fn:"CX180",dep:"14:00",arr:"22:00",days:[1,2,3,4,5,6,7]},{fn:"CX162",dep:"10:55",arr:"17:10",days:[1,2,3,4,5,6,7]}],
+    attractions:["🎭 Sydney Opera House — iconic harbourside performing arts centre","🌉 Sydney Harbour Bridge — climb or walk the arch","🏖 Bondi Beach — world-famous surf beach + coastal walk"],
+    itinerary:"D1: Circular Quay + Opera House + Harbour Bridge walk + The Rocks. D2: Bondi to Coogee coastal walk + Bondi Icebergs. D3: Taronga Zoo ferry + Manly Beach + sunset harbour cruise. D4: Royal Botanic Gardens + Darling Harbour + fly home.",
+    hotels:["Park Hyatt Sydney — Opera House waterfront views","The Langham Sydney — heritage luxury in The Rocks","Crown Towers Sydney — Barangaroo waterfront"]},
+  {name:"Melbourne",iata:"MEL",country:"Australia",lat:-37.6733,lng:144.8430,tz:10,
+    outbound:[{fn:"CX135",dep:"19:05",arr:"07:10+1",days:[1,2,3,4,5,6,7]},{fn:"CX105",dep:"00:30",arr:"12:30",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX134",dep:"08:40",arr:"14:55",days:[1,2,3,4,5,6,7]},{fn:"CX106",dep:"13:30",arr:"19:45",days:[1,2,3,4,5,6,7]}],
+    attractions:["🎨 Hosier Lane — world-famous street art laneways","🏏 Melbourne Cricket Ground — Australia's sporting cathedral","🐧 Phillip Island — penguin parade at sunset"],
+    itinerary:"D1: Federation Square + Hosier Lane + Queen Victoria Market. D2: Great Ocean Road day trip — Twelve Apostles. D3: Royal Botanic Gardens + NGV art gallery + Yarra River. D4: South Melbourne Market + Brighton Beach boxes + fly home.",
+    hotels:["Crown Towers Melbourne — Southbank luxury","The Langham Melbourne — Southbank riverside elegance","Park Hyatt Melbourne — Parliament district"]},
+  {name:"Auckland",iata:"AKL",country:"New Zealand",lat:-37.0082,lng:174.7850,tz:12,
+    outbound:[{fn:"CX117",dep:"23:50",arr:"16:00+1",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX118",dep:"08:00",arr:"15:10",days:[1,2,3,4,5,6,7]}],
+    attractions:["🌋 Sky Tower — 328m observation + SkyWalk","⛴ Waiheke Island — vineyards + beaches by ferry","🏔 Rangitoto Island — volcanic cone day hike"],
+    itinerary:"D1: Sky Tower + Viaduct Harbour + Ponsonby Road. D2: Waiheke Island wine trail + Oneroa Beach. D3: Rangitoto hike or Piha black-sand beach day trip. D4: Auckland Museum + Mission Bay + fly home.",
+    hotels:["Park Hyatt Auckland — Viaduct Harbour waterfront","Cordis Auckland — central city 5-star","Hotel DeBrett — boutique art-deco in High Street"]},
+  {name:"Brisbane",iata:"BNE",country:"Australia",lat:-27.3842,lng:153.1175,tz:10,
+    outbound:[{fn:"CX157",dep:"12:25",arr:"23:00",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX158",dep:"00:30",arr:"06:30",days:[1,2,3,4,5,6,7]}],
+    attractions:["🐨 Lone Pine Koala Sanctuary — world's first koala sanctuary","🏖 South Bank Parklands — urban beach + cultural precinct","🏝 Moreton Island — sand dunes + snorkelling shipwrecks"],
+    itinerary:"D1: South Bank + GOMA art gallery + Story Bridge climb. D2: Lone Pine Koala Sanctuary + Mt Coot-tha lookout. D3: North Stradbroke or Moreton Island day trip. D4: Queen Street Mall + New Farm Park + fly home.",
+    hotels:["The Calile Hotel — James Street boutique design","W Brisbane — riverside contemporary luxury","Emporium Hotel South Bank — rooftop pool + river views"]},
+  {name:"Perth",iata:"PER",country:"Australia",lat:-31.9403,lng:115.9670,tz:8,
+    outbound:[{fn:"CX171",dep:"13:00",arr:"21:00",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX172",dep:"22:00",arr:"06:00+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏝 Rottnest Island — quokka selfies + crystal bays","🏖 Cottesloe Beach — Indian Ocean sunset beach","🌳 Kings Park — 400ha botanical garden + city views"],
+    itinerary:"D1: Kings Park + Elizabeth Quay + Northbridge dining. D2: Rottnest Island full day — bikes + snorkelling + quokkas. D3: Fremantle — markets + prison tour + fishing boat harbour. D4: Cottesloe Beach morning + Swan Valley wineries + fly home.",
+    hotels:["COMO The Treasury — State Buildings heritage luxury","Crown Towers Perth — Burswood riverside resort","The Ritz-Carlton Perth — Elizabeth Quay waterfront"]},
+  {name:"Cairns",iata:"CNS",country:"Australia",lat:-16.8858,lng:145.7554,tz:10,
+    outbound:[{fn:"CX121",dep:"09:00",arr:"18:25",days:[2,4,6]}],
+    inbound:[{fn:"CX122",dep:"19:30",arr:"01:55+1",days:[2,4,6]}],
+    attractions:["🐠 Great Barrier Reef — snorkelling + diving world wonder","🌿 Daintree Rainforest — oldest tropical rainforest on Earth","🚂 Kuranda Scenic Railway — rainforest mountain rail"],
+    itinerary:"D1: Cairns Esplanade + lagoon + night markets. D2: Great Barrier Reef cruise — Outer Reef snorkelling + diving. D3: Daintree Rainforest + Cape Tribulation day trip. D4: Kuranda Railway + Skyrail + fly home.",
+    hotels:["Silky Oaks Lodge — Daintree rainforest luxury","Crystalbrook Riley — Esplanade resort","Lizard Island Resort — Great Barrier Reef private island"]},
+  {name:"Adelaide",iata:"ADL",country:"Australia",lat:-34.9461,lng:138.5310,tz:9.5,
+    outbound:[{fn:"CX175",dep:"00:15",arr:"11:40",days:[1,3,5,7]},{fn:"CX173",dep:"09:15",arr:"20:35",days:[2,4,6]}],
+    inbound:[{fn:"CX174",dep:"13:00",arr:"19:20",days:[1,3,5,7]},{fn:"CX176",dep:"21:30",arr:"05:05+1",days:[2,4,6]}],
+    attractions:["🍷 Barossa Valley — world-class wine region","🐨 Cleland Wildlife Park — hand-feed koalas + kangaroos","🏖 Glenelg Beach — tram-connected seaside suburb"],
+    itinerary:"D1: Adelaide Central Market + North Terrace cultural boulevard. D2: Barossa Valley wine tour — Penfolds + Jacob's Creek. D3: Hahndorf German village + Cleland Wildlife Park. D4: Glenelg beach morning + Henley Beach + fly home.",
+    hotels:["The Mayfair Hotel — heritage-listed central luxury","Eos by SkyCity — Adelaide Oval views","Sequoia Lodge — Mount Lofty Ranges retreat"]},
+
+  // ── NORTH AMERICA ──
+  {name:"New York",iata:"JFK",country:"United States",lat:40.6413,lng:-73.7781,tz:-4,
+    outbound:[{fn:"CX840",dep:"16:30",arr:"19:05",days:[1,2,3,4,5,6,7]},{fn:"CX830",dep:"09:05",arr:"12:00",days:[1,2,3,4,5,6,7]},{fn:"CX846",dep:"00:30",arr:"03:10",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX841",dep:"20:30",arr:"01:30+2",days:[1,2,3,4,5,6,7]},{fn:"CX831",dep:"13:00",arr:"18:00+1",days:[1,2,3,4,5,6,7]},{fn:"CX843",dep:"01:30",arr:"06:30+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🗽 Statue of Liberty — harbour icon + Ellis Island","🌳 Central Park — 843-acre urban oasis","🏙 Times Square + Broadway — neon heart of Manhattan"],
+    itinerary:"D1: Times Square + Top of the Rock + Central Park + 5th Avenue. D2: Statue of Liberty + Brooklyn Bridge + DUMBO. D3: MoMA + High Line + Chelsea Market + West Village. D4: SoHo + Chinatown + Lower East Side + fly home.",
+    hotels:["The Plaza — iconic 5th Avenue landmark","Aman New York — ultra-luxury in Crown Building","1 Hotel Central Park — eco-luxury park views"]},
+  {name:"Los Angeles",iata:"LAX",country:"United States",lat:33.9425,lng:-118.4081,tz:-7,
+    outbound:[{fn:"CX880",dep:"00:30",arr:"21:10",days:[1,2,3,4,5,6,7]},{fn:"CX882",dep:"16:40",arr:"13:20",days:[1,4,6]}],
+    inbound:[{fn:"CX881",dep:"23:20",arr:"07:00+2",days:[1,2,3,4,5,6,7]},{fn:"CX883",dep:"22:15",arr:"06:15+2",days:[1,4,6]}],
+    attractions:["🎬 Hollywood Sign + Walk of Fame — cinema history","🏖 Santa Monica Pier — Pacific oceanfront amusement","🎨 Getty Center — hilltop art museum + gardens"],
+    itinerary:"D1: Hollywood + Griffith Observatory + Sunset Strip. D2: Santa Monica + Venice Beach boardwalk + Malibu. D3: Getty Center + Beverly Hills + Rodeo Drive. D4: Arts District + Grand Central Market + LAX.",
+    hotels:["The Beverly Hills Hotel — iconic Pink Palace","Shutters on the Beach — Santa Monica oceanfront","1 Hotel West Hollywood — Sunset Strip eco-luxury"]},
+  {name:"San Francisco",iata:"SFO",country:"United States",lat:37.6213,lng:-122.3790,tz:-7,
+    outbound:[{fn:"CX872",dep:"01:10",arr:"22:40",days:[1,2,3,4,5,6,7]},{fn:"CX870",dep:"13:25",arr:"09:00",days:[1,2,3,4,7]}],
+    inbound:[{fn:"CX873",dep:"13:30",arr:"19:30+1",days:[1,2,3,4,5,6,7]},{fn:"CX871",dep:"23:30",arr:"05:30+2",days:[1,2,3,4,7]}],
+    attractions:["🌉 Golden Gate Bridge — iconic red suspension bridge","🏝 Alcatraz Island — former federal prison tour","🎣 Fisherman's Wharf — sea lions + clam chowder"],
+    itinerary:"D1: Golden Gate Bridge + Presidio + Palace of Fine Arts. D2: Alcatraz morning + Fisherman's Wharf + Ghirardelli Square. D3: Cable car + Chinatown + North Beach + Coit Tower. D4: Sausalito ferry + Golden Gate Park + fly home.",
+    hotels:["The Ritz-Carlton San Francisco — Nob Hill elegance","St. Regis San Francisco — SoMa modern luxury","Cavallo Point — Golden Gate Bridge lodge"]},
+  {name:"Toronto",iata:"YYZ",country:"Canada",lat:43.6777,lng:-79.6248,tz:-4,
+    outbound:[{fn:"CX826",dep:"19:10",arr:"21:15",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX827",dep:"23:00",arr:"03:30+2",days:[1,2,3,4,5,6,7]}],
+    attractions:["🏙 CN Tower — 553m landmark with glass floor","🌊 Niagara Falls — thundering horseshoe falls (day trip)","🎭 Distillery District — Victorian industrial arts precinct"],
+    itinerary:"D1: CN Tower + Ripley's Aquarium + Harbourfront. D2: Niagara Falls full day trip. D3: Royal Ontario Museum + Kensington Market + Chinatown. D4: St Lawrence Market + Distillery District + fly home.",
+    hotels:["Four Seasons Toronto — Yorkville designer luxury","The Ritz-Carlton Toronto — Financial District elegance","Shangri-La Toronto — University Avenue tower"]},
+  {name:"Vancouver",iata:"YVR",country:"Canada",lat:49.1967,lng:-123.1815,tz:-7,
+    outbound:[{fn:"CX838",dep:"15:30",arr:"11:00",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX839",dep:"13:00",arr:"17:30+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🌲 Stanley Park — 1000-acre urban forest + seawall","🏔 Grouse Mountain — Skyride gondola + alpine views","🐟 Granville Island — public market + artisan studios"],
+    itinerary:"D1: Stanley Park seawall bike + English Bay sunset. D2: Grouse Mountain + Capilano Suspension Bridge. D3: Granville Island + Gastown + Chinatown. D4: Queen Elizabeth Park + VanDusen Gardens + fly home.",
+    hotels:["Fairmont Pacific Rim — Coal Harbour waterfront","Rosewood Hotel Georgia — heritage downtown boutique","Shangri-La Vancouver — tallest building in city"]},
+
+  // ── EUROPE (new) ──
+  {name:"Amsterdam",iata:"AMS",country:"Netherlands",lat:52.3105,lng:4.7683,tz:2,
+    outbound:[{fn:"CX271",dep:"00:50",arr:"07:20",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX270",dep:"11:00",arr:"05:40+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🖼 Rijksmuseum — Rembrandt + Vermeer masterpieces","🌷 Keukenhof Gardens — 7 million tulips (spring)","🚲 Canal Ring — UNESCO bike-friendly waterways"],
+    itinerary:"D1: Canal cruise + Anne Frank House + Jordaan district. D2: Rijksmuseum + Van Gogh Museum + Vondelpark. D3: Keukenhof (spring) or Zaanse Schans windmills. D4: Albert Cuyp Market + De Pijp + fly home.",
+    hotels:["Waldorf Astoria Amsterdam — canal-house luxury","The Dylan — Keizersgracht boutique","Conservatorium Hotel — Museum Quarter landmark"]},
+  {name:"Frankfurt",iata:"FRA",country:"Germany",lat:50.0379,lng:8.5622,tz:2,
+    outbound:[{fn:"CX289",dep:"23:55",arr:"06:52+1",days:[1,3,4,5,6,7]}],
+    inbound:[{fn:"CX288",dep:"11:30",arr:"05:30+1",days:[2,3,4,5,6,7]}],
+    attractions:["🏛 Römer — medieval town hall + half-timbered square","🏙 Main Tower — skyline observation deck","🍺 Sachsenhausen — apple wine tavern district"],
+    itinerary:"D1: Römer + Dom Cathedral + Kleinmarkthalle. D2: Rhine Valley day trip — castles + Riesling wine. D3: Städel Museum + Sachsenhausen apple wine + Main River walk. D4: Palmengarten botanical garden + Zeil shopping + fly home.",
+    hotels:["Villa Kennedy — Rocco Forte riverside retreat","Jumeirah Frankfurt — city centre contemporary","Grandhotel Hessischer Hof — classic opposite Messe"]},
+  {name:"Manchester",iata:"MAN",country:"United Kingdom",lat:53.3537,lng:-2.2750,tz:1,
+    outbound:[{fn:"CX259",dep:"00:55",arr:"06:55",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX258",dep:"22:20",arr:"17:10+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["⚽ Old Trafford — Theatre of Dreams stadium tour","🏛 Manchester Museum — natural history + cultural collections","🎵 Northern Quarter — indie music + street art + bars"],
+    itinerary:"D1: Northern Quarter + Manchester Art Gallery + Piccadilly Gardens. D2: Old Trafford or Etihad Stadium tour + MediaCityUK. D3: Lake District day trip — Windermere + Ambleside. D4: John Rylands Library + Spinningfields brunch + fly home.",
+    hotels:["The Midland — Edwardian railway hotel landmark","King Street Townhouse — rooftop infinity pool","Stock Exchange Hotel — former stock exchange by GG Hospitality"]},
+  {name:"Milan",iata:"MXP",country:"Italy",lat:45.6306,lng:8.7281,tz:2,
+    outbound:[{fn:"CX233",dep:"01:00",arr:"07:55",days:[1,2,3,4,5,6,7]}],
+    inbound:[{fn:"CX234",dep:"12:00",arr:"06:00+1",days:[1,2,3,4,5,6,7]}],
+    attractions:["🖼 The Last Supper — da Vinci's masterpiece in Santa Maria","🏛 Duomo di Milano — Gothic cathedral + rooftop terraces","🛍 Galleria Vittorio Emanuele II — luxury shopping arcade"],
+    itinerary:"D1: Duomo + Galleria + Brera district. D2: Last Supper + Sforza Castle + Parco Sempione. D3: Lake Como day trip — Bellagio + villa gardens. D4: Navigli canal district brunch + Quadrilatero della Moda + fly home.",
+    hotels:["Bulgari Hotel Milano — Brera botanical garden retreat","Mandarin Oriental Milan — Via Andegari elegance","Park Hyatt Milan — Galleria-adjacent luxury"]},
+  {name:"Rome",iata:"FCO",country:"Italy",lat:41.8003,lng:12.2389,tz:2,
+    outbound:[{fn:"CX293",dep:"00:30",arr:"07:35",days:[1,4,6]}],
+    inbound:[{fn:"CX292",dep:"13:00",arr:"06:30+1",days:[1,4,6]}],
+    attractions:["🏛 Colosseum — iconic Roman amphitheatre","⛪ Vatican + Sistine Chapel — Michelangelo's ceiling","⛲ Trevi Fountain — Baroque masterpiece"],
+    itinerary:"D1: Colosseum + Roman Forum + Palatine Hill. D2: Vatican Museums + Sistine Chapel + St Peter's. D3: Trevi Fountain + Spanish Steps + Pantheon + Trastevere dinner. D4: Borghese Gallery + Via Condotti shopping + fly home.",
+    hotels:["Hotel de Russie — Piazza del Popolo secret garden","The St. Regis Rome — Via Veneto grande dame","Hotel Eden — Dorchester Collection rooftop views"]},
+  {name:"Barcelona",iata:"BCN",country:"Spain",lat:41.2971,lng:2.0785,tz:2,
+    outbound:[{fn:"CX317",dep:"00:20",arr:"08:00",days:[1,3,5,6]}],
+    inbound:[{fn:"CX318",dep:"13:00",arr:"07:00+1",days:[1,3,5,6]}],
+    attractions:["⛪ Sagrada Familia — Gaudí's unfinished basilica masterpiece","🏞 Park Güell — mosaic wonderland with city views","🏖 Barceloneta Beach — Mediterranean city beach"],
+    itinerary:"D1: Las Ramblas + Gothic Quarter + Picasso Museum. D2: Sagrada Familia + Park Güell + Gràcia district. D3: Barceloneta Beach + Born district + tapas crawl. D4: Montjuïc + cable car + Joan Miró Foundation + fly home.",
+    hotels:["Hotel Arts Barcelona — Frank Gehry fish tower beachfront","Mandarin Oriental Barcelona — Passeig de Gràcia","El Palace Barcelona — 1919 grand hotel on Gran Via"]},
+  {name:"Madrid",iata:"MAD",country:"Spain",lat:40.4983,lng:-3.5676,tz:2,
+    outbound:[{fn:"CX315",dep:"00:45",arr:"09:15",days:[1,3,5,7]}],
+    inbound:[{fn:"CX316",dep:"12:30",arr:"07:00+1",days:[1,3,5,7]}],
+    attractions:["🖼 Museo del Prado — Velázquez + Goya + El Greco","🏛 Royal Palace — largest functioning royal palace in Europe","🏞 Retiro Park — crystal palace + boating lake"],
+    itinerary:"D1: Prado Museum + Retiro Park + Puerta del Sol. D2: Royal Palace + Almudena Cathedral + La Latina tapas. D3: Toledo day trip — medieval walled city. D4: Gran Vía + Mercado de San Miguel + Malasaña + fly home.",
+    hotels:["The Ritz Madrid — Mandarin Oriental, Prado-view","Four Seasons Madrid — Centro Canalejas landmark","Rosewood Villa Magna — Paseo de la Castellana"]}
+];
+
+const OWM_KEY = "712270799a8b7d594508656a8cdeeab7";
+const AIRLABS_KEY = "87e415c0-508e-43ff-9dea-b329193fc411";
+let liveFlightCache = {};
+let liveLastFetch = 0;
+
+// CX fleet seat configurations (F=First, J=Business, W=PremEco, Y=Economy)
+const AIRCRAFT_CONFIG = {
+  'A359': {name:'A350-900',    cabins:{J:46, W:26, Y:256}},
+  'A35K': {name:'A350-1000',   cabins:{J:46, W:26, Y:281}},
+  'B77W': {name:'777-300ER',   cabins:{F:6,  J:53, W:36, Y:200}},
+  'B772': {name:'777-200',     cabins:{J:50, Y:249}},
+  'A333': {name:'A330-300',    cabins:{J:42, Y:189}},
+  'A321': {name:'A321neo',     cabins:{J:12, Y:150}},
+  'A320': {name:'A320',        cabins:{J:12, Y:138}},
+  'B748': {name:'747-8F',      cabins:{}},
+  'B744': {name:'747-400F',    cabins:{}}
+};
+
+async function fetchLiveFlights() {
+  if (Date.now() - liveLastFetch < 1800000 && Object.keys(liveFlightCache).length > 0) return;
+  try {
+    const [depRes, arrRes] = await Promise.all([
+      fetch(`https://airlabs.co/api/v9/schedules?dep_iata=HKG&airline_iata=CX&api_key=${AIRLABS_KEY}&_fields=flight_iata,dep_iata,arr_iata,status,dep_delayed,arr_delayed,dep_estimated,arr_estimated,dep_gate,dep_terminal,arr_terminal,duration,aircraft_icao,aircraft_iata`),
+      fetch(`https://airlabs.co/api/v9/schedules?arr_iata=HKG&airline_iata=CX&api_key=${AIRLABS_KEY}&_fields=flight_iata,dep_iata,arr_iata,status,dep_delayed,arr_delayed,dep_estimated,arr_estimated,dep_gate,dep_terminal,arr_terminal,duration,aircraft_icao,aircraft_iata`)
+    ]);
+    const depData = await depRes.json();
+    const arrData = await arrRes.json();
+    liveFlightCache = {};
+    [...(depData.response||[]), ...(arrData.response||[])].forEach(f => {
+      if (f.flight_iata) liveFlightCache[f.flight_iata] = f;
+    });
+    liveLastFetch = Date.now();
+    applyLiveBadges();
+    applyAircraftInfo();
+    updateLiveCounter();
+  } catch(e) { console.log('AirLabs fetch error:', e); }
+}
+
+function getLiveStatus(flightIata) {
+  const f = liveFlightCache[flightIata];
+  if (!f) return null;
+  const delay = f.dep_delayed || f.arr_delayed || 0;
+  let badge = '', cls = '';
+  if (f.status === 'cancelled') { badge = '❌ CANCELLED'; cls = 'live-cancelled'; }
+  else if (f.status === 'active' || f.status === 'en-route') { badge = '🛫 IN FLIGHT'; cls = 'live-active'; }
+  else if (f.status === 'landed') { badge = '✅ LANDED'; cls = 'live-landed'; }
+  else if (delay > 30) { badge = `⚠️ DELAYED ${delay}min`; cls = 'live-delayed'; }
+  else if (delay > 0) { badge = `🟡 +${delay}min`; cls = 'live-minor'; }
+  else if (f.status === 'scheduled') { badge = '🟢 ON TIME'; cls = 'live-ontime'; }
+  return {badge, cls, delay, gate: f.dep_gate, terminal: f.dep_terminal, status: f.status};
+}
+
+function applyLiveBadges() {
+  document.querySelectorAll('.flight-row .fn').forEach(el => {
+    const fnText = el.textContent.trim().match(/CX\d+/);
+    if (!fnText) return;
+    const existing = el.parentElement.querySelector('.live-badge');
+    if (existing) existing.remove();
+    const live = getLiveStatus(fnText[0]);
+    if (live) {
+      const span = document.createElement('span');
+      span.className = `live-badge ${live.cls}`;
+      span.textContent = live.badge;
+      if (live.gate) span.title = `Gate ${live.gate}`;
+      el.parentElement.appendChild(span);
+    }
+  });
+}
+
+function updateLiveCounter() {
+  const count = Object.keys(liveFlightCache).length;
+  const el = document.getElementById('liveCount');
+  if (el) el.textContent = count > 0 ? `📡 ${count} live flights tracked` : '';
+}
+
+// Typical CX aircraft per destination IATA (fleet assignment by route)
+const ROUTE_AIRCRAFT = {
+  'CDG':'A359','LHR':'A35K','AMS':'A359','MAN':'B77W','ZRH':'A359','MXP':'A359',
+  'MAD':'B77W','BCN':'B77W','FCO':'A359','FRA':'A359',
+  'JFK':'A35K','LAX':'A35K','SFO':'B77W','YVR':'B77W','YYZ':'B77W','ORD':'B77W',
+  'SYD':'A35K','MEL':'B77W','BNE':'A333','PER':'A333','ADL':'A333','CNS':'A333',
+  'AKL':'A359',
+  'ICN':'A333','NRT':'A333','HND':'A333','KIX':'A321','FUK':'A321','CTS':'A321','OKA':'A321',
+  'TPE':'A321','PEK':'A333','PVG':'A333','CAN':'A321','TFU':'A321','NKG':'A321',
+  'XIY':'A321','CKG':'A321','CGO':'A321','WUH':'A321','XMN':'A321','CTU':'A321',
+  'BKK':'A321','HKT':'A321','SIN':'A333','KUL':'A333','PEN':'A321',
+  'SGN':'A321','HAN':'A321','CGK':'A333','MNL':'A333','DPS':'A333',
+  'KTI':'A321','RGN':'A321',
+  'DEL':'A333','BOM':'A333','CMB':'A333','KTM':'A333','MLE':'A333',
+};
+
+function renderAircraftRow(el) {
+  const dest = el.getAttribute('data-dest') || '';
+  const icao = ROUTE_AIRCRAFT[dest] || '';
+  const cfg  = AIRCRAFT_CONFIG[icao];
+  const CABIN_LABEL = {F:'First',J:'Business',W:'Prem Eco',Y:'Economy'};
+  const CABIN_CLS   = {F:'cc-f',J:'cc-j',W:'cc-w',Y:'cc-y'};
+  const bookUrl = `https://www.cathaypacific.com/cx/en_HK/search-schedule/results.html?departureAirport=HKG&arrivalAirport=${dest}`;
+  if (!cfg) {
+    el.innerHTML = `<a class="ac-book" href="${bookUrl}" target="_blank" rel="noopener">Check seats →</a>`;
+    return;
+  }
+  const chips = Object.entries(cfg.cabins)
+    .map(([c,n]) => `<span class="cabin-chip ${CABIN_CLS[c]}" title="${CABIN_LABEL[c]}">${c}&thinsp;${n}</span>`)
+    .join('');
+  const total = Object.values(cfg.cabins).reduce((s,n)=>s+n,0);
+  el.innerHTML = `
+    <span class="ac-type">🛩 <span>${cfg.name}</span></span>
+    <span class="cabin-chips">${chips}</span>
+    <span style="color:#455a64;font-size:0.65rem">${total} seats</span>
+    <a class="ac-book" href="${bookUrl}" target="_blank" rel="noopener" title="Check live availability on cathaypacific.com">Book →</a>`;
+}
+
+function applyAircraftInfo() {
+  document.querySelectorAll('.ac-info[data-dest]').forEach(renderAircraftRow);
+}
+
+const DAYS = ["","Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const HKG = {lat:22.3080, lng:113.9185};
+
+let selectedDate = new Date();
+let sliderStartDate = new Date();
+let weatherCache = {};
+let selectedDest = null;
+
+// ===================== DATE SLIDER =====================
+function buildSlider() {
+  const slider = document.getElementById('dateSlider');
+  slider.innerHTML = '';
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(sliderStartDate);
+    d.setDate(d.getDate() + i);
+    d.setHours(0,0,0,0);
+    const isToday = d.getTime() === today.getTime();
+    const isSelected = d.toDateString() === selectedDate.toDateString();
+    const chip = document.createElement('div');
+    chip.className = 'date-chip' + (isSelected ? ' active' : '') + (isToday ? ' today' : '');
+    chip.innerHTML = `
+      <span class="day-name">${isToday ? 'Today' : DAY_NAMES[d.getDay()]}</span>
+      <span class="day-num">${d.getDate()}</span>
+      <span class="month">${MONTH_NAMES[d.getMonth()]}</span>`;
+    chip.addEventListener('click', () => {
+      selectedDate = new Date(d);
+      onDateChange();
+    });
+    slider.appendChild(chip);
+  }
+}
+
+function updateDateDisplay() {
+  const d = selectedDate;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const sel = new Date(d);
+  sel.setHours(0,0,0,0);
+  let prefix = '';
+  if (sel.getTime() === today.getTime()) prefix = 'Today — ';
+  else {
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate()+1);
+    if (sel.getTime() === tomorrow.getTime()) prefix = 'Tomorrow — ';
+  }
+  document.getElementById('selectedDateDisplay').textContent =
+    `${prefix}${DAY_FULL[d.getDay()]}, ${d.getDate()} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function onDateChange() {
+  buildSlider();
+  updateDateDisplay();
+  renderGrid();
+  updateMap();
+  // Refresh weather overlays immediately AND after fade-out completes
+  updateMapWeather();
+  setTimeout(() => updateMapWeather(), 1600);
+  updateWeatherPick();
+  document.getElementById('returnPanel').style.display = 'none';
+}
+
+// ===================== MAP (Leaflet) =====================
+let map, routeLines = [], destMarkers = [];
+let prevActiveSet = new Set();
+let wxOverlays = []; // weather icons + warning zones on map
+
+function drawMap() {
+  map = L.map('map', {zoomControl:true, scrollWheelZoom:true}).setView([18, 105], 4);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution:'&copy; OpenStreetMap &copy; CARTO', maxZoom:18
+  }).addTo(map);
+
+  L.circleMarker([HKG.lat, HKG.lng], {radius:10, color:'#fff', weight:2, fillColor:'#00b4d8', fillOpacity:1})
+    .addTo(map).bindTooltip('Hong Kong (HKG)', {permanent:true, direction:'top', className:'map-tip'});
+
+  map.on('moveend', filterCardsByViewport);
+
+  function filterCardsByViewport() {
+    const bounds = map.getBounds();
+    const visible = new Set();
+    DESTINATIONS.forEach(dest => {
+      if (bounds.contains([dest.lat, dest.lng])) visible.add(dest.iata);
+    });
+    let shown = 0;
+    document.querySelectorAll('.card[data-iata]').forEach(card => {
+      const iata = card.getAttribute('data-iata');
+      if (visible.has(iata)) { card.style.display = ''; shown++; }
+      else { card.style.display = 'none'; }
+    });
+    const title = document.getElementById('flightsTitle');
+    if (visible.size < DESTINATIONS.length) {
+      title.textContent = `✈ Showing ${shown} destinations in view`;
+    }
+  }
+
+  DESTINATIONS.forEach(dest => {
+    const line = L.polyline([[HKG.lat, HKG.lng],[dest.lat, dest.lng]], {
+      color:'#00b4d8', weight:1.5, dashArray:'6,4', opacity:0.4
+    }).addTo(map);
+    routeLines.push({line, iata:dest.iata});
+
+    const marker = L.circleMarker([dest.lat, dest.lng], {
+      radius:7, color:'#fff', weight:1.5, fillColor:'#ff6b35', fillOpacity:0.9
+    }).addTo(map);
+    marker.bindTooltip(`${dest.name} (${dest.iata})`, {direction:'top', className:'map-tip'});
+    marker.on('click', () => showReturn(dest));
+    destMarkers.push({marker, iata:dest.iata});
+  });
+}
+
+function updateMap() {
+  const dow = getSelectedDOW();
+  const newActiveSet = new Set();
+  DESTINATIONS.forEach(dest => {
+    if (flightsForDay(dest.outbound, dow).length > 0) newActiveSet.add(dest.iata);
+  });
+
+  destMarkers.forEach(({marker, iata}) => {
+    const dest = DESTINATIONS.find(d => d.iata === iata);
+    const flights = flightsForDay(dest.outbound, dow);
+    const wasActive = prevActiveSet.has(iata);
+    const isActive = flights.length > 0;
+
+    marker.unbindTooltip();
+    if (!isActive) {
+      if (wasActive) {
+        // LOST — flash red, shrink, then vanish after 1.5s
+        marker.setStyle({fillColor:'#ff1744', fillOpacity:1, radius:12, weight:2, color:'#ff1744'});
+        setTimeout(() => marker.setStyle({fillColor:'#ff1744', fillOpacity:0.6, radius:8, weight:1, color:'#ff1744'}), 500);
+        setTimeout(() => marker.setStyle({fillColor:'#ff1744', fillOpacity:0.2, radius:4, weight:0.5, color:'#ff1744'}), 1000);
+        setTimeout(() => { map.removeLayer(marker); }, 1500);
+      } else {
+        if (map.hasLayer(marker)) map.removeLayer(marker);
+      }
+    } else {
+      if (!map.hasLayer(marker)) map.addLayer(marker);
+      if (!wasActive) {
+        // GAINED — appear small, grow to green over 1.5s
+        marker.setStyle({fillColor:'#00e676', fillOpacity:0.3, radius:3, weight:1, color:'#fff'});
+        setTimeout(() => marker.setStyle({fillColor:'#00e676', fillOpacity:0.6, radius:6, weight:1.5, color:'#fff'}), 500);
+        setTimeout(() => marker.setStyle({fillColor:'#00e676', fillOpacity:1, radius:9, weight:2, color:'#fff'}), 1000);
+      } else {
+        marker.setStyle({fillColor:'#00e676', fillOpacity:1, radius:9, weight:2, color:'#fff'});
+      }
+      marker.bindTooltip(`${dest.name} (${dest.iata}) — ${flights.length} flight${flights.length>1?'s':''}`, {direction:'top', className:'map-tip'});
+    }
+  });
+
+  routeLines.forEach(({line, iata}) => {
+    const dest = DESTINATIONS.find(d => d.iata === iata);
+    const flights = flightsForDay(dest.outbound, dow);
+    const wasActive = prevActiveSet.has(iata);
+    const isActive = flights.length > 0;
+
+    if (!isActive) {
+      if (wasActive) {
+        // Fade out over 1.5s
+        line.setStyle({color:'#ff1744', opacity:0.7, weight:2.5});
+        setTimeout(() => line.setStyle({color:'#ff1744', opacity:0.3, weight:1.5}), 500);
+        setTimeout(() => line.setStyle({color:'#ff1744', opacity:0.1, weight:0.5}), 1000);
+        setTimeout(() => { map.removeLayer(line); }, 1500);
+      } else {
+        if (map.hasLayer(line)) map.removeLayer(line);
+      }
+    } else if (isActive && !wasActive) {
+      // Fade in over 1.5s
+      if (!map.hasLayer(line)) map.addLayer(line);
+      line.setStyle({color:'#00b4d8', opacity:0.1, weight:0.5});
+      setTimeout(() => line.setStyle({color:'#00b4d8', opacity:0.3, weight:1.5}), 500);
+      setTimeout(() => line.setStyle({color:'#00b4d8', opacity:0.6, weight:2}), 1000);
+    } else if (isActive) {
+      if (!map.hasLayer(line)) map.addLayer(line);
+      line.setStyle({color:'#00b4d8', opacity:0.6, weight:2});
+    }
+  });
+
+  prevActiveSet = newActiveSet;
+}
+
+// ===================== MAP WEATHER OVERLAY =====================
+function getSelectedDateKey() {
+  return selectedDate.toISOString().slice(0,10);
+}
+
+function getWeatherForDate(data, dateKey) {
+  if (!data || !data.list) return [];
+  return data.list.filter(i => new Date(i.dt * 1000).toISOString().slice(0,10) === dateKey);
+}
+
+function classifyWeather(items) {
+  if (items.length === 0) return {emoji:'—', color:'#546e7a', severe:false, desc:'No data'};
+  const dominated = {};
+  items.forEach(i => { const m = i.weather[0].main; dominated[m] = (dominated[m]||0)+1; });
+  const topCondition = Object.entries(dominated).sort((a,b) => b[1]-a[1])[0][0];
+  const hasStorm = items.some(i => ['Thunderstorm','Tornado','Squall','Hurricane'].includes(i.weather[0].main));
+  const hasHeavyRain = items.some(i => i.rain && i.rain['3h'] > 10);
+  const hasRain = items.some(i => ['Rain','Drizzle'].includes(i.weather[0].main));
+  const severe = hasStorm || hasHeavyRain;
+  const temps = items.map(i => i.main.temp);
+  const hi = Math.round(Math.max(...temps)), lo = Math.round(Math.min(...temps));
+  const descs = {};
+  items.forEach(i => { descs[i.weather[0].description] = (descs[i.weather[0].description]||0)+1; });
+  const topDesc = Object.entries(descs).sort((a,b)=>b[1]-a[1])[0][0];
+
+  let emoji, color;
+  if (severe) { emoji = '⛔'; color = '#ff1744'; }
+  else if (hasRain) { emoji = '🌧'; color = '#42a5f5'; }
+  else if (['Clouds'].includes(topCondition)) { emoji = '☁️'; color = '#78909c'; }
+  else { emoji = '☀️'; color = '#ffab00'; }
+
+  return {emoji, color, severe, desc: topDesc, hi, lo, hasRain};
+}
+
+function updateMapWeather() {
+  wxOverlays.forEach(o => map.removeLayer(o));
+  wxOverlays = [];
+  const dateKey = getSelectedDateKey();
+
+  DESTINATIONS.forEach(dest => {
+    const data = weatherCache[dest.iata];
+    const items = getWeatherForDate(data, dateKey);
+    if (items.length === 0) return;
+
+    const wx = classifyWeather(items);
+    const clouds = items.length > 0 ? Math.round(items.reduce((s,i) => s + (i.clouds?.all||0), 0) / items.length) : 0;
+
+    // Subtle ambient weather zone — large soft circle
+    let fill, opacity;
+    if (wx.severe) { fill = '#ff1744'; opacity = 0.18; }
+    else if (wx.hasRain) { fill = '#42a5f5'; opacity = 0.06 + clouds * 0.0012; }
+    else if (clouds > 60) { fill = '#78909c'; opacity = 0.05 + clouds * 0.0008; }
+    else { fill = '#ffab00'; opacity = 0.04; }
+
+    const ambientZone = L.circle([dest.lat, dest.lng], {
+      radius: 200000, color: 'transparent', fillColor: fill,
+      fillOpacity: opacity, weight: 0
+    }).addTo(map);
+    wxOverlays.push(ambientZone);
+
+    if (wx.severe) {
+      const zone = L.circle([dest.lat, dest.lng], {
+        radius: 120000, color: '#ff1744', fillColor: '#ff1744',
+        fillOpacity: 0.15, weight: 1.5, dashArray: '4,4'
+      }).addTo(map);
+      zone.bindTooltip(`⚠️ ${dest.name}: SEVERE — ${wx.desc}`, {direction:'top', className:'map-tip'});
+      wxOverlays.push(zone);
+    }
+
+    const icon = L.divIcon({
+      className: 'wx-map-icon',
+      html: `<span style="font-size:18px;filter:drop-shadow(0 0 3px ${wx.color})">${wx.emoji}</span>`,
+      iconSize: [24, 24],
+      iconAnchor: [-8, 12]
+    });
+    const wxMarker = L.marker([dest.lat, dest.lng], {icon, interactive: false}).addTo(map);
+    wxOverlays.push(wxMarker);
+  });
+}
+
+// ===================== FLIGHT LOGIC =====================
+// Park Island bus: leaves on :00 and :30. Walk out 5min before.
+// Need to be at airport 1h20min before takeoff.
+// Bus to airport ~40min. So: arrive airport = bus depart + 40min.
+// Must arrive by: takeoff - 1h20m. So bus must depart by: takeoff - 1h20m - 40min = takeoff - 2h.
+// Latest bus = round DOWN to :00 or :30. Leave home = bus - 5min.
+const BUS_TO_AIRPORT_MIN = 40;
+const AIRPORT_BEFORE_MIN = 80; // 1h20m before takeoff
+const WALK_TO_BUS_MIN = 5;
+
+const CX_LOGO = '';
+const UO_LOGO = '';
+const ONEWORLD = ['QF','BA','JL','AA','IB','AY','MH','QR','RJ','S7','UL','AT','FJ'];
+
+function carrierInfo(fn) {
+  const code = fn.slice(0,2);
+  if (code === 'CX') return {logo: CX_LOGO, tag:'Cathay', cls:'carrier-cx', preferred:true};
+  if (code === 'UO') return {logo: UO_LOGO, tag:'HK Express', cls:'carrier-uo', preferred:false};
+  if (ONEWORLD.includes(code)) return {logo:'', tag:'oneworld', cls:'carrier-ow', preferred:false};
+  return {logo:'', tag: code, cls:'carrier-other', preferred:false};
+}
+
+function calcSunRain(items) {
+  if (!items.length) return {sunH:0, rainH:0, rainPct:0, totalH:0};
+  const totalH = items.length * 3;
+  const sunSlots = items.filter(i => ['Clear','Clouds'].includes(i.weather[0].main) && (i.clouds?.all||0) < 50);
+  const rainSlots = items.filter(i => ['Rain','Drizzle','Thunderstorm'].includes(i.weather[0].main));
+  return {sunH: sunSlots.length * 3, rainH: rainSlots.length * 3, rainPct: Math.round((rainSlots.length/items.length)*100), totalH};
+}
+
+function wxEmoji(iconCode) {
+  const c = iconCode.replace('n','d');
+  const map = {'01d':'☀️','02d':'🌤️','03d':'⛅','04d':'☁️','09d':'🌧️','10d':'🌦️','11d':'⛈️','13d':'❄️','50d':'🌫️'};
+  return map[c] || '🌤️';
+}
+
+function getWeatherRanking() {
+  const dateKey = getSelectedDateKey();
+  const dow = selectedDate.getDay() || 7;
+  const scored = [];
+  DESTINATIONS.forEach(dest => {
+    if (!dest.outbound.some(f => f.days.includes(dow))) return;
+    const data = weatherCache[dest.iata];
+    if (!data) return;
+    const items = getWeatherForDate(data, dateKey);
+    if (items.length === 0) return;
+    const wx = classifyWeather(items);
+    const sr = calcSunRain(items);
+    let score = sr.sunH * 5 + wx.hi;
+    if (wx.severe) score -= 50;
+    if (sr.rainH > 0) score -= sr.rainH * 3;
+    scored.push({dest, wx, sr, score});
+  });
+  return scored.sort((a,b) => b.score - a.score);
+}
+
+function calcDuration(dep, arr, destTz) {
+  const [dh,dm] = dep.split(':').map(Number);
+  const clean = arr.replace(/[+-]\d/,'');
+  const [ah, am] = clean.split(':').map(Number);
+  const plus = parseInt((arr.match(/\+(\d)/)||[0,0])[1]);
+  if (destTz !== undefined) {
+    const depUTC = dh*60+dm - 480;
+    const arrUTC = ah*60+am + plus*1440 - destTz*60;
+    let mins = arrUTC - depUTC;
+    while (mins <= 0) mins += 1440;
+    while (mins > 1440) mins -= 1440;
+    const h = Math.floor(mins/60), m = mins%60;
+    return {mins, label: m ? `${h}h${m.toString().padStart(2,'0')}` : `${h}h`};
+  }
+  let mins = (ah*60+am) + plus*1440 - (dh*60+dm);
+  if (mins <= 0) mins += 1440;
+  const h = Math.floor(mins/60), m = mins%60;
+  return {mins, label: m ? `${h}h${m.toString().padStart(2,'0')}` : `${h}h`};
+}
+
+function calcLeaveHome(depTime) {
+  const [hh, mm] = depTime.split(':').map(Number);
+  const flightMin = hh * 60 + mm;
+  const latestArrival = flightMin - AIRPORT_BEFORE_MIN;
+  const latestBus = latestArrival - BUS_TO_AIRPORT_MIN;
+  // Round down to :00 or :30
+  const busHour = Math.floor(latestBus / 60);
+  const busMinPart = latestBus % 60;
+  const busDep = busMinPart >= 30 ? busHour * 60 + 30 : busHour * 60;
+  const leaveHome = busDep - WALK_TO_BUS_MIN;
+  const lh = leaveHome < 0 ? leaveHome + 1440 : leaveHome;
+  const busActual = busDep < 0 ? busDep + 1440 : busDep;
+  const fmt = m => `${String(Math.floor(((m%1440)+1440)%1440/60)).padStart(2,'0')}:${String(((m%1440)+1440)%1440%60).padStart(2,'0')}`;
+  const airportArr = busActual + BUS_TO_AIRPORT_MIN;
+  return {
+    leaveHome: fmt(lh),
+    busDep: fmt(busActual),
+    airportArr: fmt(airportArr),
+    counterCloses: fmt(flightMin - 60),
+    dep: depTime,
+    tight: (latestBus - busDep) < 15
+  };
+}
+
+function getSelectedDOW() {
+  const jsDay = selectedDate.getDay();
+  return jsDay === 0 ? 7 : jsDay;
+}
+
+function flightsForDay(flights, dow) {
+  return flights.filter(f => f.days.includes(dow));
+}
+
+function freqLabel(days) {
+  if (days.length === 7) return "Daily";
+  return days.map(d => DAYS[d]).join(", ");
+}
+
+// ===================== RENDER CARDS =====================
+function renderGrid() {
+  const dow = getSelectedDOW();
+  const grid = document.getElementById('flightGrid');
+  grid.innerHTML = '';
+  let totalFlights = 0;
+  let availableDests = 0;
+
+  // Build array of {dest, flights} and sort by earliest departure
+  const destCards = DESTINATIONS.map(dest => {
+    const flights = flightsForDay(dest.outbound, dow);
+    const sorted = [...flights].sort((a,b) => a.dep.localeCompare(b.dep));
+    return {dest, flights: sorted};
+  });
+  destCards.sort((a,b) => {
+    if (a.flights.length === 0 && b.flights.length === 0) return 0;
+    if (a.flights.length === 0) return 1;
+    if (b.flights.length === 0) return -1;
+    return a.flights[0].dep.localeCompare(b.flights[0].dep);
+  });
+
+  destCards.filter(d => d.flights.length > 0).forEach(({dest, flights}) => {
+    totalFlights += flights.length;
+    availableDests++;
+    const card = document.createElement('div');
+    card.className = 'card'; card.setAttribute('data-iata', dest.iata);
+    card.innerHTML = `
+      <div class="card-inner">
+        <div class="card-left">
+          <span class="dest">${dest.name}</span>
+          <span class="iata">${dest.iata}</span>
+          <span class="country">${dest.country}</span>
+        </div>
+        <div class="card-mid">
+          ${flights.map(f => {
+                const lh = calcLeaveHome(f.dep);
+                const dur = calcDuration(f.dep, f.arr, dest.tz);
+                const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
+                const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
+                const cr = carrierInfo(f.fn);
+                return `
+                <div class="flight-block">
+                  <div class="flight-row">
+                    <span class="fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
+                    <span class="times">${f.dep} → ${f.arr}</span>
+                    <span class="lh-flight-dur"><span class="lh-dur-bar" style="width:${pct}px;background:${barCol}"></span><span class="lh-dur-label">${dur.label}</span></span>
+                    <span class="freq badge">${freqLabel(f.days)}</span>
+                  </div>
+                  <div class="leave-home-row${lh.tight ? ' tight' : ''}">
+                    <span class="lh-step lh-home">🚪 <span class="lh-t">${lh.leaveHome}</span><span class="lh-l">leave</span></span><span class="lh-sep">›</span>
+                    <span class="lh-step">🚌 <span class="lh-t">${lh.busDep}</span><span class="lh-l">bus</span></span><span class="lh-sep">›</span>
+                    <span class="lh-step">🏢 <span class="lh-t">${lh.airportArr}</span><span class="lh-l">airport</span></span><span class="lh-sep">›</span>
+                    <span class="lh-step">🛂 <span class="lh-t">${lh.counterCloses}</span><span class="lh-l">check-in</span></span><span class="lh-sep">›</span>
+                    <span class="lh-step">✈️ <span class="lh-t">${f.dep}</span><span class="lh-l">depart</span></span><span class="lh-sep">›</span>
+                    <span class="lh-step">📍 <span class="lh-t" style="color:#00b4d8">${f.arr}</span><span class="lh-l">arrive</span></span>
+                  </div>
+                  <div class="ac-info" data-fn="${f.fn}" data-dest="${dest.iata}" data-dep="${f.dep}">
+                    <span class="ac-loading">🛩 aircraft loading…</span>
+                  </div>
+                </div>`;
+              }).join('')}
+        </div>
+        <div class="card-right">
+          <div class="weather-section" id="wx-${dest.iata}">
+            <span class="wx-loading">Loading forecast…</span>
+          </div>
+        </div>
+      </div>
+      ${dest.attractions ? `<div class="travel-section">
+        <div class="travel-col"><h4>🎯 Things to Do</h4>${dest.attractions.map(a=>`<div class="t-item">${a}</div>`).join('')}</div>
+        <div class="travel-col"><h4>📋 4-Day Itinerary</h4><div class="itinerary-text">${dest.itinerary.replace(/D(\d):/g,'<strong>Day $1:</strong>')}</div></div>
+        <div class="travel-col"><h4>🏨 Top Hotels</h4>${dest.hotels.map(h=>`<div class="t-item">${h}</div>`).join('')}</div>
+      </div>` : ''}`;
+    if (flights.length > 0) {
+      card.addEventListener('click', () => showReturn(dest));
+    }
+    grid.appendChild(card);
+    card.querySelectorAll('.ac-info[data-dest]').forEach(renderAircraftRow);
+    fetchWeather(dest);
+  });
+
+  document.getElementById('statFlights').textContent = totalFlights;
+  document.getElementById('statDests').textContent = availableDests;
+  document.getElementById('statNoFlight').textContent = DESTINATIONS.length - availableDests;
+  document.getElementById('flightsTitle').textContent =
+    `✈ ${totalFlights} Flights to ${availableDests} Destinations`;
+}
+
+// ===================== WEATHER (5-day forecast) =====================
+function updateWeatherPick() {
+  const dateKey = getSelectedDateKey();
+  const dow = selectedDate.getDay() || 7;
+  let best = null, bestScore = -Infinity;
+  DESTINATIONS.forEach(dest => {
+    if (!dest.outbound.some(f => f.days.includes(dow))) return;
+    const data = weatherCache[dest.iata];
+    if (!data) return;
+    const items = getWeatherForDate(data, dateKey);
+    if (items.length === 0) return;
+    const wx = classifyWeather(items);
+    if (wx.severe) return;
+    const sr = calcSunRain(items);
+    let score = sr.sunH * 5 + wx.hi;
+    if (wx.severe) return;
+    if (sr.rainH > 0) score -= sr.rainH * 3;
+    if (score > bestScore) { bestScore = score; best = {dest, wx, sr}; }
+  });
+  const box = document.getElementById('weatherPick');
+  if (!best) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const f = best.dest.outbound.find(f => f.days.includes(dow));
+  document.getElementById('weatherPickBody').textContent =
+    `${best.wx.emoji} Fly to ${best.dest.name} (${best.dest.iata}) — ${best.wx.hi}°C, ☀️ ${best.sr.sunH}h sunshine${best.sr.rainH > 0 ? `, 🌧️ ${best.sr.rainH}h rain` : ', no rain ✓'}`;
+  const lh = calcLeaveHome(f.dep);
+  document.getElementById('weatherPickSub').textContent =
+    `${f.fn} departing ${f.dep} · Leave home ${lh.leaveHome} · ${best.dest.attractions?.[0] || ''}`;
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('pick-highlight'));
+  document.querySelector(`[data-iata="${best.dest.iata}"]`)?.classList.add('pick-highlight');
+}
+
+async function fetchWeather(dest) {
+  const el = document.getElementById(`wx-${dest.iata}`);
+  if (!el) return;
+  if (weatherCache[dest.iata]) { renderForecast(el, weatherCache[dest.iata], dest); return; }
+  try {
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${dest.lat}&lon=${dest.lng}&appid=${OWM_KEY}&units=metric`);
+    const data = await res.json();
+    if (data.cod !== '200') throw new Error();
+    weatherCache[dest.iata] = data;
+    renderForecast(el, data, dest);
+    updateMapWeather();
+    updateWeatherPick(); renderWeatherTop5();
+  } catch(e) {
+    el.innerHTML = '<span class="wx-loading">Weather unavailable</span>';
+  }
+}
+
+function renderForecast(el, data, dest) {
+  const list = data.list;
+  const selKey = getSelectedDateKey();
+
+  // Group by day — pick midday (12:00) entry or closest
+  const dayMap = {};
+  list.forEach(item => {
+    const d = new Date(item.dt * 1000);
+    const key = d.toISOString().slice(0,10);
+    const hour = d.getHours();
+    if (!dayMap[key] || Math.abs(hour - 13) < Math.abs(new Date(dayMap[key].dt * 1000).getHours() - 13)) {
+      dayMap[key] = item;
+    }
+  });
+  const days = Object.keys(dayMap).sort().slice(0, 7);
+
+  // Selected day weather — prominent display
+  const selItems = getWeatherForDate(data, selKey);
+  const selWx = classifyWeather(selItems);
+  let selHTML = '';
+  if (selItems.length > 0) {
+    const midItem = selItems[Math.floor(selItems.length/2)];
+    const sr = calcSunRain(selItems);
+    const sunBar = Math.round((sr.sunH / Math.max(sr.totalH,1)) * 100);
+    const rainBar = Math.round((sr.rainH / Math.max(sr.totalH,1)) * 100);
+    selHTML = `
+      <div class="wx-selected-day">
+        <span style="font-size:2.2rem;filter:brightness(1.3)">${wxEmoji(midItem.weather[0].icon)}</span>
+        <div class="wx-sel-info" style="flex:1">
+          <div class="wx-sel-temp">${selWx.lo}–${selWx.hi}°C ${selWx.emoji}</div>
+          <div class="wx-sel-desc">${selWx.desc}${selWx.severe ? ' · ⚠️ AVOID' : ''}</div>
+          <div style="display:flex;gap:12px;margin-top:5px;align-items:center">
+            <div style="display:flex;align-items:center;gap:4px"><span style="font-size:1.1rem">☀️</span><strong style="color:#ffd600;font-size:0.9rem">${sr.sunH}h sun</strong></div>
+            <div style="flex:1;height:6px;background:#1a2a3a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${sunBar}%;background:linear-gradient(90deg,#ffd600,#ffab00);border-radius:3px"></div></div>
+            ${sr.rainH > 0 ? `<div style="display:flex;align-items:center;gap:4px"><span style="font-size:1.1rem">🌧️</span><span style="color:#42a5f5;font-size:0.8rem;font-weight:600">${sr.rainH}h (${sr.rainPct}%)</span></div>
+            <div style="flex:0.5;height:6px;background:#1a2a3a;border-radius:3px;overflow:hidden"><div style="height:100%;width:${rainBar}%;background:#42a5f5;border-radius:3px"></div></div>` : '<span style="color:#00e676;font-size:0.75rem;font-weight:600">No rain ✓</span>'}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // 7-day mini calendar with selected day highlighted
+  let forecastHTML = '<div class="wx-forecast">';
+  days.forEach(key => {
+    const item = dayMap[key];
+    const d = new Date(key + 'T12:00:00');
+    const dayName = DAY_NAMES[d.getDay()];
+    const dateNum = d.getDate();
+    const hi = Math.round(item.main.temp_max);
+    const lo = Math.round(item.main.temp_min);
+    const icon = item.weather[0].icon;
+    const isSel = key === selKey;
+    const daySR = calcSunRain(getWeatherForDate(data, key));
+    const jsDay = d.getDay();
+    const dataDay = jsDay === 0 ? 7 : jsDay;
+    const retFlights = dest && dest.inbound ? dest.inbound.filter(f => f.days.includes(dataDay)) : [];
+    const hasReturn = retFlights.length > 0;
+    const retTip = hasReturn ? retFlights.map(f => f.fn + ' ' + f.dep).join(', ') : '';
+    forecastHTML += `
+      <div class="wx-day${isSel ? ' wx-day-active' : ''}">
+        <div class="wx-d">${dayName} ${dateNum}</div>
+        <span class="wx-emoji">${wxEmoji(icon)}</span>
+        <div class="wx-t">${hi}°</div>
+        <div style="font-size:0.6rem;color:${daySR.sunH >= 9 ? '#ffd600' : daySR.sunH >= 6 ? '#ffab00' : '#78909c'};font-weight:700">☀${daySR.sunH}h</div>
+        ${daySR.rainH > 0 ? `<div style="font-size:0.55rem;color:#42a5f5">🌧${daySR.rainH}h</div>` : ''}
+        <div style="font-size:0.65rem;margin-top:3px;${hasReturn ? 'color:#4fc3f7' : 'color:#37474f'}" title="${retTip}">${hasReturn ? '✈️' + retFlights[0].dep : '—'}</div>
+      </div>`;
+  });
+  forecastHTML += '</div>';
+
+  // Period summaries relative to selected date
+  const selStart = new Date(selKey + 'T00:00:00').getTime();
+  const periods = [
+    {label:'Morning', startH:6, endH:12},
+    {label:'Afternoon', startH:12, endH:18},
+    {label:'Evening', startH:18, endH:24}
+  ];
+
+  let summaryHTML = '<div class="wx-summary">';
+  periods.forEach(p => {
+    const items = list.filter(item => {
+      const dt = item.dt * 1000;
+      const h = (dt - selStart) / 3600000;
+      return h >= p.startH && h < p.endH;
+    });
+    if (items.length === 0) return;
+    const temps = items.map(i => i.main.temp);
+    const hi = Math.round(Math.max(...temps));
+    const lo = Math.round(Math.min(...temps));
+    const descs = {};
+    items.forEach(i => { descs[i.weather[0].description] = (descs[i.weather[0].description]||0)+1; });
+    const topDesc = Object.entries(descs).sort((a,b)=>b[1]-a[1])[0][0];
+    const mainIcon = items[Math.floor(items.length/2)].weather[0].icon;
+    const rainItems = items.filter(i => i.rain && i.rain['3h'] > 0);
+    const rainChance = Math.round((rainItems.length / items.length) * 100);
+
+    summaryHTML += `
+      <div class="wx-period">
+        <span class="wx-period-label">${p.label}</span>
+        <span style="font-size:1.1rem">${wxEmoji(mainIcon)}</span>
+        <span class="wx-period-detail">${topDesc}, ${lo}–${hi}°C${rainChance > 0 ? ` 🌧 ${rainChance}%` : ''}</span>
+      </div>`;
+  });
+  summaryHTML += '</div>';
+
+  // Weather ranking for this destination
+  const ranking = getWeatherRanking();
+  const thisRank = ranking.findIndex(r => r.dest.iata === el.id.replace('wx-','')) + 1;
+  let rankHTML = '';
+  if (thisRank > 0) {
+    rankHTML = `<div class="wx-rank-section"><div class="wx-rank-title">☀️ Weather Rank: #${thisRank} of ${ranking.length}</div></div>`;
+  }
+
+  el.innerHTML = selHTML + forecastHTML + summaryHTML + rankHTML;
+}
+
+function renderWeatherTop5() {
+  let box = document.getElementById('weatherTop5');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'weatherTop5';
+    box.style.cssText = 'background:#0d1b2a;border:1px solid #1a3a5c;border-radius:12px;padding:14px 20px;margin-bottom:16px';
+    document.getElementById('weatherPick').after(box);
+  }
+  const ranking = getWeatherRanking();
+  const top8 = ranking.slice(0, 8);
+  if (top8.length === 0) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  const maxSun = Math.max(...top8.map(r => r.sr.sunH), 1);
+  box.innerHTML = `
+    <div class="wx-rank-title" style="margin-bottom:10px">🏆 Top 8 Weather Destinations Today</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${top8.map((r, i) => {
+      const sunPct = Math.round((r.sr.sunH / maxSun) * 100);
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      return `<div style="background:#0a1628;border:1px solid ${i < 3 ? '#ffd600' : '#1a3a5c'};border-radius:10px;padding:10px;text-align:center;position:relative;${i === 0 ? 'box-shadow:0 0 12px rgba(255,214,0,0.2)' : ''}">
+        <div style="font-size:0.62rem;color:#546e7a;position:absolute;top:6px;left:8px">#${i+1}</div>
+        ${medal ? `<div style="position:absolute;top:4px;right:6px;font-size:0.9rem">${medal}</div>` : ''}
+        <div style="font-size:1.5rem;margin:2px 0">${r.wx.emoji}</div>
+        <div style="font-size:0.85rem;font-weight:700;color:#fff">${r.dest.name}</div>
+        <div style="font-size:0.68rem;color:#546e7a;margin-bottom:6px">${r.dest.iata} · ${r.wx.hi}°C</div>
+        <div style="display:flex;align-items:center;gap:4px;justify-content:center">
+          <span style="font-size:0.8rem">☀️</span>
+          <div style="flex:1;height:5px;background:#1a2a3a;border-radius:3px;max-width:60px"><div style="height:100%;width:${sunPct}%;background:linear-gradient(90deg,#ffd600,#ff9100);border-radius:3px"></div></div>
+          <span style="font-size:0.72rem;font-weight:700;color:#ffd600">${r.sr.sunH}h</span>
+        </div>
+        ${r.sr.rainH > 0 ? `<div style="font-size:0.65rem;color:#42a5f5;margin-top:3px">🌧 ${r.sr.rainH}h (${r.sr.rainPct}%)</div>` : `<div style="font-size:0.65rem;color:#00e676;margin-top:3px">No rain ✓</div>`}
+      </div>`}).join('')}
+    </div>`;
+  box.querySelectorAll('[style*="background:#0a1628"]').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+      const name = card.querySelector('div[style*="font-weight:700;color:#fff"]').textContent;
+      document.querySelector(`[data-iata] .dest`)?.closest('.card');
+      const target = [...document.querySelectorAll('.card')].find(c => c.querySelector('.dest')?.textContent === name);
+      if (target) target.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+  });
+}
+
+// ===================== RETURN PANEL =====================
+function showReturn(dest) {
+  selectedDest = dest;
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.card').forEach(c => {
+    if (c.querySelector('.iata') && c.querySelector('.iata').textContent === dest.iata) c.classList.add('active');
+  });
+  const dow = getSelectedDOW();
+  const allReturns = dest.inbound;
+  const panel = document.getElementById('returnPanel');
+  document.getElementById('returnTitle').textContent = `↩ Return Flights: ${dest.name} (${dest.iata}) → HKG`;
+  document.getElementById('returnList').innerHTML = allReturns.map(f => {
+    const available = f.days.includes(dow);
+    return `<div class="return-row" style="${available ? '' : 'opacity:0.4'}">
+      <span class="fn">${f.fn}</span>
+      <span class="times">${f.dep} → ${f.arr}</span>
+      <span class="freq badge">${freqLabel(f.days)}</span>
+      ${available ? '<span class="badge" style="background:#00b4d8;color:#fff">Today</span>' : ''}
+    </div>`;
+  }).join('');
+  panel.style.display = 'block';
+  panel.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  selectedDate = new Date(today);
+  sliderStartDate = new Date(today);
+
+  buildSlider();
+  updateDateDisplay();
+  renderGrid();
+  drawMap();
+  // Seed prevActiveSet so first render doesn't animate everything
+  const initDow = getSelectedDOW();
+  DESTINATIONS.forEach(d => { if (flightsForDay(d.outbound, initDow).length > 0) prevActiveSet.add(d.iata); });
+  updateMap();
+  fetchLiveFlights();
+  setInterval(fetchLiveFlights, 1800000);
+
+  document.getElementById('prevWeek').addEventListener('click', () => {
+    sliderStartDate.setDate(sliderStartDate.getDate() - 7);
+    buildSlider();
+  });
+  document.getElementById('nextWeek').addEventListener('click', () => {
+    sliderStartDate.setDate(sliderStartDate.getDate() + 7);
+    buildSlider();
+  });
+});
+</script>
+
+</body>
+</html>
