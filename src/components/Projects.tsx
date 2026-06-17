@@ -81,6 +81,22 @@ const PROJECTS: {
     status: 'Beta',
   },
   {
+    icon: '⛳',
+    title: 'GolfTOOL',
+    desc: 'AI-powered golf intelligence platform. Course analysis, player performance, and content automation — all agent-run with a dedicated OpenClaw agent.',
+    url: 'https://golftool.krispyking.com',
+    badge: 'AI / Sports',
+    status: 'Live',
+  },
+  {
+    icon: '✈️',
+    title: 'Flight Planner',
+    desc: 'AI travel planning tool. Itinerary building, route optimisation, and destination intelligence — built on top of 30 years of passport-stamped experience.',
+    url: 'https://www.krispyking.com/travel',
+    badge: 'AI / Travel',
+    status: 'Beta',
+  },
+  {
     icon: '🏢',
     title: '12E Block 5',
     desc: 'AI-managed residential property at Park Island, Hong Kong. A dedicated agent handles tenant management, lease reviews, maintenance scheduling, and admin — fully autonomous, human-in-the-loop for key decisions.',
