@@ -229,17 +229,17 @@
     .wx-day{min-width:40px}
   }
   /* REGION FILTER BAR */
-  .region-bar{background:#03080f;border-bottom:1px solid #0a1e2e;position:sticky;top:0;z-index:100}
-  .region-map-wrap{width:100%;overflow:hidden}
-  .region-map-wrap svg{width:100%;height:110px;display:block}
+  .region-bar{background:#03080f;border-bottom:1px solid #0a1e2e;position:sticky;top:0;z-index:100;display:flex;align-items:stretch}
+  .region-map-wrap{width:22%;max-width:220px;min-width:100px;flex-shrink:0;border-right:1px solid #0a1e2e;padding:4px 0;display:flex;align-items:center}
+  .region-map-wrap svg{width:100%;height:auto;display:block}
   .region-area{fill:#0a1e32;stroke:#0e2840;stroke-width:1.5;cursor:pointer;transition:fill 0.25s,stroke 0.25s}
   .region-area:hover{fill:#152e4a;stroke:#1e4a78}
-  .region-area.active{fill:#003d5c;stroke:#00b4d8;stroke-width:2}
-  .r-lbl{font-family:'Segoe UI',sans-serif;font-weight:900;fill:#152535;cursor:pointer;user-select:none;transition:fill 0.25s;text-transform:uppercase;letter-spacing:4px}
+  .region-area.active{fill:#003d5c;stroke:#00b4d8;stroke-width:2.5}
+  .r-lbl{font-family:'Segoe UI',sans-serif;font-weight:900;fill:#0d1e2e;cursor:pointer;user-select:none;transition:fill 0.25s;text-transform:uppercase;letter-spacing:2px;font-size:56px}
   .r-lbl:hover,.r-lbl.active{fill:#00b4d8}
-  .region-pills{display:flex;gap:6px;padding:6px 14px 8px;overflow-x:auto;scrollbar-width:none;border-top:1px solid #0a1a2a}
+  .region-pills{flex:1;display:flex;gap:6px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap;align-content:center}
   .region-pills::-webkit-scrollbar{display:none}
-  .region-pill{border:1px solid #1a3a5c;background:none;color:#546e7a;font-size:0.72rem;font-weight:700;letter-spacing:0.4px;border-radius:20px;padding:4px 14px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
+  .region-pill{border:1px solid #1a3a5c;background:none;color:#546e7a;font-size:0.78rem;font-weight:700;letter-spacing:0.4px;border-radius:20px;padding:5px 16px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
   .region-pill:hover{border-color:#2a6090;color:#90caf9;background:#0d1e30}
   .region-pill.active{background:#003d5c;border-color:#00b4d8;color:#00d4ff}
 
@@ -269,7 +269,7 @@
 
 <div class="region-bar" id="regionBar">
   <div class="region-map-wrap">
-    <svg id="regionMapSvg" viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <svg id="regionMapSvg" viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
       <rect width="1000" height="420" fill="#040d1a"/>
       <!-- North America -->
       <path class="region-area" data-region="americas" d="M45,52 90,18 210,15 335,35 375,90 355,140 310,160 282,185 238,198 194,186 158,150 146,106 162,88 124,74 Z"/>
@@ -304,10 +304,10 @@
       <!-- New Zealand -->
       <path class="region-area" data-region="pacific" d="M958,363 976,348 983,372 966,386 957,376 Z"/>
       <!-- Region labels -->
-      <text class="r-lbl" data-region="americas" x="195" y="148" font-size="42" text-anchor="middle">Americas</text>
-      <text class="r-lbl" data-region="europe" x="518" y="105" font-size="38" text-anchor="middle">Europe</text>
-      <text class="r-lbl" data-region="asia" x="785" y="78" font-size="42" text-anchor="middle">Asia</text>
-      <text class="r-lbl" data-region="pacific" x="870" y="372" font-size="32" text-anchor="middle">Pacific</text>
+      <text class="r-lbl" data-region="americas" x="195" y="155" font-size="70" text-anchor="middle">AME</text>
+      <text class="r-lbl" data-region="europe" x="518" y="108" font-size="64" text-anchor="middle">EUR</text>
+      <text class="r-lbl" data-region="asia" x="785" y="82" font-size="76" text-anchor="middle">ASIA</text>
+      <text class="r-lbl" data-region="pacific" x="878" y="385" font-size="52" text-anchor="middle">PAC</text>
     </svg>
   </div>
   <div class="region-pills">
@@ -348,13 +348,13 @@
     <div style="display:flex;align-items:center;gap:12px">
       <span style="font-size:1.6rem;flex-shrink:0">☀️</span>
       <div class="wx-slider-track" style="flex:1;position:relative">
-        <input type="range" class="wx-slider-input" id="wxSlider" min="0" max="100" value="50">
+        <input type="range" class="wx-slider-input" id="wxSlider" min="0" max="100" value="100">
       </div>
       <span style="font-size:1.6rem;flex-shrink:0">🌧️</span>
     </div>
     <div class="wx-slider-labels">
       <span style="color:#ffd600">☀️ Sunniest only</span>
-      <span id="wxSliderLabel" style="color:#00d4ff;font-weight:700;font-size:0.75rem">50% sunshine threshold</span>
+      <span id="wxSliderLabel" style="color:#00d4ff;font-weight:700;font-size:0.75rem">Showing all destinations</span>
       <span style="color:#607d8b">🌧️ Show all</span>
     </div>
     <div class="wx-dest-dots" id="wxDestDots"></div>
@@ -873,7 +873,7 @@ let selectedDate = new Date();
 let sliderStartDate = new Date();
 let weatherCache = {};
 let selectedDest = null;
-let weatherMinSunPct = 50;
+let weatherMinSunPct = 0;
 let prevPassingIatas = new Set();
 let wxToastTimer = null;
 
