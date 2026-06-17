@@ -132,6 +132,13 @@
   .ng-moon{font-size:1.1rem;opacity:0.85}
   .ng-text{color:#2a4a6a;text-transform:uppercase;font-weight:700;letter-spacing:1px;font-size:0.7rem}
   .ng-dur{color:#1c344e;margin-left:auto;font-size:0.67rem}
+  .flight-compact{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #0e2236;flex-wrap:wrap}
+  .flight-compact:last-child{border-bottom:none}
+  .fc-fn{font-size:0.85rem;font-weight:700;color:#90caf9;display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .fc-times{font-size:0.85rem;color:#e0e0e0;font-weight:600;white-space:nowrap}
+  .fc-dur{font-size:0.72rem;color:#607d8b}
+  .fc-leave{font-size:0.78rem;color:#90caf9;margin-left:auto;white-space:nowrap}
+  .fc-leave b{color:#fff;font-weight:700}
   .leave-home-row{display:flex;align-items:center;gap:10px;font-size:0.78rem;color:#90caf9;padding:5px 10px;background:#162032;border-radius:6px;margin-top:4px;flex-wrap:wrap}
   .leave-home-row.tight{background:#3e1a1a;color:#ff8a80}
   .lh-step{display:flex;align-items:center;gap:3px;white-space:nowrap}
@@ -1144,17 +1151,23 @@ function renderGrid() {
   let totalFlights = 0;
   let availableDests = 0;
 
+  // 00:00-05:59 departures sort as "next day" so morning flights lead each card
+  function depSortKey(dep) {
+    const p = dep.replace(/\+.*/, '').split(':');
+    const m = +p[0] * 60 + +p[1];
+    return m < 360 ? m + 1440 : m;
+  }
   // Build array of {dest, flights} and sort by earliest departure
   const destCards = DESTINATIONS.map(dest => {
     const flights = flightsForDay(dest.outbound, dow);
-    const sorted = [...flights].sort((a,b) => a.dep.localeCompare(b.dep));
+    const sorted = [...flights].sort((a,b) => depSortKey(a.dep) - depSortKey(b.dep));
     return {dest, flights: sorted};
   });
   destCards.sort((a,b) => {
     if (a.flights.length === 0 && b.flights.length === 0) return 0;
     if (a.flights.length === 0) return 1;
     if (b.flights.length === 0) return -1;
-    return a.flights[0].dep.localeCompare(b.flights[0].dep);
+    return depSortKey(a.flights[0].dep) - depSortKey(b.flights[0].dep);
   });
 
   destCards.filter(d => d.flights.length > 0).forEach(({dest, flights}) => {
@@ -1178,18 +1191,17 @@ function renderGrid() {
                   const cD = f.dep.replace(/\+.*/, '').split(':');
                   const prevMins = +pD[0] * 60 + +pD[1];
                   const currMins = +cD[0] * 60 + +cD[1];
-                  if (prevMins < 300 && currMins >= 360) {
-                    const gapTotal = currMins - prevMins;
-                    const gH = Math.floor(gapTotal / 60), gM = gapTotal % 60;
-                    divider = '<div class="night-gap"><span class="ng-moon">🌙</span><span class="ng-text">Quiet Hours — No Flights</span><span class="ng-dur">' + prevF.dep + ' → ' + f.dep + ' (' + gH + (gM ? 'h ' + gM + 'm' : 'h') + ')</span></div>';
+                  if (prevMins >= 360 && currMins < 360) {
+                    divider = '<div class="night-gap"><span class="ng-moon">🌙</span><span class="ng-text">Overnight departures — leave home the night before</span></div>';
                   }
                 }
                 const lh = calcLeaveHome(f.dep);
                 const dur = calcDuration(f.dep, f.arr, dest.tz);
-                const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
-                const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
                 const cr = carrierInfo(f.fn);
-                return html + divider + `
+                if (i === 0) {
+                  const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
+                  const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
+                  return html + divider + `
                 <div class="flight-block">
                   <div class="flight-row">
                     <span class="fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
@@ -1208,6 +1220,15 @@ function renderGrid() {
                   <div class="ac-info" data-fn="${f.fn}" data-dest="${dest.iata}" data-dep="${f.dep}">
                     <span class="ac-loading">🛩 aircraft loading…</span>
                   </div>
+                </div>`;
+                }
+                return html + divider + `
+                <div class="flight-compact">
+                  <span class="fc-fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
+                  <span class="fc-times">${f.dep} → ${f.arr}</span>
+                  <span class="fc-dur">${dur.label}</span>
+                  <span class="freq badge">${freqLabel(f.days)}</span>
+                  <span class="fc-leave">🚪 Leave <b>${lh.leaveHome}</b></span>
                 </div>`;
               }, '')}
         </div>
