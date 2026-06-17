@@ -232,15 +232,8 @@
     .wx-day{min-width:40px}
   }
   /* REGION FILTER BAR */
-  .region-bar{background:#03080f;border-bottom:1px solid #0a1e2e;position:sticky;top:0;z-index:100;display:flex;align-items:stretch}
-  .region-map-wrap{width:22%;max-width:220px;min-width:100px;flex-shrink:0;border-right:1px solid #0a1e2e;padding:4px 0;display:flex;align-items:center}
-  .region-map-wrap svg{width:100%;height:auto;display:block}
-  .region-area{fill:#0a1e32;stroke:#0e2840;stroke-width:1.5;cursor:pointer;transition:fill 0.25s,stroke 0.25s}
-  .region-area:hover{fill:#152e4a;stroke:#1e4a78}
-  .region-area.active{fill:#003d5c;stroke:#00b4d8;stroke-width:2.5}
-  .r-lbl{font-family:'Segoe UI',sans-serif;font-weight:900;fill:#0d1e2e;cursor:pointer;user-select:none;transition:fill 0.25s;text-transform:uppercase;letter-spacing:2px;font-size:56px}
-  .r-lbl:hover,.r-lbl.active{fill:#00b4d8}
-  .region-pills{flex:1;display:flex;gap:6px;padding:8px 14px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap;align-content:center}
+  .region-bar{background:#03080f;border-bottom:1px solid #0a1e2e;position:sticky;top:0;z-index:100;display:flex;align-items:center}
+  .region-pills{flex:1;display:flex;gap:6px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;flex-wrap:wrap;align-content:center}
   .region-pills::-webkit-scrollbar{display:none}
   .region-pill{border:1px solid #1a3a5c;background:none;color:#546e7a;font-size:0.78rem;font-weight:700;letter-spacing:0.4px;border-radius:20px;padding:5px 16px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
   .region-pill:hover{border-color:#2a6090;color:#90caf9;background:#0d1e30}
@@ -248,7 +241,7 @@
 
   /* Weather Sunshine Slider */
   .wx-slider-frame{background:linear-gradient(135deg,#080f1e,#03080f);border:1px solid #0a2040;border-radius:12px;padding:16px 20px;margin-bottom:16px}
-  .wx-slider-track{height:32px;border-radius:20px;background:linear-gradient(90deg,#ffd600 0%,#ffab00 20%,#8bc34a 42%,#607d8b 62%,#1a3a6c 80%,#0d1b3e 100%);position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4)}
+  .wx-slider-track{height:32px;border-radius:20px;background:linear-gradient(90deg,#ffe000 0%,#ffcc00 12%,#ff9100 28%,#ff4500 46%,#cc1a3a 62%,#6b1a5a 76%,#1e0a2e 90%,#080810 100%);position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4)}
   .wx-slider-input{width:100%;-webkit-appearance:none;appearance:none;height:32px;border-radius:20px;background:transparent;position:absolute;top:0;left:0;cursor:pointer;outline:none;margin:0}
   .wx-slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #00b4d8;box-shadow:0 0 0 4px rgba(0,180,216,0.2),0 4px 12px rgba(0,0,0,0.6);cursor:pointer;margin-top:-3px}
   .wx-slider-input::-webkit-slider-thumb:hover{box-shadow:0 0 0 8px rgba(0,180,216,0.3),0 4px 12px rgba(0,0,0,0.6)}
@@ -271,48 +264,6 @@
 </header>
 
 <div class="region-bar" id="regionBar">
-  <div class="region-map-wrap">
-    <svg id="regionMapSvg" viewBox="0 0 1000 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-      <rect width="1000" height="420" fill="#040d1a"/>
-      <!-- North America -->
-      <path class="region-area" data-region="americas" d="M45,52 90,18 210,15 335,35 375,90 355,140 310,160 282,185 238,198 194,186 158,150 146,106 162,88 124,74 Z"/>
-      <!-- South America -->
-      <path class="region-area" data-region="americas" d="M280,205 344,200 408,232 402,318 348,356 310,412 278,388 256,300 264,248 Z"/>
-      <!-- Greenland -->
-      <path class="region-area" data-region="americas" d="M338,18 388,8 414,34 394,62 354,68 334,44 Z"/>
-      <!-- UK + Ireland -->
-      <path class="region-area" data-region="europe" d="M445,60 462,48 476,66 468,90 450,92 438,78 Z"/>
-      <!-- Iceland -->
-      <path class="region-area" data-region="europe" d="M394,36 418,28 426,50 413,66 396,63 Z"/>
-      <!-- Europe mainland -->
-      <path class="region-area" data-region="europe" d="M466,68 490,48 536,46 570,60 586,92 570,135 536,150 508,156 480,146 460,126 456,92 Z"/>
-      <!-- Africa -->
-      <path class="region-area" data-region="africa" d="M452,145 570,142 620,192 626,280 596,360 548,418 500,418 460,375 440,282 446,192 Z"/>
-      <!-- Middle East -->
-      <path class="region-area" data-region="mideast" d="M576,130 646,126 666,160 660,216 618,240 586,222 568,186 Z"/>
-      <!-- Asia main (Russia + Central Asia + China) -->
-      <path class="region-area" data-region="asia" d="M586,97 580,48 718,16 878,13 960,36 993,72 968,110 910,132 856,146 806,160 752,168 718,160 698,176 686,156 652,140 616,126 578,115 Z"/>
-      <!-- India -->
-      <path class="region-area" data-region="asia" d="M690,156 752,153 765,220 728,265 696,259 663,216 Z"/>
-      <!-- SE Asia + Malaysia -->
-      <path class="region-area" data-region="asia" d="M765,163 840,146 860,196 840,250 796,263 758,229 748,196 Z"/>
-      <!-- Japan -->
-      <path class="region-area" data-region="asia" d="M898,106 920,96 928,126 913,143 896,130 Z"/>
-      <!-- Philippines -->
-      <path class="region-area" data-region="asia" d="M876,196 898,186 910,216 893,229 874,216 Z"/>
-      <!-- Indonesia blob -->
-      <path class="region-area" data-region="asia" d="M798,267 858,255 858,282 828,290 798,282 Z"/>
-      <!-- Australia -->
-      <path class="region-area" data-region="pacific" d="M806,306 920,296 956,332 958,395 908,430 840,432 788,396 776,349 Z"/>
-      <!-- New Zealand -->
-      <path class="region-area" data-region="pacific" d="M958,363 976,348 983,372 966,386 957,376 Z"/>
-      <!-- Region labels -->
-      <text class="r-lbl" data-region="americas" x="195" y="155" font-size="70" text-anchor="middle">AME</text>
-      <text class="r-lbl" data-region="europe" x="518" y="108" font-size="64" text-anchor="middle">EUR</text>
-      <text class="r-lbl" data-region="asia" x="785" y="82" font-size="76" text-anchor="middle">ASIA</text>
-      <text class="r-lbl" data-region="pacific" x="878" y="385" font-size="52" text-anchor="middle">PAC</text>
-    </svg>
-  </div>
   <div class="region-pills">
     <button class="region-pill" data-region="all" onclick="setRegion(null)">🌐 All</button>
     <button class="region-pill" data-region="asia" onclick="setRegion('asia')">🌏 Asia</button>
@@ -340,6 +291,9 @@
     <div class="stat"><div class="stat-num" id="statNoFlight">0</div><div class="stat-label">No Service</div></div>
   </div>
 
+  <div class="section-title">🗺 Destination Map</div>
+  <div id="map"></div>
+
   <div id="weatherPick" style="background:linear-gradient(135deg,#003322,#00443a);border:1px solid #00b4d8;border-radius:12px;padding:14px 20px;margin-bottom:16px;display:none;cursor:pointer" onclick="document.querySelector('.card.pick-highlight')?.scrollIntoView({behavior:'smooth',block:'center'})">
     <div style="font-size:0.72rem;color:#90caf9;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">☀️ Best Weather Pick</div>
     <div id="weatherPickBody" style="font-size:1.05rem;color:#fff;font-weight:700"></div>
@@ -363,9 +317,6 @@
     <div class="wx-dest-dots" id="wxDestDots"></div>
   </div>
   <div id="wxToast"></div>
-
-  <div class="section-title">🗺 Destination Map</div>
-  <div id="map"></div>
 
   <div class="section-title" id="flightsTitle">✈ Available Flights</div>
   <div class="grid" id="flightGrid"></div>
@@ -1307,11 +1258,10 @@ function updateWxSliderUI() {
   });
   scored.sort((a,b) => b.pct - a.pct);
 
-  dots.innerHTML = scored.map(s => {
-    const pass = s.pct >= weatherMinSunPct;
-    const bg    = pass ? (s.pct >= 70 ? '#0d2200' : '#1a2000') : '#0d0d1e';
-    const bdr   = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#1e2a40';
-    const clr   = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#37474f';
+  dots.innerHTML = scored.filter(s => s.pct >= weatherMinSunPct).map(s => {
+    const bg  = s.pct >= 70 ? '#0d2200' : '#1a2000';
+    const bdr = s.pct >= 70 ? '#00e676' : '#ffd600';
+    const clr = s.pct >= 70 ? '#00e676' : '#ffd600';
     return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr}">${s.wx?.emoji||'🌤'} ${s.iata} ${s.pct}%</span>`;
   }).join('');
 }
@@ -1775,13 +1725,6 @@ document.addEventListener('DOMContentLoaded', () => {
   new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting && !mapFsActive) enterMapFs();
   }, {threshold: 0.5}).observe(document.getElementById('map'));
-  document.getElementById('regionMapSvg').addEventListener('click', e => {
-    const el = e.target.closest('[data-region]');
-    if (el && el.dataset.region !== 'all') {
-      const r = el.dataset.region;
-      setRegion(r === activeRegion ? null : r);
-    }
-  });
   // Seed prevActiveSet so first render doesn't animate everything
   const initDow = getSelectedDOW();
   DESTINATIONS.forEach(d => { if (flightsForDay(d.outbound, initDow).length > 0) prevActiveSet.add(d.iata); });
