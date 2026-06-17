@@ -291,9 +291,6 @@
     <div class="stat"><div class="stat-num" id="statNoFlight">0</div><div class="stat-label">No Service</div></div>
   </div>
 
-  <div class="section-title">🗺 Destination Map</div>
-  <div id="map"></div>
-
   <div id="weatherPick" style="background:linear-gradient(135deg,#003322,#00443a);border:1px solid #00b4d8;border-radius:12px;padding:14px 20px;margin-bottom:16px;display:none;cursor:pointer" onclick="document.querySelector('.card.pick-highlight')?.scrollIntoView({behavior:'smooth',block:'center'})">
     <div style="font-size:0.72rem;color:#90caf9;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">☀️ Best Weather Pick</div>
     <div id="weatherPickBody" style="font-size:1.05rem;color:#fff;font-weight:700"></div>
@@ -317,6 +314,9 @@
     <div class="wx-dest-dots" id="wxDestDots"></div>
   </div>
   <div id="wxToast"></div>
+
+  <div class="section-title">🗺 Destination Map</div>
+  <div id="map"></div>
 
   <div class="section-title" id="flightsTitle">✈ Available Flights</div>
   <div class="grid" id="flightGrid"></div>
