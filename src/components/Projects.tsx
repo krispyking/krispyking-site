@@ -9,20 +9,38 @@ const STATUS_STYLES: Record<Status, string> = {
   Concept: 'text-gray-400 border-gray-400/30 bg-gray-400/5',
 }
 
-const PROJECTS: {
+type Project = {
   icon: string
   title: string
   desc: string
   url?: string
   badge: string
   status: Status
-}[] = [
+}
+
+const OWNED: Project[] = [
+  {
+    icon: '🚀',
+    title: 'Nowtrax',
+    desc: 'Real-time logistics and tracking intelligence platform. Live data, smart routing, and operational visibility — built for speed.',
+    url: 'https://www.nowtrax.com',
+    badge: 'AI / Logistics',
+    status: 'Live',
+  },
   {
     icon: '☕',
     title: 'Sijahtra',
     desc: 'Luxury wild Kopi Luwak sourced from the Gayo Highlands, Sumatra. Positioned at the very top end of the market. Full e-commerce with gift options.',
     url: 'https://www.sijahtra.com',
     badge: 'E-Commerce / Luxury',
+    status: 'Live',
+  },
+  {
+    icon: '🧠',
+    title: 'BrainINTuition',
+    desc: 'Multi-agent AI platform. A fleet of specialist agents covering finance, legal, ops, marketing, analytics, and research — all connected and orchestrated.',
+    url: 'https://brainintuition.com',
+    badge: 'AI / Multi-Agent',
     status: 'Live',
   },
   {
@@ -33,6 +51,25 @@ const PROJECTS: {
     badge: 'PropTech / 3D',
     status: 'Beta',
   },
+  {
+    icon: '🥽',
+    title: 'HoloDive',
+    desc: 'AI underwater goggle. Real-time species identification, dive logging, and underwater navigation — now live.',
+    url: 'https://www.holodive.io',
+    badge: 'AI / Hardware',
+    status: 'Live',
+  },
+  {
+    icon: '🔒',
+    title: 'MyPrivacyTool',
+    desc: "Privacy awareness platform. Know what data you're giving away and who has it.",
+    url: 'https://www.myprivacytool.io',
+    badge: 'Privacy / Consumer',
+    status: 'Beta',
+  },
+]
+
+const SUBDOMAINS: Project[] = [
   {
     icon: '🎮',
     title: 'theARgame',
@@ -58,36 +95,12 @@ const PROJECTS: {
     status: 'Live',
   },
   {
-    icon: '🥽',
-    title: 'HoloDive',
-    desc: 'AI underwater goggle. Real-time species identification, dive logging, and underwater navigation — now live.',
-    url: 'https://www.holodive.io',
-    badge: 'AI / Hardware',
-    status: 'Live',
-  },
-  {
-    icon: '🔒',
-    title: 'MyPrivacyTool',
-    desc: "Privacy awareness platform. Know what data you're giving away and who has it.",
-    url: 'https://www.myprivacytool.io',
-    badge: 'Privacy / Consumer',
-    status: 'Beta',
-  },
-  {
     icon: '🥊',
     title: 'BoxingTOOL',
     desc: 'AI-powered boxing media production and video automation platform. Content pipeline, brand management, and market intelligence — all agent-run.',
     url: 'https://boxingtool.krispyking.com',
     badge: 'AI / Media / Sports',
     status: 'Beta',
-  },
-  {
-    icon: '🧠',
-    title: 'BrainINTuition',
-    desc: 'Multi-agent AI platform. A fleet of specialist agents covering finance, legal, ops, marketing, analytics, and research — all connected and orchestrated.',
-    url: 'https://brainintuition.com',
-    badge: 'AI / Multi-Agent',
-    status: 'Live',
   },
   {
     icon: '⛳',
@@ -121,6 +134,47 @@ const PROJECTS: {
   },
 ]
 
+function ProjectCard({ p, i, inView }: { p: Project; i: number; inView: boolean }) {
+  return (
+    <motion.div
+      key={p.title}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay: i * 0.07 }}
+      className="rounded-2xl p-6 border-t-2 border-t-accent border border-border hover:border-accent transition-colors group flex flex-col"
+      style={{ background: '#1a2235' }}
+    >
+      <div className="flex items-start justify-between mb-3">
+        <span className="text-3xl">{p.icon}</span>
+        <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${STATUS_STYLES[p.status]}`}>
+          {p.status}
+        </span>
+      </div>
+      <h3 className="font-serif text-lg font-semibold text-text-primary mb-2 group-hover:text-accent transition-colors">
+        {p.title}
+      </h3>
+      <p className="text-sm text-text-secondary leading-relaxed flex-1 mb-4">
+        {p.desc}
+      </p>
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs px-3 py-1 rounded-full font-medium text-accent border border-accent/30 bg-accent/5">
+          {p.badge}
+        </span>
+        {p.url && (
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-text-secondary hover:text-accent transition-colors shrink-0"
+          >
+            Visit →
+          </a>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Projects() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
@@ -143,44 +197,29 @@ export default function Projects() {
           </p>
         </motion.div>
 
+        {/* Own-domain projects */}
+        <p className="text-xs font-semibold uppercase tracking-widest text-text-secondary mb-4">
+          Projects
+        </p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {OWNED.map((p, i) => (
+            <ProjectCard key={p.title} p={p} i={i} inView={inView} />
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex-1 h-px bg-border" />
+          <p className="text-xs font-semibold uppercase tracking-widest text-text-secondary whitespace-nowrap">
+            Also on krispyking.com
+          </p>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        {/* Subdomain projects */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PROJECTS.map((p, i) => (
-            <motion.div
-              key={p.title}
-              initial={{ opacity: 0, y: 24 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.07 }}
-              className="rounded-2xl p-6 border-t-2 border-t-accent border border-border hover:border-accent transition-colors group flex flex-col"
-              style={{ background: '#1a2235' }}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <span className="text-3xl">{p.icon}</span>
-                <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${STATUS_STYLES[p.status]}`}>
-                  {p.status}
-                </span>
-              </div>
-              <h3 className="font-serif text-lg font-semibold text-text-primary mb-2 group-hover:text-accent transition-colors">
-                {p.title}
-              </h3>
-              <p className="text-sm text-text-secondary leading-relaxed flex-1 mb-4">
-                {p.desc}
-              </p>
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs px-3 py-1 rounded-full font-medium text-accent border border-accent/30 bg-accent/5">
-                  {p.badge}
-                </span>
-                {p.url && (
-                  <a
-                    href={p.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-text-secondary hover:text-accent transition-colors shrink-0"
-                  >
-                    Visit →
-                  </a>
-                )}
-              </div>
-            </motion.div>
+          {SUBDOMAINS.map((p, i) => (
+            <ProjectCard key={p.title} p={p} i={i + OWNED.length} inView={inView} />
           ))}
         </div>
       </div>
