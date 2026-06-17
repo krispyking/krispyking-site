@@ -43,10 +43,7 @@
 
   /* MAP */
   .section-title{font-size:1.1rem;font-weight:700;color:#90caf9;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-  #map{width:100%;height:420px;border-radius:14px;border:1px solid #1a3a5c;margin-bottom:24px;z-index:1;transition:border-radius 0.3s,height 0.3s}
-  #map.map-fs{position:fixed;top:0;left:0;width:100vw!important;height:100vh!important;z-index:500;border-radius:0!important;border:none!important;margin:0!important}
-  #mapFsHint{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.72);color:#00d4ff;font-size:1rem;font-weight:700;padding:12px 28px;border-radius:30px;border:1px solid #00b4d8;z-index:501;pointer-events:none;animation:hintPulse 2s ease infinite}
-  @keyframes hintPulse{0%,100%{opacity:.75;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.04)}}
+  #map{width:100%;height:420px;border-radius:14px;border:1px solid #1a3a5c;margin-bottom:24px;z-index:1}
   .map-tip{background:#162032!important;border:1px solid #00b4d8!important;color:#fff!important;font-size:0.82rem!important;font-weight:600!important;border-radius:6px!important;box-shadow:none!important}
   .map-tip::before{border-top-color:#00b4d8!important}
   .wx-map-icon{background:none!important;border:none!important}
@@ -831,8 +828,6 @@ let weatherMinSunPct = 0;
 let prevPassingIatas = new Set();
 let wxToastTimer = null;
 let wxUpdateTimer = null;
-let mapFsActive = false;
-let mapFsSavedScroll = 0;
 
 // ===================== DATE SLIDER =====================
 function buildSlider() {
@@ -1676,41 +1671,6 @@ function showReturn(dest) {
   panel.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-// ===================== INIT =====================
-function enterMapFs() {
-  if (mapFsActive) return;
-  mapFsActive = true;
-  mapFsSavedScroll = window.scrollY;
-  document.body.style.overflow = 'hidden';
-  document.body.style.position = 'fixed';
-  document.body.style.top = `-${mapFsSavedScroll}px`;
-  document.body.style.width = '100%';
-  document.body.style.height = '100vh';
-  document.documentElement.style.background = '#030810';
-  document.getElementById('map').classList.add('map-fs');
-  map.invalidateSize();
-  const hint = document.createElement('div');
-  hint.id = 'mapFsHint';
-  hint.textContent = '🗺 Click the map to continue scrolling';
-  document.body.appendChild(hint);
-  document.getElementById('map').addEventListener('click', exitMapFs, {once: true});
-}
-
-function exitMapFs() {
-  if (!mapFsActive) return;
-  mapFsActive = false;
-  document.body.style.overflow = '';
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.width = '';
-  document.body.style.height = '';
-  document.documentElement.style.background = '';
-  window.scrollTo(0, mapFsSavedScroll);
-  document.getElementById('map').classList.remove('map-fs');
-  map.invalidateSize();
-  const hint = document.getElementById('mapFsHint');
-  if (hint) hint.remove();
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
@@ -1722,9 +1682,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDateDisplay();
   setRegion('asia');
   drawMap();
-  new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting && !mapFsActive) enterMapFs();
-  }, {threshold: 0.5}).observe(document.getElementById('map'));
   // Seed prevActiveSet so first render doesn't animate everything
   const initDow = getSelectedDOW();
   DESTINATIONS.forEach(d => { if (flightsForDay(d.outbound, initDow).length > 0) prevActiveSet.add(d.iata); });
