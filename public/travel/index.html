@@ -1253,10 +1253,11 @@ function updateWxSliderUI() {
   });
   scored.sort((a,b) => b.pct - a.pct);
 
-  dots.innerHTML = scored.filter(s => s.pct >= weatherMinSunPct).map(s => {
-    const bg  = s.pct >= 70 ? '#0d2200' : '#1a2000';
-    const bdr = s.pct >= 70 ? '#00e676' : '#ffd600';
-    const clr = s.pct >= 70 ? '#00e676' : '#ffd600';
+  dots.innerHTML = scored.map(s => {
+    const pass = weatherMinSunPct === 0 || s.pct >= weatherMinSunPct;
+    const bg  = pass ? (s.pct >= 70 ? '#0d2200' : '#1a2000') : '#0d0d1e';
+    const bdr = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#1e2a40';
+    const clr = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#37474f';
     return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr}">${s.wx?.emoji||'🌤'} ${s.iata} ${s.pct}%</span>`;
   }).join('');
 }
