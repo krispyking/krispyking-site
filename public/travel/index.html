@@ -1341,6 +1341,39 @@ function showWxToast(newDests) {
   }, 4500);
 }
 
+function applyWxFilter() {
+  const dotsEl = document.getElementById('wxDestDots');
+  if (dotsEl) dotsEl.style.display = weatherMinSunPct === 0 ? 'none' : '';
+
+  const cards = document.querySelectorAll('.card[data-iata]');
+  let totalFlights = 0, availableDests = 0;
+  const newPassingIatas = new Set();
+
+  cards.forEach(card => {
+    const iata = card.dataset.iata;
+    const sunPct = getSunPctForDate(iata);
+    const passes = weatherMinSunPct === 0 || sunPct === null || sunPct >= weatherMinSunPct;
+    card.style.display = passes ? '' : 'none';
+    if (passes) {
+      newPassingIatas.add(iata);
+      availableDests++;
+      totalFlights += Number(card.dataset.flightCount || 0);
+    }
+  });
+
+  document.getElementById('statFlights').textContent = totalFlights;
+  document.getElementById('statDests').textContent = availableDests;
+  const regionTotal = activeRegion ? DESTINATIONS.filter(d => REGION_MAP[d.iata] === activeRegion).length : DESTINATIONS.length;
+  document.getElementById('statNoFlight').textContent = regionTotal - availableDests;
+  document.getElementById('flightsTitle').textContent = `✈ ${totalFlights} Flights to ${availableDests} Destinations`;
+
+  if (prevPassingIatas.size > 0) {
+    const newlyVisible = DESTINATIONS.filter(d => newPassingIatas.has(d.iata) && !prevPassingIatas.has(d.iata));
+    if (newlyVisible.length > 0) showWxToast(newlyVisible);
+  }
+  prevPassingIatas = newPassingIatas;
+}
+
 function renderGrid() {
   const dow = getSelectedDOW();
   const grid = document.getElementById('flightGrid');
@@ -1367,19 +1400,13 @@ function renderGrid() {
     return depSortKey(a.flights[0].dep) - depSortKey(b.flights[0].dep);
   });
 
-  const currentPassingIatas = new Set();
   destCards.filter(d => {
     if (d.flights.length === 0) return false;
     if (activeRegion && REGION_MAP[d.dest.iata] !== activeRegion) return false;
-    const sunPct = getSunPctForDate(d.dest.iata);
-    if (weatherMinSunPct > 0 && sunPct !== null && sunPct < weatherMinSunPct) return false;
     return true;
   }).forEach(({dest, flights}) => {
-    currentPassingIatas.add(dest.iata);
-    totalFlights += flights.length;
-    availableDests++;
     const card = document.createElement('div');
-    card.className = 'card'; card.setAttribute('data-iata', dest.iata);
+    card.className = 'card'; card.setAttribute('data-iata', dest.iata); card.dataset.flightCount = flights.length;
     card.innerHTML = `
       <div class="card-inner">
         <div class="card-left">
@@ -1456,19 +1483,7 @@ function renderGrid() {
     fetchWeather(dest);
   });
 
-  document.getElementById('statFlights').textContent = totalFlights;
-  document.getElementById('statDests').textContent = availableDests;
-  const regionTotal = activeRegion ? DESTINATIONS.filter(d => REGION_MAP[d.iata] === activeRegion).length : DESTINATIONS.length;
-  document.getElementById('statNoFlight').textContent = regionTotal - availableDests;
-  document.getElementById('flightsTitle').textContent =
-    `✈ ${totalFlights} Flights to ${availableDests} Destinations`;
-
-  // Fire toast for newly visible destinations (slider moved right → more appear)
-  if (prevPassingIatas.size > 0) {
-    const newlyVisible = DESTINATIONS.filter(d => currentPassingIatas.has(d.iata) && !prevPassingIatas.has(d.iata));
-    if (newlyVisible.length > 0) showWxToast(newlyVisible);
-  }
-  prevPassingIatas = currentPassingIatas;
+  applyWxFilter();
 }
 
 // ===================== WEATHER (5-day forecast) =====================
@@ -1515,7 +1530,7 @@ async function fetchWeather(dest) {
     renderForecast(el, data, dest);
     updateMapWeather();
     updateWeatherPick(); renderWeatherTop5();
-    updateWxSliderUI(); renderGrid();
+    updateWxSliderUI(); applyWxFilter();
   } catch(e) {
     el.innerHTML = '<span class="wx-loading">Weather unavailable</span>';
   }
@@ -1740,22 +1755,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('wxSlider').addEventListener('input', function() {
     const newThreshold = 100 - Number(this.value);
-    const relaxing = newThreshold < weatherMinSunPct;
+    const tightening = newThreshold > weatherMinSunPct;
     weatherMinSunPct = newThreshold;
-    const lbl = document.getElementById('wxSliderLabel');
-    if (weatherMinSunPct === 0) {
-      lbl.textContent = 'Showing all destinations';
-    } else {
-      lbl.textContent = `${weatherMinSunPct}%+ sunshine required`;
-    }
+    document.getElementById('wxSliderLabel').textContent =
+      weatherMinSunPct === 0 ? 'Showing all destinations' : `${weatherMinSunPct}%+ sunshine required`;
+    if (tightening) prevPassingIatas = new Set();
     updateWxSliderUI();
-    if (relaxing) {
-      // moving right → toast fires inside renderGrid via prevPassingIatas diff
-      renderGrid();
-    } else {
-      prevPassingIatas = new Set(); // reset so we don't fire toast when tightening
-      renderGrid();
-    }
+    applyWxFilter();
   });
 });
 </script>
