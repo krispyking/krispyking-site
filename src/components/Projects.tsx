@@ -73,6 +73,14 @@ const PROJECTS: {
     status: 'Beta',
   },
   {
+    icon: '🥊',
+    title: 'BoxingTOOL',
+    desc: 'AI-powered boxing media production and video automation platform. Content pipeline, brand management, and market intelligence — all agent-run.',
+    url: 'https://boxingtool-io.cransford.workers.dev',
+    badge: 'AI / Media / Sports',
+    status: 'Beta',
+  },
+  {
     icon: '🏢',
     title: '12E Block 5',
     desc: 'AI-managed residential property at Park Island, Hong Kong. A dedicated agent handles tenant management, lease reviews, maintenance scheduling, and admin — fully autonomous, human-in-the-loop for key decisions.',
