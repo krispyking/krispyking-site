@@ -242,6 +242,20 @@
   .region-pill{border:1px solid #1a3a5c;background:none;color:#546e7a;font-size:0.72rem;font-weight:700;letter-spacing:0.4px;border-radius:20px;padding:4px 14px;cursor:pointer;transition:all 0.2s;white-space:nowrap;flex-shrink:0}
   .region-pill:hover{border-color:#2a6090;color:#90caf9;background:#0d1e30}
   .region-pill.active{background:#003d5c;border-color:#00b4d8;color:#00d4ff}
+
+  /* Weather Sunshine Slider */
+  .wx-slider-frame{background:linear-gradient(135deg,#080f1e,#03080f);border:1px solid #0a2040;border-radius:12px;padding:16px 20px;margin-bottom:16px}
+  .wx-slider-track{height:32px;border-radius:20px;background:linear-gradient(90deg,#ffd600 0%,#ffab00 20%,#8bc34a 42%,#607d8b 62%,#1a3a6c 80%,#0d1b3e 100%);position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4)}
+  .wx-slider-input{width:100%;-webkit-appearance:none;appearance:none;height:32px;border-radius:20px;background:transparent;position:absolute;top:0;left:0;cursor:pointer;outline:none;margin:0}
+  .wx-slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #00b4d8;box-shadow:0 0 0 4px rgba(0,180,216,0.2),0 4px 12px rgba(0,0,0,0.6);cursor:pointer;margin-top:-3px}
+  .wx-slider-input::-webkit-slider-thumb:hover{box-shadow:0 0 0 8px rgba(0,180,216,0.3),0 4px 12px rgba(0,0,0,0.6)}
+  .wx-slider-input::-moz-range-thumb{width:32px;height:32px;border-radius:50%;background:#fff;border:3px solid #00b4d8;box-shadow:0 0 0 4px rgba(0,180,216,0.2),0 4px 12px rgba(0,0,0,0.6);cursor:pointer}
+  .wx-slider-labels{display:flex;justify-content:space-between;font-size:0.68rem;margin-top:6px}
+  .wx-dest-dots{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px;min-height:22px}
+  .wx-dest-dot{font-size:0.68rem;padding:2px 7px;border-radius:10px;border:1px solid;white-space:nowrap;transition:all 0.25s;cursor:default}
+  #wxToast{position:fixed;bottom:28px;right:20px;background:linear-gradient(135deg,#003348,#004d33);border:1px solid #00e5d4;border-radius:16px;padding:14px 18px;color:#fff;font-size:0.88rem;z-index:9999;max-width:300px;box-shadow:0 8px 32px rgba(0,229,212,0.25);display:none;line-height:1.5}
+  @keyframes wxToastIn{from{transform:translateX(80px);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes wxToastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(80px)}}
 </style>
 </head>
 <body>
@@ -328,6 +342,24 @@
     <div id="weatherPickBody" style="font-size:1.05rem;color:#fff;font-weight:700"></div>
     <div id="weatherPickSub" style="font-size:0.82rem;color:#80cbc4;margin-top:4px"></div>
   </div>
+
+  <div id="wxSliderFrame" class="wx-slider-frame" style="display:none">
+    <div style="font-size:0.72rem;color:#90caf9;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🌡️ Sunshine Filter — drag left for sunny only, right to show all</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:1.6rem;flex-shrink:0">☀️</span>
+      <div class="wx-slider-track" style="flex:1;position:relative">
+        <input type="range" class="wx-slider-input" id="wxSlider" min="0" max="100" value="50">
+      </div>
+      <span style="font-size:1.6rem;flex-shrink:0">🌧️</span>
+    </div>
+    <div class="wx-slider-labels">
+      <span style="color:#ffd600">☀️ Sunniest only</span>
+      <span id="wxSliderLabel" style="color:#00d4ff;font-weight:700;font-size:0.75rem">50% sunshine threshold</span>
+      <span style="color:#607d8b">🌧️ Show all</span>
+    </div>
+    <div class="wx-dest-dots" id="wxDestDots"></div>
+  </div>
+  <div id="wxToast"></div>
 
   <div class="section-title">🗺 Destination Map</div>
   <div id="map"></div>
@@ -841,6 +873,9 @@ let selectedDate = new Date();
 let sliderStartDate = new Date();
 let weatherCache = {};
 let selectedDest = null;
+let weatherMinSunPct = 50;
+let prevPassingIatas = new Set();
+let wxToastTimer = null;
 
 // ===================== DATE SLIDER =====================
 function buildSlider() {
@@ -1240,6 +1275,72 @@ function setRegion(r) {
 }
 
 // ===================== RENDER CARDS =====================
+function getSunPctForDate(iata) {
+  const data = weatherCache[iata];
+  if (!data) return null;
+  const items = getWeatherForDate(data, getSelectedDateKey());
+  if (!items.length) return null;
+  const sr = calcSunRain(items);
+  return sr.totalH > 0 ? Math.round(sr.sunH / sr.totalH * 100) : 0;
+}
+
+function updateWxSliderUI() {
+  const hasAny = DESTINATIONS.some(d => weatherCache[d.iata]);
+  const frame = document.getElementById('wxSliderFrame');
+  if (!hasAny || !frame) return;
+  frame.style.display = 'block';
+
+  const dots = document.getElementById('wxDestDots');
+  const scored = [];
+  DESTINATIONS.forEach(d => {
+    const pct = getSunPctForDate(d.iata);
+    if (pct === null) return;
+    const items = getWeatherForDate(weatherCache[d.iata], getSelectedDateKey());
+    const wx = items.length ? classifyWeather(items) : null;
+    scored.push({iata: d.iata, name: d.name, pct, wx});
+  });
+  scored.sort((a,b) => b.pct - a.pct);
+
+  dots.innerHTML = scored.map(s => {
+    const pass = s.pct >= weatherMinSunPct;
+    const bg    = pass ? (s.pct >= 70 ? '#0d2200' : '#1a2000') : '#0d0d1e';
+    const bdr   = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#1e2a40';
+    const clr   = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#37474f';
+    return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr}">${s.wx?.emoji||'🌤'} ${s.iata} ${s.pct}%</span>`;
+  }).join('');
+}
+
+function showWxToast(newDests) {
+  if (!newDests.length) return;
+  const toast = document.getElementById('wxToast');
+  if (!toast) return;
+  if (wxToastTimer) { clearTimeout(wxToastTimer); wxToastTimer = null; }
+
+  const openers = [
+    '🎉 New destinations unlocked!',
+    '✈️ More options just appeared!',
+    '🌅 Your horizons just got wider...',
+    '🗺️ Fresh spots on the radar!',
+  ];
+  const hdr = openers[Math.floor(newDests.length * 13 + newDests[0].iata.charCodeAt(0)) % openers.length];
+
+  const lines = newDests.slice(0, 4).map(d => {
+    const pct = getSunPctForDate(d.iata);
+    const items = weatherCache[d.iata] ? getWeatherForDate(weatherCache[d.iata], getSelectedDateKey()) : [];
+    const wx = items.length ? classifyWeather(items) : null;
+    return `<div style="margin-top:5px">${wx?.emoji||'🌤'} <b>${d.name}</b> — ${pct}% sun · ${wx?.hi||'?'}°C</div>`;
+  }).join('');
+  const extra = newDests.length > 4 ? `<div style="color:#90caf9;margin-top:4px;font-size:0.78rem">+ ${newDests.length - 4} more below ↓</div>` : '';
+
+  toast.innerHTML = `<div style="font-size:0.95rem;font-weight:700;margin-bottom:4px">${hdr}</div>${lines}${extra}`;
+  toast.style.cssText = 'position:fixed;bottom:28px;right:20px;background:linear-gradient(135deg,#003348,#004d33);border:1px solid #00e5d4;border-radius:16px;padding:14px 18px;color:#fff;font-size:0.88rem;z-index:9999;max-width:300px;box-shadow:0 8px 32px rgba(0,229,212,0.25);display:block;line-height:1.5;animation:wxToastIn 0.4s ease forwards';
+
+  wxToastTimer = setTimeout(() => {
+    toast.style.animation = 'wxToastOut 0.4s ease forwards';
+    setTimeout(() => { toast.style.display = 'none'; }, 400);
+  }, 4500);
+}
+
 function renderGrid() {
   const dow = getSelectedDOW();
   const grid = document.getElementById('flightGrid');
@@ -1266,7 +1367,15 @@ function renderGrid() {
     return depSortKey(a.flights[0].dep) - depSortKey(b.flights[0].dep);
   });
 
-  destCards.filter(d => d.flights.length > 0 && (!activeRegion || REGION_MAP[d.dest.iata] === activeRegion)).forEach(({dest, flights}) => {
+  const currentPassingIatas = new Set();
+  destCards.filter(d => {
+    if (d.flights.length === 0) return false;
+    if (activeRegion && REGION_MAP[d.dest.iata] !== activeRegion) return false;
+    const sunPct = getSunPctForDate(d.dest.iata);
+    if (weatherMinSunPct > 0 && sunPct !== null && sunPct < weatherMinSunPct) return false;
+    return true;
+  }).forEach(({dest, flights}) => {
+    currentPassingIatas.add(dest.iata);
     totalFlights += flights.length;
     availableDests++;
     const card = document.createElement('div');
@@ -1353,6 +1462,13 @@ function renderGrid() {
   document.getElementById('statNoFlight').textContent = regionTotal - availableDests;
   document.getElementById('flightsTitle').textContent =
     `✈ ${totalFlights} Flights to ${availableDests} Destinations`;
+
+  // Fire toast for newly visible destinations (slider moved right → more appear)
+  if (prevPassingIatas.size > 0) {
+    const newlyVisible = DESTINATIONS.filter(d => currentPassingIatas.has(d.iata) && !prevPassingIatas.has(d.iata));
+    if (newlyVisible.length > 0) showWxToast(newlyVisible);
+  }
+  prevPassingIatas = currentPassingIatas;
 }
 
 // ===================== WEATHER (5-day forecast) =====================
@@ -1399,6 +1515,7 @@ async function fetchWeather(dest) {
     renderForecast(el, data, dest);
     updateMapWeather();
     updateWeatherPick(); renderWeatherTop5();
+    updateWxSliderUI(); renderGrid();
   } catch(e) {
     el.innerHTML = '<span class="wx-loading">Weather unavailable</span>';
   }
@@ -1619,6 +1736,26 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('nextWeek').addEventListener('click', () => {
     sliderStartDate.setDate(sliderStartDate.getDate() + 7);
     buildSlider();
+  });
+
+  document.getElementById('wxSlider').addEventListener('input', function() {
+    const newThreshold = 100 - Number(this.value);
+    const relaxing = newThreshold < weatherMinSunPct;
+    weatherMinSunPct = newThreshold;
+    const lbl = document.getElementById('wxSliderLabel');
+    if (weatherMinSunPct === 0) {
+      lbl.textContent = 'Showing all destinations';
+    } else {
+      lbl.textContent = `${weatherMinSunPct}%+ sunshine required`;
+    }
+    updateWxSliderUI();
+    if (relaxing) {
+      // moving right → toast fires inside renderGrid via prevPassingIatas diff
+      renderGrid();
+    } else {
+      prevPassingIatas = new Set(); // reset so we don't fire toast when tightening
+      renderGrid();
+    }
   });
 });
 </script>
