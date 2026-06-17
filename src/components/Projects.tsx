@@ -76,7 +76,7 @@ const PROJECTS: {
     icon: '🥊',
     title: 'BoxingTOOL',
     desc: 'AI-powered boxing media production and video automation platform. Content pipeline, brand management, and market intelligence — all agent-run.',
-    url: 'https://boxingtool-io.cransford.workers.dev',
+    url: 'https://boxingtool.krispyking.com',
     badge: 'AI / Media / Sports',
     status: 'Beta',
   },
