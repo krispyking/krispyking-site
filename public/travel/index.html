@@ -238,7 +238,7 @@
 
   /* Weather Sunshine Slider */
   .wx-slider-frame{background:linear-gradient(135deg,#080f1e,#03080f);border:1px solid #0a2040;border-radius:12px;padding:16px 20px;margin-bottom:16px}
-  .wx-slider-track{height:32px;border-radius:20px;background:linear-gradient(90deg,#ffe000 0%,#ffcc00 12%,#ff9100 28%,#ff4500 46%,#cc1a3a 62%,#6b1a5a 76%,#1e0a2e 90%,#080810 100%);position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4)}
+  .wx-slider-track{height:32px;border-radius:20px;background:linear-gradient(90deg,#ffd600 0%,#ffab00 20%,#8bc34a 42%,#607d8b 62%,#1a3a6c 80%,#0d1b3e 100%);position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,0.4)}
   .wx-slider-input{width:100%;-webkit-appearance:none;appearance:none;height:32px;border-radius:20px;background:transparent;position:absolute;top:0;left:0;cursor:pointer;outline:none;margin:0}
   .wx-slider-input::-webkit-slider-thumb{-webkit-appearance:none;width:38px;height:38px;border-radius:50%;background:#fff;border:3px solid #00b4d8;box-shadow:0 0 0 4px rgba(0,180,216,0.2),0 4px 12px rgba(0,0,0,0.6);cursor:pointer;margin-top:-3px}
   .wx-slider-input::-webkit-slider-thumb:hover{box-shadow:0 0 0 8px rgba(0,180,216,0.3),0 4px 12px rgba(0,0,0,0.6)}
@@ -1253,7 +1253,7 @@ function updateWxSliderUI() {
   });
   scored.sort((a,b) => b.pct - a.pct);
 
-  dots.innerHTML = scored.map(s => {
+  dots.innerHTML = scored.filter(s => weatherMinSunPct === 0 || s.pct > 0).map(s => {
     const pass = weatherMinSunPct === 0 || s.pct >= weatherMinSunPct;
     const bg  = pass ? (s.pct >= 70 ? '#0d2200' : '#1a2000') : '#0d0d1e';
     const bdr = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#1e2a40';
