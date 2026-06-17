@@ -318,11 +318,16 @@
   </div>
   <div id="wxToast"></div>
 
-  <div class="section-title">🗺 Destination Map</div>
-  <div id="map"></div>
-
-  <div class="section-title" id="flightsTitle">✈ Available Flights</div>
-  <div class="grid" id="flightGrid"></div>
+  <div class="map-and-flights">
+    <div class="map-col">
+      <div class="section-title">🗺 Destination Map</div>
+      <div id="map"></div>
+    </div>
+    <div class="flights-col">
+      <div class="section-title" id="flightsTitle">✈ Available Flights</div>
+      <div class="grid" id="flightGrid"></div>
+    </div>
+  </div>
 
   <div class="return-panel" id="returnPanel">
     <h3 id="returnTitle">Return Flights</h3>
@@ -904,26 +909,6 @@ function drawMap() {
   L.circleMarker([HKG.lat, HKG.lng], {radius:10, color:'#fff', weight:2, fillColor:'#00b4d8', fillOpacity:1})
     .addTo(map).bindTooltip('Hong Kong (HKG)', {permanent:true, direction:'top', className:'map-tip'});
 
-  map.on('moveend', filterCardsByViewport);
-
-  function filterCardsByViewport() {
-    const bounds = map.getBounds();
-    const visible = new Set();
-    DESTINATIONS.forEach(dest => {
-      if (bounds.contains([dest.lat, dest.lng])) visible.add(dest.iata);
-    });
-    let shown = 0;
-    document.querySelectorAll('.card[data-iata]').forEach(card => {
-      const iata = card.getAttribute('data-iata');
-      if (visible.has(iata)) { card.style.display = ''; shown++; }
-      else { card.style.display = 'none'; }
-    });
-    const title = document.getElementById('flightsTitle');
-    if (visible.size < DESTINATIONS.length) {
-      title.textContent = `✈ Showing ${shown} destinations in view`;
-    }
-  }
-
   DESTINATIONS.forEach(dest => {
     const line = L.polyline([[HKG.lat, HKG.lng],[dest.lat, dest.lng]], {
       color:'#00b4d8', weight:1.5, dashArray:'6,4', opacity:0.4
@@ -1255,19 +1240,17 @@ function updateWxSliderUI() {
     if (pct === null) return;
     const items = getWeatherForDate(weatherCache[d.iata], getSelectedDateKey());
     const wx = items.length ? classifyWeather(items) : null;
-    scored.push({iata: d.iata, name: d.name, pct, wx});
+    const sr = items.length ? calcSunRain(items) : null;
+    scored.push({iata: d.iata, name: d.name, pct, wx, sr});
   });
   scored.sort((a,b) => b.pct - a.pct);
 
-  dots.innerHTML = scored.filter(s => weatherMinSunPct === 0 || s.pct > 0).map(s => {
+  dots.innerHTML = scored.map(s => {
     const pass = weatherMinSunPct === 0 || s.pct >= weatherMinSunPct;
     const bg  = pass ? (s.pct >= 70 ? '#0d2200' : '#1a2000') : '#0d0d1e';
     const bdr = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#1e2a40';
     const clr = pass ? (s.pct >= 70 ? '#00e676' : '#ffd600') : '#37474f';
-    if (pass) {
-      return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr};font-size:0.58rem;padding:1px 5px">${s.iata} ${s.pct}%</span>`;
-    }
-    return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr}">${s.wx?.emoji||'🌧'} ${s.iata} ${s.pct}%</span>`;
+    return `<span class="wx-dest-dot" style="background:${bg};border-color:${bdr};color:${clr}">${s.wx?.emoji||'🌤'} ${s.iata} ${s.pct}%</span>`;
   }).join('');
 }
 
@@ -1313,7 +1296,11 @@ function applyWxFilter() {
   cards.forEach(card => {
     const iata = card.dataset.iata;
     const sunPct = getSunPctForDate(iata);
-    const passes = weatherMinSunPct === 0 || sunPct === null || sunPct >= weatherMinSunPct;
+    let passes = weatherMinSunPct === 0 || sunPct === null || sunPct >= weatherMinSunPct;
+    if (passes && weatherMinSunPct > 0 && weatherCache[iata]) {
+      const items = getWeatherForDate(weatherCache[iata], getSelectedDateKey());
+      if (items.length && calcSunRain(items).rainH > 0) passes = false;
+    }
     card.style.display = passes ? '' : 'none';
     if (passes) {
       newPassingIatas.add(iata);
