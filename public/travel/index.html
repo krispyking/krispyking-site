@@ -128,6 +128,10 @@
   .dur-label{font-size:0.72rem;color:#b0bec5;white-space:nowrap}
   .flight-block{margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1a3a5c}
   .flight-block:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .night-gap{display:flex;align-items:center;gap:8px;padding:10px 14px;margin:6px 0;background:repeating-linear-gradient(-45deg,#030b14,#030b14 8px,#080f1c 8px,#080f1c 16px);border-radius:8px;border:1px solid #0c1c2c}
+  .ng-moon{font-size:1.1rem;opacity:0.85}
+  .ng-text{color:#2a4a6a;text-transform:uppercase;font-weight:700;letter-spacing:1px;font-size:0.7rem}
+  .ng-dur{color:#1c344e;margin-left:auto;font-size:0.67rem}
   .leave-home-row{display:flex;align-items:center;gap:10px;font-size:0.78rem;color:#90caf9;padding:5px 10px;background:#162032;border-radius:6px;margin-top:4px;flex-wrap:wrap}
   .leave-home-row.tight{background:#3e1a1a;color:#ff8a80}
   .lh-step{display:flex;align-items:center;gap:3px;white-space:nowrap}
@@ -1166,13 +1170,26 @@ function renderGrid() {
           <span class="country">${dest.country}</span>
         </div>
         <div class="card-mid">
-          ${flights.map(f => {
+          ${flights.reduce((html, f, i) => {
+                const prevF = flights[i - 1];
+                let divider = '';
+                if (prevF) {
+                  const pD = prevF.dep.replace(/\+.*/, '').split(':');
+                  const cD = f.dep.replace(/\+.*/, '').split(':');
+                  const prevMins = +pD[0] * 60 + +pD[1];
+                  const currMins = +cD[0] * 60 + +cD[1];
+                  if (prevMins < 300 && currMins >= 360) {
+                    const gapTotal = currMins - prevMins;
+                    const gH = Math.floor(gapTotal / 60), gM = gapTotal % 60;
+                    divider = '<div class="night-gap"><span class="ng-moon">🌙</span><span class="ng-text">Quiet Hours — No Flights</span><span class="ng-dur">' + prevF.dep + ' → ' + f.dep + ' (' + gH + (gM ? 'h ' + gM + 'm' : 'h') + ')</span></div>';
+                  }
+                }
                 const lh = calcLeaveHome(f.dep);
                 const dur = calcDuration(f.dep, f.arr, dest.tz);
                 const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
                 const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
                 const cr = carrierInfo(f.fn);
-                return `
+                return html + divider + `
                 <div class="flight-block">
                   <div class="flight-row">
                     <span class="fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
@@ -1192,7 +1209,7 @@ function renderGrid() {
                     <span class="ac-loading">🛩 aircraft loading…</span>
                   </div>
                 </div>`;
-              }).join('')}
+              }, '')}
         </div>
         <div class="card-right">
           <div class="weather-section" id="wx-${dest.iata}">
