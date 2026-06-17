@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const NAV_LINKS = [
-  { label: 'About',    href: '#about' },
-  { label: 'Hobbies',  href: '#hobbies' },
-  { label: 'Travel',   href: '#travel' },
-  { label: 'AI',       href: '#ai-journey' },
-  { label: 'Now',      href: '#now' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Connect',  href: '#connect' },
+  { label: 'About',    href: '/#about' },
+  { label: 'Hobbies',  href: '/#hobbies' },
+  { label: 'Travel',   href: '/#travel' },
+  { label: 'AI',       href: '/ai' },
+  { label: 'Now',      href: '/#now' },
+  { label: 'Projects', href: '/#projects' },
+  { label: 'Connect',  href: '/#connect' },
 ]
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -30,24 +32,35 @@ export default function Nav() {
       }}
     >
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
-        <a
-          href="#hero"
+        <Link
+          to="/"
           className="font-serif font-bold text-text-primary text-lg hover:text-accent transition-colors"
         >
           KrispyKing
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
-          {NAV_LINKS.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm text-text-secondary hover:text-accent transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map(link => {
+            const isActive = link.href === '/ai' && location.pathname === '/ai'
+            return link.href.startsWith('/#') ? (
+              <a
+                key={link.href}
+                href={link.href}
+                className="text-sm text-text-secondary hover:text-accent transition-colors"
+              >
+                {link.label}
+              </a>
+            ) : (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`text-sm transition-colors ${isActive ? 'text-accent' : 'text-text-secondary hover:text-accent'}`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Mobile hamburger */}
@@ -78,16 +91,27 @@ export default function Nav() {
           style={{ background: 'rgba(10, 15, 26, 0.98)', backdropFilter: 'blur(12px)' }}
         >
           <nav className="flex flex-col px-6 py-4 gap-1">
-            {NAV_LINKS.map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="text-text-secondary hover:text-accent transition-colors text-sm font-medium py-2.5 border-b border-border/40 last:border-0"
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map(link =>
+              link.href.startsWith('/#') ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className="text-text-secondary hover:text-accent transition-colors text-sm font-medium py-2.5 border-b border-border/40 last:border-0"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  onClick={() => setOpen(false)}
+                  className="text-text-secondary hover:text-accent transition-colors text-sm font-medium py-2.5 border-b border-border/40 last:border-0"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
         </div>
       )}
