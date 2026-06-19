@@ -1672,8 +1672,9 @@ function showReturn(dest) {
 document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
   today.setHours(0,0,0,0);
-  selectedDate = new Date(today);
   sliderStartDate = new Date(today);
+  selectedDate = new Date(today);
+  selectedDate.setDate(selectedDate.getDate() + 1); // default to tomorrow — today's UTC date mismatches HKT
 
   buildSlider();
   updateDateDisplay();
