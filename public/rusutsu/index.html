@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rusutsu Ridge Retreat — Interactive Map</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet"/>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+  <script src="./config"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; background: #0a0e1a; color: #fff; font-family: 'Georgia', serif; }
+
+    header {
+      height: 64px;
+      padding: 0 28px;
+      background: linear-gradient(135deg, #0a0e1a, #141e38);
+      border-bottom: 1px solid #1e2d50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .hdr-left h1 { font-size: 1.18rem; color: #e8d5a3; letter-spacing: 3px; text-transform: uppercase; }
+    .hdr-left p  { font-size: 0.68rem; color: #5566aa; margin-top: 2px; letter-spacing: 1.5px; }
+    .hdr-badge {
+      background: rgba(232,213,163,0.09);
+      border: 1px solid rgba(232,213,163,0.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.68rem;
+      color: #e8d5a3;
+      letter-spacing: 1px;
+    }
+
+    #wrap { position: relative; width: 100%; height: calc(100vh - 64px); }
+    #map  { width: 100%; height: 100%; }
+
+    /* shared panel */
+    .panel {
+      position: absolute;
+      background: rgba(7, 10, 20, 0.88);
+      border: 1px solid #1e2d50;
+      border-radius: 10px;
+      padding: 13px 15px;
+      z-index: 10;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .panel h3 {
+      font-size: 0.66rem;
+      color: #e8d5a3;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid #131b30;
+    }
+
+    /* layer controls */
+    #ctrl { top: 12px; right: 12px; min-width: 165px; }
+    .ctrl-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 0; font-size: 0.73rem; color: #7788aa;
+      cursor: pointer; user-select: none;
+    }
+    .ctrl-row:hover { color: #e8d5a3; }
+    .ctrl-row input { accent-color: #e8d5a3; width: 13px; height: 13px; cursor: pointer; }
+    .ctrl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* land card */
+    #land-card { bottom: 28px; left: 12px; max-width: 228px; }
+    .lc-badge {
+      display: inline-block;
+      background: rgba(232,213,163,0.09);
+      border: 1px solid rgba(232,213,163,0.22);
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 0.6rem;
+      color: #e8d5a3;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .lc-title { font-size: 0.86rem; color: #e8d5a3; margin-bottom: 2px; }
+    .lc-sub { font-size: 0.66rem; color: #445577; margin-bottom: 10px; line-height: 1.5; }
+    .stat { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.71rem; }
+    .stat + .stat { border-top: 1px solid #111928; }
+    .stat-k { color: #445577; }
+    .stat-v { color: #e8d5a3; font-weight: bold; }
+
+    /* ring legend */
+    #ring-legend { bottom: 28px; right: 12px; }
+    .rl-row { display: flex; align-items: center; gap: 8px; font-size: 0.71rem; color: #7788aa; padding: 3px 0; }
+    .rl-line { width: 22px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+
+    /* route note */
+    #route-note {
+      position: absolute;
+      top: 12px; left: 50%; transform: translateX(-50%);
+      background: rgba(7,10,20,0.82);
+      border: 1px solid #1e2d50;
+      border-radius: 7px;
+      padding: 5px 14px;
+      font-size: 0.65rem; color: #445577;
+      z-index: 10; white-space: nowrap; pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    /* loading */
+    #loading {
+      position: absolute; inset: 0;
+      background: rgba(7,10,20,0.72);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 50; gap: 14px;
+    }
+    #loading.hidden { display: none; }
+    #loading p { font-size: 0.75rem; color: #e8d5a3; letter-spacing: 3px; }
+    .spin {
+      width: 30px; height: 30px;
+      border: 2px solid #1e2d50;
+      border-top-color: #e8d5a3;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* popup overrides */
+    .mapboxgl-popup-content {
+      background: #090d1c !important;
+      border: 1px solid #1e2d50 !important;
+      border-radius: 8px !important;
+      color: #99aabb !important;
+      font-size: 0.76rem !important;
+      padding: 11px 14px !important;
+      line-height: 1.65 !important;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.7) !important;
+    }
+    .mapboxgl-popup-close-button { color: #445577 !important; font-size: 15px !important; right: 4px !important; top: 4px !important; }
+    .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip { border-top-color: #1e2d50 !important; }
+    .mapboxgl-popup-anchor-top    .mapboxgl-popup-tip { border-bottom-color: #1e2d50 !important; }
+    .mapboxgl-popup-anchor-left   .mapboxgl-popup-tip { border-right-color: #1e2d50 !important; }
+    .mapboxgl-popup-anchor-right  .mapboxgl-popup-tip { border-left-color: #1e2d50 !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hdr-left">
+      <h1>⛷ Rusutsu Ridge Retreat</h1>
+      <p>Hokkaido's Hidden Gem — Ski-Adjacent Living</p>
+    </div>
+    <div class="hdr-badge">276-67 Ohara · Toyako-cho · Hokkaido</div>
+  </header>
+
+  <div id="wrap">
+    <div id="map"></div>
+
+    <div id="loading">
+      <div class="spin"></div>
+      <p>LOADING MAP DATA</p>
+    </div>
+
+    <div id="route-note">⚠ Off-piste routes are approximate — illustrative purposes only</div>
+
+    <div class="panel" id="ctrl">
+      <h3>Map Layers</h3>
+      <label class="ctrl-row">
+        <input type="checkbox" id="tog-rings" checked/>
+        <div class="ctrl-dot" style="background:linear-gradient(135deg,#4ac064,#e87a50);"></div>
+        Drive-Time Rings
+      </label>
+      <label class="ctrl-row">
+        <input type="checkbox" id="tog-offpiste" checked/>
+        <div class="ctrl-dot" style="background:#e87a50;"></div>
+        Off-Piste Routes
+      </label>
+      <label class="ctrl-row">
+        <input type="checkbox" id="tog-markers" checked/>
+        <div class="ctrl-dot" style="background:#e8d5a3;"></div>
+        Key Locations
+      </label>
+    </div>
+
+    <div class="panel" id="land-card">
+      <div class="lc-badge">⭐ Our Land</div>
+      <div class="lc-title">Lake Toya Dream Land B</div>
+      <div class="lc-sub">276-67 &amp; 276-25 Ohara<br/>Toyako-cho, Hokkaido</div>
+      <div class="stat"><span class="stat-k">Price</span><span class="stat-v">¥11,500,000</span></div>
+      <div class="stat"><span class="stat-k">USD equiv.</span><span class="stat-v">~$75,000</span></div>
+      <div class="stat"><span class="stat-k">Area</span><span class="stat-v">662 m²</span></div>
+      <div class="stat"><span class="stat-k">BCR / FAR</span><span class="stat-v">60% / 200%</span></div>
+      <div class="stat"><span class="stat-k">To Resort</span><span class="stat-v">⛷ 22 min</span></div>
+    </div>
+
+    <div class="panel" id="ring-legend">
+      <h3>Drive Time from Resort</h3>
+      <div class="rl-row"><div class="rl-line" style="background:#4ac064;"></div>20 min radius</div>
+      <div class="rl-row"><div class="rl-line" style="background:#f0c040;"></div>30 min radius</div>
+      <div class="rl-row"><div class="rl-line" style="background:#e87a50;"></div>40 min radius</div>
+    </div>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = window.MAPBOX_TOKEN || '';
+
+    const RESORT = [140.8999, 42.6598];
+    const LAND   = [140.7986, 42.5996];
+    const LAKE   = [140.7900, 42.5950];
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      center: [140.855, 42.632],
+      zoom: 10.8,
+      pitch: 38,
+      bearing: -8
+    });
+
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    map.addControl(new mapboxgl.ScaleControl({ unit: 'metric' }), 'bottom-right');
+
+    const offPiste = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {
+            name: 'Tree Run — North Bowl',
+            vertical: '~350m', distance: '~2 km', risk: 'Medium', riskColor: '#f0c040',
+            notes: 'Popular tree skiing, marked entry points. Beacon recommended.'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: [[140.905,42.672],[140.903,42.668],[140.899,42.663],[140.895,42.658]]
+          }
+        },
+        {
+          type: 'Feature',
+          properties: {
+            name: 'West Face Powder Fields',
+            vertical: '~400m', distance: '~1.5 km', risk: 'High', riskColor: '#e87a50',
+            notes: 'Steep entry, avalanche risk in heavy snow. Guide recommended.'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: [[140.893,42.668],[140.888,42.662],[140.882,42.656],[140.878,42.651]]
+          }
+        },
+        {
+          type: 'Feature',
+          properties: {
+            name: 'Back Bowl Traverse',
+            vertical: '~200m', distance: '~3 km', risk: 'Medium', riskColor: '#f0c040',
+            notes: 'Long flat runout, requires guide. Good first-timer backcountry route.'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: [[140.912,42.667],[140.918,42.663],[140.922,42.658],[140.920,42.652]]
+          }
+        },
+        {
+          type: 'Feature',
+          properties: {
+            name: 'East Ridge Hike-to',
+            vertical: '+150m hike / ~2.5 km ski', distance: '~2.5 km', risk: 'High', riskColor: '#e87a50',
+            notes: '45-min bootpack, cliff exposure at top. Full touring kit required.'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: [[140.916,42.672],[140.913,42.667],[140.910,42.660],[140.908,42.653]]
+          }
+        },
+        {
+          type: 'Feature',
+          properties: {
+            name: 'Lake Toya Descent (Backcountry)',
+            vertical: '~600m', distance: '~5 km', risk: 'Very High', riskColor: '#e84040',
+            notes: 'Multi-day backcountry tour, permit zone. Ends near Toyako-cho. Guide + permit mandatory.'
+          },
+          geometry: {
+            type: 'LineString',
+            coordinates: [[140.908,42.665],[140.895,42.650],[140.875,42.635],[140.850,42.620],[140.820,42.608]]
+          }
+        }
+      ]
+    };
+
+    const markerObjects = [];
+
+    function popup(html) {
+      return new mapboxgl.Popup({ offset: 14, maxWidth: '270px' }).setHTML(html);
+    }
+
+    async function fetchIsochrones() {
+      const res = await fetch(
+        `https://api.mapbox.com/isochrone/v1/mapbox/driving/${RESORT[0]},${RESORT[1]}` +
+        `?contours_minutes=20,30,40&polygons=true&access_token=${mapboxgl.accessToken}`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    function fallbackRings() {
+      const defs = [[40, 0.30], [30, 0.22], [20, 0.14]];
+      return {
+        type: 'FeatureCollection',
+        features: defs.map(([mins, r]) => {
+          const pts = [];
+          for (let i = 0; i <= 72; i++) {
+            const a = (i / 72) * 2 * Math.PI;
+            pts.push([RESORT[0] + Math.cos(a) * r, RESORT[1] + Math.sin(a) * r * 0.76]);
+          }
+          return { type: 'Feature', properties: { contour: mins }, geometry: { type: 'Polygon', coordinates: [pts] } };
+        })
+      };
+    }
+
+    map.on('load', async () => {
+      // isochrones
+      let isoData;
+      try { isoData = await fetchIsochrones(); }
+      catch (e) { console.warn('Isochrone API fell back to circles:', e); isoData = fallbackRings(); }
+
+      map.addSource('iso', { type: 'geojson', data: isoData });
+      map.addLayer({
+        id: 'iso-fill', type: 'fill', source: 'iso',
+        paint: {
+          'fill-color': ['match', ['get', 'contour'], 20, '#4ac064', 30, '#f0c040', '#e87a50'],
+          'fill-opacity': 0.12
+        }
+      });
+      map.addLayer({
+        id: 'iso-line', type: 'line', source: 'iso',
+        paint: {
+          'line-color': ['match', ['get', 'contour'], 20, '#4ac064', 30, '#f0c040', '#e87a50'],
+          'line-width': 1.5, 'line-opacity': 0.6, 'line-dasharray': [3, 2]
+        }
+      });
+
+      // off-piste routes
+      map.addSource('offpiste', { type: 'geojson', data: offPiste });
+      map.addLayer({
+        id: 'offpiste-shadow', type: 'line', source: 'offpiste',
+        paint: { 'line-color': '#000', 'line-width': 5, 'line-opacity': 0.25 }
+      });
+      map.addLayer({
+        id: 'offpiste-line', type: 'line', source: 'offpiste',
+        paint: { 'line-color': ['get', 'riskColor'], 'line-width': 2.5, 'line-dasharray': [2, 1.5] }
+      });
+
+      map.on('click', 'offpiste-line', (e) => {
+        const p = e.features[0].properties;
+        new mapboxgl.Popup({ offset: 8 })
+          .setLngLat(e.lngLat)
+          .setHTML(`
+            <strong style="color:#e8d5a3;display:block;margin-bottom:5px">${p.name}</strong>
+            <span style="color:${p.riskColor};font-size:0.7rem">⚠ Risk: ${p.risk}</span>
+            <div style="color:#7788aa;margin-top:6px;font-size:0.7rem">
+              Vertical: <strong style="color:#ccd">${p.vertical}</strong>
+              &nbsp;·&nbsp; Distance: <strong style="color:#ccd">${p.distance}</strong>
+            </div>
+            <div style="color:#445577;margin-top:5px;font-size:0.68rem;font-style:italic">${p.notes}</div>
+          `)
+          .addTo(map);
+      });
+      map.on('mouseenter', 'offpiste-line', () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', 'offpiste-line', () => { map.getCanvas().style.cursor = ''; });
+
+      // land parcel marker (gold star)
+      const starEl = document.createElement('div');
+      starEl.textContent = '⭐';
+      starEl.style.cssText = 'font-size:22px;cursor:pointer;line-height:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.9));';
+      const landM = new mapboxgl.Marker({ element: starEl })
+        .setLngLat(LAND)
+        .setPopup(popup(`
+          <strong style="color:#e8d5a3;display:block;margin-bottom:5px">⭐ Lake Toya Dream Land B</strong>
+          <div style="color:#445577;font-size:0.7rem;margin-bottom:8px">276-67 &amp; 276-25 Ohara, Toyako-cho</div>
+          <div style="color:#4dd9a0;font-size:0.92rem;font-weight:bold;margin-bottom:2px">¥11,500,000</div>
+          <div style="color:#5566aa;font-size:0.7rem;margin-bottom:9px">~$75,000 USD</div>
+          <div style="font-size:0.7rem;color:#7788aa;line-height:1.9">
+            Area: <strong style="color:#ccd">662 m²</strong><br/>
+            BCR: <strong style="color:#ccd">60%</strong> &nbsp;|&nbsp; FAR: <strong style="color:#ccd">200%</strong><br/>
+            To resort: <strong style="color:#ccd">⛷ 22 min</strong>
+          </div>
+        `))
+        .addTo(map);
+      markerObjects.push(landM);
+
+      // Rusutsu Resort marker
+      const resortM = new mapboxgl.Marker({ color: '#4a90d9', scale: 1.2 })
+        .setLngLat(RESORT)
+        .setPopup(popup(`
+          <strong style="color:#4a90d9;display:block;margin-bottom:5px">⛷ Rusutsu Resort</strong>
+          <div style="font-size:0.7rem;color:#7788aa;line-height:1.9">
+            <strong style="color:#ccd">38 runs</strong> across 3 mountains<br/>
+            <strong style="color:#ccd">18 lifts</strong> incl. 3 gondolas<br/>
+            Summit: <strong style="color:#ccd">Mt Rusutsu 994m</strong><br/>
+            Snow: <strong style="color:#ccd">~15m / season</strong>
+          </div>
+          <div style="margin-top:7px;font-size:0.68rem;color:#445577;font-style:italic">
+            World-class Hokkaido powder — consistently less crowded than Niseko
+          </div>
+        `))
+        .addTo(map);
+      markerObjects.push(resortM);
+
+      // Lake Toya marker
+      const toyaM = new mapboxgl.Marker({ color: '#4dd9a0', scale: 1.0 })
+        .setLngLat(LAKE)
+        .setPopup(popup(`
+          <strong style="color:#4dd9a0;display:block;margin-bottom:5px">Lake Toya</strong>
+          <div style="font-size:0.7rem;color:#7788aa;line-height:1.9">
+            Caldera lake — volcanic origin<br/>
+            <strong style="color:#ccd">UNESCO Global Geopark</strong><br/>
+            6.3 km from land parcel
+          </div>
+          <div style="margin-top:7px;font-size:0.68rem;color:#445577;font-style:italic">
+            Visible from the property — key selling point
+          </div>
+        `))
+        .addTo(map);
+      markerObjects.push(toyaM);
+
+      // layer toggles
+      document.getElementById('tog-rings').addEventListener('change', (e) => {
+        const vis = e.target.checked ? 'visible' : 'none';
+        ['iso-fill','iso-line'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis); });
+        document.getElementById('ring-legend').style.opacity = e.target.checked ? '1' : '0.35';
+      });
+
+      document.getElementById('tog-offpiste').addEventListener('change', (e) => {
+        const vis = e.target.checked ? 'visible' : 'none';
+        ['offpiste-shadow','offpiste-line'].forEach(id => { if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis); });
+        document.getElementById('route-note').style.opacity = e.target.checked ? '1' : '0';
+      });
+
+      document.getElementById('tog-markers').addEventListener('change', (e) => {
+        markerObjects.forEach(m => e.target.checked ? m.addTo(map) : m.remove());
+      });
+
+      document.getElementById('loading').classList.add('hidden');
+    });
+  </script>
+</body>
+</html>
