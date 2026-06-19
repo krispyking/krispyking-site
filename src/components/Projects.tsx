@@ -119,6 +119,14 @@ const SUBDOMAINS: Project[] = [
     status: 'Beta',
   },
   {
+    icon: '⛷',
+    title: 'Rusutsu Ridge Retreat',
+    desc: 'Interactive investment map for a ski-adjacent land parcel near Rusutsu Resort, Hokkaido. Drive-time rings, off-piste routes, terrain satellite view, and property data — all on one page.',
+    url: 'https://rusutsu.krispyking.com',
+    badge: 'PropTech / Japan',
+    status: 'Live',
+  },
+  {
     icon: '🏢',
     title: '12E Block 5',
     desc: 'AI-managed residential property at Park Island, Hong Kong. A dedicated agent handles tenant management, lease reviews, maintenance scheduling, and admin — fully autonomous, human-in-the-loop for key decisions.',
