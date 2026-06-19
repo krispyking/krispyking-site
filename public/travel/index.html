@@ -1287,7 +1287,7 @@ function showWxToast(newDests) {
 
 function applyWxFilter() {
   const dotsEl = document.getElementById('wxDestDots');
-  if (dotsEl) dotsEl.style.display = weatherMinSunPct === 0 ? 'none' : '';
+  if (dotsEl) dotsEl.style.display = '';
 
   const cards = document.querySelectorAll('.card[data-iata]');
   let totalFlights = 0, availableDests = 0;
