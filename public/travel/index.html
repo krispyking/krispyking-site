@@ -1378,10 +1378,9 @@ function renderGrid() {
                 const lh = calcLeaveHome(f.dep);
                 const dur = calcDuration(f.dep, f.arr, dest.tz);
                 const cr = carrierInfo(f.fn);
-                if (i === 0) {
-                  const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
-                  const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
-                  return html + divider + `
+                const pct = Math.min(100, Math.round((dur.mins / (14*60)) * 100));
+                const barCol = dur.mins > 480 ? '#ff5252' : dur.mins > 300 ? '#ff9800' : '#00e676';
+                return html + divider + `
                 <div class="flight-block">
                   <div class="flight-row">
                     <span class="fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
@@ -1400,15 +1399,6 @@ function renderGrid() {
                   <div class="ac-info" data-fn="${f.fn}" data-dest="${dest.iata}" data-dep="${f.dep}">
                     <span class="ac-loading">🛩 aircraft loading…</span>
                   </div>
-                </div>`;
-                }
-                return html + divider + `
-                <div class="flight-compact">
-                  <span class="fc-fn"><span class="carrier-tag ${cr.cls}">${cr.tag}</span>${f.fn}</span>
-                  <span class="fc-times">${f.dep} → ${f.arr}</span>
-                  <span class="fc-dur">${dur.label}</span>
-                  <span class="freq badge">${freqLabel(f.days)}</span>
-                  <span class="fc-leave">🚪 Leave <b>${lh.leaveHome}</b></span>
                 </div>`;
               }, '')}
         </div>
