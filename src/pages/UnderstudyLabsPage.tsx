@@ -80,10 +80,11 @@ function DigitalFrameMark({ className = 'h-7 w-7' }: { className?: string }) {
       <path d="M28 10V4h-6" />
       <path d="M4 22v6h6" />
       <path d="M22 4h6v6" />
-      {/* Fingerprint ridge, overlapping the open corner */}
-      <path d="M22 22c2.2 0 4-1.8 4-4" opacity="0.9" />
-      <path d="M24 25c3.3 0 6-2.7 6-6" opacity="0.7" />
-      <path d="M20 19.5c1.1 0 2-.9 2-2" opacity="0.9" />
+      {/* Fingerprint ridge — 3 concentric arcs, evenly spaced so they read as
+          distinct rings rather than merging at small (header) sizes */}
+      <path d="M19.5 19.5c0 1.5 1.2 2.7 2.7 2.7" opacity="1" />
+      <path d="M21 21c0 2.5 2 4.5 4.5 4.5" opacity="0.75" />
+      <path d="M22.5 22.5c0 3.5 2.8 6.3 6.3 6.3" opacity="0.5" />
     </svg>
   )
 }
@@ -106,7 +107,7 @@ export default function UnderstudyLabsPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <span className="flex items-center gap-2.5">
             <DigitalFrameMark />
-            <span className="hidden sm:inline font-ul-heading text-xl font-semibold tracking-wide text-ul-platinum">
+            <span className="hidden md:inline font-ul-heading text-xl font-semibold tracking-wide text-ul-platinum">
               Understudy Labs
             </span>
           </span>
