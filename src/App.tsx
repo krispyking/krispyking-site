@@ -10,6 +10,7 @@ import Projects from './components/Projects'
 import Connect from './components/Connect'
 import Footer from './components/Footer'
 import AIPage from './pages/AIPage'
+import UnderstudyLabsPage from './pages/UnderstudyLabsPage'
 
 function HomePage() {
   return (
@@ -27,13 +28,27 @@ function HomePage() {
   )
 }
 
-export default function App() {
+// The KrispyKing personal-site nav shouldn't appear on /understudylabs — that page is
+// its own brand identity, not a section of this site — so it's routed as a sibling
+// with no shared layout rather than nested under the Nav-wrapped routes below.
+function MainSite() {
   return (
-    <BrowserRouter>
+    <>
       <Nav />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/ai" element={<AIPage />} />
+      </Routes>
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/understudylabs" element={<UnderstudyLabsPage />} />
+        <Route path="/*" element={<MainSite />} />
       </Routes>
     </BrowserRouter>
   )
