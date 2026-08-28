@@ -127,6 +127,14 @@ const SUBDOMAINS: Project[] = [
     status: 'Live',
   },
   {
+    icon: '🎭',
+    title: 'Understudy Labs',
+    desc: 'Licensed digital performer marketplace. Real humans, consented and contracted, categorised by archetype, delivered by API for film, advertising, gaming, and creator content.',
+    url: 'https://www.krispyking.com/understudylabs',
+    badge: 'AI / Licensed Talent',
+    status: 'Concept',
+  },
+  {
     icon: '🏢',
     title: '12E Block 5',
     desc: 'AI-managed residential property at Park Island, Hong Kong. A dedicated agent handles tenant management, lease reviews, maintenance scheduling, and admin — fully autonomous, human-in-the-loop for key decisions.',
