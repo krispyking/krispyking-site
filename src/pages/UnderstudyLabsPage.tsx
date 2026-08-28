@@ -61,6 +61,33 @@ const TIERS = [
 const WAITLIST_MAILTO =
   'mailto:cransford@gmail.com?subject=Understudy%20Labs%20—%20waitlist'
 
+// "The Digital Frame" — per the brand spec: a minimalist, incomplete square with a
+// biometric fingerprint ridge integrated into the corner. Stroke-only, Platinum Silver,
+// monoline and geometric. Inline (no external asset) so it scales cleanly at any size.
+function DigitalFrameMark({ className = 'h-7 w-7' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      className={className}
+      stroke="#e5e4e2"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      {/* Incomplete square — the frame, deliberately open at the bottom-right corner */}
+      <path d="M4 10V4h6" />
+      <path d="M28 10V4h-6" />
+      <path d="M4 22v6h6" />
+      <path d="M22 4h6v6" />
+      {/* Fingerprint ridge, overlapping the open corner */}
+      <path d="M22 22c2.2 0 4-1.8 4-4" opacity="0.9" />
+      <path d="M24 25c3.3 0 6-2.7 6-6" opacity="0.7" />
+      <path d="M20 19.5c1.1 0 2-.9 2-2" opacity="0.9" />
+    </svg>
+  )
+}
+
 function fadeUp(delay = 0) {
   return {
     initial: { opacity: 0, y: 20 },
@@ -73,11 +100,15 @@ function fadeUp(delay = 0) {
 export default function UnderstudyLabsPage() {
   return (
     <div className="min-h-screen bg-ul-charcoal text-ul-platinum font-ul-body">
-      {/* Standalone header — Understudy Labs is a distinct brand, not a KrispyKing section */}
+      {/* Standalone header — Understudy Labs is a distinct brand, not a KrispyKing section.
+          16px inline padding keeps the mark off the viewport edge on narrow screens. */}
       <header className="border-b border-ul-navy/60">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <span className="font-ul-heading text-xl font-semibold tracking-wide text-ul-platinum">
-            Understudy Labs
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <span className="flex items-center gap-2.5">
+            <DigitalFrameMark />
+            <span className="hidden sm:inline font-ul-heading text-xl font-semibold tracking-wide text-ul-platinum">
+              Understudy Labs
+            </span>
           </span>
           <Link to="/" className="text-sm text-ul-platinum/60 hover:text-ul-cyan transition-colors">
             ← krispyking.com
@@ -126,6 +157,14 @@ export default function UnderstudyLabsPage() {
           </motion.div>
           <motion.p {...fadeUp(0.4)} className="text-xs text-ul-platinum/40 mt-4">
             No public waitlist form yet — the links above open an email to the team.
+          </motion.p>
+
+          {/* Trust badges — text-only per the spec's minimal aesthetic, no icons yet */}
+          <motion.p
+            {...fadeUp(0.5)}
+            className="font-ul-body text-sm text-ul-platinum/70 mt-10 tracking-[0.05em]"
+          >
+            No FAKES Act compliant · C2PA watermarked · Consent-first verified
           </motion.p>
         </section>
 
