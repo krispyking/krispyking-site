@@ -11,6 +11,8 @@ import Connect from './components/Connect'
 import Footer from './components/Footer'
 import AIPage from './pages/AIPage'
 import UnderstudyLabsPage from './pages/UnderstudyLabsPage'
+import GentlemanPage from './pages/GentlemanPage'
+import GentlemanResultsPage from './pages/GentlemanResultsPage'
 
 function HomePage() {
   return (
@@ -28,9 +30,9 @@ function HomePage() {
   )
 }
 
-// The KrispyKing personal-site nav shouldn't appear on /understudylabs — that page is
-// its own brand identity, not a section of this site — so it's routed as a sibling
-// with no shared layout rather than nested under the Nav-wrapped routes below.
+// The KrispyKing personal-site nav shouldn't appear on /understudylabs or /gentleman —
+// each is its own brand identity, not a section of this site — so both are routed as
+// siblings with no shared layout rather than nested under the Nav-wrapped routes below.
 function MainSite() {
   return (
     <>
@@ -48,6 +50,8 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/understudylabs" element={<UnderstudyLabsPage />} />
+        <Route path="/gentleman" element={<GentlemanPage />} />
+        <Route path="/gentleman/results" element={<GentlemanResultsPage />} />
         <Route path="/*" element={<MainSite />} />
       </Routes>
     </BrowserRouter>

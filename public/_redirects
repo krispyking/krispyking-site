@@ -8,4 +8,11 @@
 /theargame    https://theargame.krispyking.com    301
 /boxingtool   https://boxingtool.krispyking.com 301
 
+# D-033 amendment (2026-08-30, Chris): public route is /gentleman, never the internal
+# abbreviation — "wog" collides with a slur and must never appear in a public URL.
+/wog                 /gentleman  301
+/woag                /gentleman  301
+/WOaG                /gentleman  301
+/awordofagentleman   /gentleman  301
+
 /* /index.html 200
