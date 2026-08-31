@@ -8,4 +8,12 @@
 /theargame    https://theargame.krispyking.com    301
 /boxingtool   https://boxingtool.krispyking.com 301
 
+# D-033 amendment (2026-08-30): WOG collides with a real ethnic slur and is
+# retired from all public/living surfaces. Legacy/candidate paths 301 to the
+# canonical /gentleman route (CK-5875/CK-5877).
+/wog                 /gentleman  301
+/woag                /gentleman  301
+/WOaG                /gentleman  301
+/awordofagentleman   /gentleman  301
+
 /* /index.html 200

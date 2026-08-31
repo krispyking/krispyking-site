@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Word of a Gentleman</title>
+  <meta name="description" content="A family finishes a film. An extended trailer, a question for its audience, and a vote on how far the project goes next." />
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/gentleman/assets/gentleman-D27tsuof.js"></script>
+  <link rel="modulepreload" crossorigin href="/gentleman/assets/supabaseClient-CbGs-eM9.js">
+  <link rel="stylesheet" crossorigin href="/gentleman/assets/supabaseClient-C7CFfUU_.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">A Family Film &middot; Extended Trailer</p>
+      <h1 class="title">The Word of a Gentleman</h1>
+      <p class="subtitle">A family finishes a film their grandfather couldn't. This is the demo that decides how far it goes.</p>
+    </header>
+
+    <div class="placeholder-imagery" role="presentation"></div>
+
+    <section aria-labelledby="player-heading">
+      <p class="eyebrow" id="player-heading">Watch</p>
+      <div class="player">
+        <p class="player-note">Placeholder cut — the real edit hasn't been assembled yet. Chapter markers below are wired and ready for the finished film.</p>
+        <video id="chapter-video" controls preload="metadata"
+               poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='540'%3E%3Crect width='960' height='540' fill='%23141110'/%3E%3Ctext x='50%25' y='50%25' fill='%23A8843C' font-family='Georgia,serif' font-size='28' text-anchor='middle' dominant-baseline='middle'%3EThe Word of a Gentleman%3C/text%3E%3Ctext x='50%25' y='58%25' fill='%238C8574' font-family='Georgia,serif' font-size='16' text-anchor='middle' dominant-baseline='middle'%3E(placeholder cut)%3C/text%3E%3C/svg%3E">
+          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+          Your browser doesn't support embedded video.
+        </video>
+        <nav class="chapters" aria-label="Chapters">
+          <button type="button" class="chapter-btn" data-time="0">I &middot; A man called Neil Ransford</button>
+          <button type="button" class="chapter-btn" data-time="10">II &middot; The inheritance</button>
+          <button type="button" class="chapter-btn" data-time="20">III &middot; The grandson, two lenses</button>
+          <button type="button" class="chapter-btn trailer-jump" data-time="30">&#9654; Jump to trailer (IV)</button>
+          <button type="button" class="chapter-btn" data-time="40">V &middot; The question</button>
+        </nav>
+      </div>
+    </section>
+
+    <section class="disclosure" aria-labelledby="disclosure-heading">
+      <p class="eyebrow" id="disclosure-heading">A note on the voice you hear</p>
+      <p><strong>Narration uses a synthetic reconstruction of Oliver Ransford's voice, made with his family's consent, reading his own words.</strong></p>
+      <p style="color:var(--stone); font-size:0.92rem; margin-bottom:0;">Every word spoken by that voice is drawn from what he actually wrote &mdash; his books, his thesis, his letters, his 1972 commentary track. It is never scripted new dialogue, and it never speaks as a character.</p>
+    </section>
+
+    <section aria-labelledby="ballot-heading">
+      <h2 id="ballot-heading">So &mdash; how far down the rabbit hole do we go?</h2>
+      <p>Five movements got you here. This is the part where you get a say. Pick one, tell us why, and if you've got advice, a warning, or a contact worth chasing &mdash; we're listening.</p>
+
+      <form id="ballot-form" novalidate>
+        <fieldset>
+          <legend>Your vote</legend>
+
+          <div class="ballot-option">
+            <input type="radio" id="opt-act1" name="ballot_choice" value="act1_chapter" required />
+            <label for="opt-act1"><span class="opt-title">Act 1 chapter</span><span class="opt-desc">~30 min, ~$840 &mdash; prove it, then decide again</span></label>
+          </div>
+          <div class="ballot-option">
+            <input type="radio" id="opt-full" name="ballot_choice" value="full_film" />
+            <label for="opt-full"><span class="opt-title">The full film</span><span class="opt-desc">Straight through, no interim gate</span></label>
+          </div>
+          <div class="ballot-option">
+            <input type="radio" id="opt-doc" name="ballot_choice" value="documentary_first" />
+            <label for="opt-doc"><span class="opt-title">Documentary first</span><span class="opt-desc">The family/journey story before the drama</span></label>
+          </div>
+          <div class="ballot-option">
+            <input type="radio" id="opt-ride" name="ballot_choice" value="the_ride" />
+            <label for="opt-ride"><span class="opt-title">The ride</span><span class="opt-desc">Fund/follow the motorbike retracing as its own series</span></label>
+          </div>
+          <div class="ballot-option">
+            <input type="radio" id="opt-stop" name="ballot_choice" value="stop_here" />
+            <label for="opt-stop"><span class="opt-title">Stop here</span><span class="opt-desc">It was a beautiful test</span></label>
+          </div>
+        </fieldset>
+
+        <label class="field-label" for="cut-watched">Which cut did you watch?</label>
+        <select id="cut-watched" name="cut_watched" required>
+          <option value="" disabled selected>Choose one&hellip;</option>
+          <option value="full_demo">Full demo (~15 min, all five movements)</option>
+          <option value="trailer_only">Trailer only (Movement IV, standalone)</option>
+        </select>
+
+        <label class="field-label" for="advice">Advice, warnings, ideas, contacts &mdash; anything</label>
+        <textarea id="advice" name="advice" placeholder="Optional, but this is the part we read closest."></textarea>
+
+        <label class="field-label" for="contact">Can we contact you? (optional)</label>
+        <input type="text" id="contact" name="contact" placeholder="Email or phone &mdash; only if you're open to being contacted" />
+
+        <p class="privacy-note">Responses go directly to Chris Ransford and the immediate family reviewing this decision &mdash; nobody else reads them, and they are never sold, shared, or used for advertising. No analytics beyond Cloudflare's own basic traffic stats run on this page.</p>
+
+        <button type="submit" class="submit" id="submit-btn">Cast your vote</button>
+        <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <footer class="site-footer">
+      <p>The Word of a Gentleman &mdash; a family film project. Private staging build, not for public distribution.</p>
+    </footer>
+  </div>
+
+</body>
+</html>

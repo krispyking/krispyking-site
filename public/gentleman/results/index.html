@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Word of a Gentleman — Results</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/gentleman/assets/results-BHUAIDVo.js"></script>
+  <link rel="modulepreload" crossorigin href="/gentleman/assets/supabaseClient-CbGs-eM9.js">
+  <link rel="stylesheet" crossorigin href="/gentleman/assets/supabaseClient-C7CFfUU_.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">Private &middot; Not Public</p>
+      <h1 class="title" style="font-size:clamp(1.6rem,5vw,2.4rem);">Results &amp; Tallies</h1>
+      <p class="subtitle">Gated to Chris and the family. Not linked from the public page.</p>
+    </header>
+
+    <div id="gate" class="gate-box">
+      <label class="field-label" for="token-input">Access token</label>
+      <input type="text" id="token-input" placeholder="Enter the results token" autocomplete="off" />
+      <button type="button" class="submit" id="unlock-btn" style="margin-top:0.9rem;">Unlock</button>
+      <p id="gate-status" class="form-status" role="status" aria-live="polite"></p>
+    </div>
+
+    <div id="results" hidden>
+      <p id="results-status" class="form-status info"></p>
+      <table class="tally" id="tally-table" hidden>
+        <thead>
+          <tr><th>Ballot choice</th><th>Votes</th></tr>
+        </thead>
+        <tbody id="tally-body"></tbody>
+      </table>
+    </div>
+
+    <footer class="site-footer">
+      <p>The Word of a Gentleman &mdash; private tally view. Do not share this link or token.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
