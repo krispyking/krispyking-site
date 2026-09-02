@@ -8,88 +8,208 @@
   <meta name="robots" content="noindex" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cinzel:wght@500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <script type="module" crossorigin src="/gentleman/assets/gentleman-D27tsuof.js"></script>
-  <link rel="modulepreload" crossorigin href="/gentleman/assets/supabaseClient-CbGs-eM9.js">
-  <link rel="stylesheet" crossorigin href="/gentleman/assets/supabaseClient-C7CFfUU_.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --ink:#1E1A16; --paper:#EFE7D8; --crimson:#7A1A1A; --brass:#A8843C;
+      --stone:#8C8574; --panel:#141110; --paper-dim:#E3D9C6; --rule:#D8CDB6;
+      --ff-head:'Playfair Display',Georgia,serif;
+      --ff-label:'Cinzel',Georgia,serif;
+      --ff-body:'EB Garamond',Georgia,serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{background:var(--paper);color:var(--ink);font-family:var(--ff-body);font-size:19px;line-height:1.55;-webkit-font-smoothing:antialiased}
+    img,video{max-width:100%}
+    a{color:var(--crimson)}
+    a:hover{color:var(--ink)}
+    .wrap{max-width:68ch;margin:0 auto;padding:0 1.5rem}
+    .eyebrow{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.14em;font-size:.72rem;color:var(--stone);margin:0}
+    h1,h2{font-family:var(--ff-head);font-weight:400;line-height:1.1;margin:0}
+    p{margin:0 0 1rem}
+
+    /* Hero */
+    .hero{padding:5rem 0 2.5rem}
+    .hero h1{font-size:clamp(2.4rem,6vw,4rem);margin:.6rem 0 1rem;max-width:14ch}
+    .hero .deck{font-family:var(--ff-head);font-style:italic;font-size:1.25rem;color:var(--crimson);max-width:34ch;margin-bottom:1rem}
+    .hero .lede{font-size:1.15rem;max-width:52ch}
+    /* Image slot — invisible until a src is set. Family-owned material only (photos, 1972 frames). */
+    .hero-image{margin:2rem 0 0;display:none}
+    .hero-image[data-has-src="true"]{display:block}
+    .hero-image img{display:block;width:100%;height:auto}
+    .hero-image figcaption{font-size:.95rem;color:var(--stone);font-style:italic;margin-top:.5rem}
+
+    /* The screen */
+    .screen{background:var(--panel);color:var(--paper);padding:3rem 0 2.5rem;margin-top:1.5rem}
+    .screen .eyebrow{color:var(--brass)}
+    .screen-note{color:var(--stone);font-style:italic;font-size:.98rem;margin:.4rem 0 1.25rem}
+    .player{background:#000;position:relative}
+    .player video{display:block;width:100%;background:#000;aspect-ratio:16/9}
+    .chapters{margin:1.5rem 0 0;padding:0;list-style:none;border-top:1px solid rgba(168,132,60,.45)}
+    .chapters li{margin:0}
+    .chapter-btn{display:grid;grid-template-columns:3rem 1fr auto;align-items:baseline;gap:1rem;width:100%;padding:.75rem 0;background:none;border:0;border-bottom:1px solid rgba(140,133,116,.35);color:var(--paper);font:inherit;text-align:left;cursor:pointer}
+    .chapter-btn .num{font-family:var(--ff-label);font-size:.8rem;letter-spacing:.1em;color:var(--brass)}
+    .chapter-btn .name{font-size:1.1rem}
+    .chapter-btn .mark{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.12em;font-size:.68rem;color:var(--stone)}
+    .chapter-btn:hover .name,.chapter-btn:focus-visible .name{color:var(--brass)}
+    .chapter-btn:focus-visible{outline:1.5px solid var(--brass);outline-offset:2px}
+    .chapter-btn[aria-current="true"] .num{color:var(--paper)}
+    .chapter-btn[aria-current="true"] .name{color:var(--paper);text-decoration:underline;text-decoration-color:var(--crimson);text-underline-offset:.3em}
+    .chapter-btn.trailer-jump .mark{color:var(--paper)}
+    .chapter-btn.trailer-jump .mark::before{content:"";display:inline-block;width:.45rem;height:.45rem;background:var(--crimson);margin-right:.5rem;vertical-align:middle}
+
+    /* Disclosure */
+    .disclosure{margin:3rem 0 0;padding-left:1.25rem;border-left:2px solid var(--crimson);max-width:60ch}
+    .disclosure .eyebrow{margin-bottom:.5rem}
+    .disclosure p{margin-bottom:.6rem}
+    .disclosure .lead{font-family:var(--ff-head);font-size:1.15rem;line-height:1.35}
+    .disclosure .fine{color:var(--stone);font-size:.98rem}
+    .journey-link{margin:2rem 0 0;font-size:1.1rem}
+    .journey-link a{font-family:var(--ff-head);font-style:italic}
+
+    /* The question */
+    .question{padding:4rem 0 1rem}
+    .question h2{font-size:clamp(1.8rem,4vw,2.5rem);max-width:22ch;margin:.5rem 0 1rem}
+    .question .lede{max-width:56ch;font-size:1.1rem}
+
+    /* Ballot paper */
+    .ballot{border:1px solid var(--ink);padding:1.75rem 1.5rem 2rem;margin:2rem 0 0;background:var(--paper)}
+    .ballot fieldset{border:0;padding:0;margin:0 0 1.75rem}
+    .ballot legend{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.14em;font-size:.72rem;color:var(--stone);padding:0;margin-bottom:.5rem}
+    .ballot-option{display:grid;grid-template-columns:1.4rem 1fr;gap:.9rem;align-items:start;padding:.7rem 0;border-bottom:1px solid var(--rule)}
+    .ballot-option:last-of-type{border-bottom:0}
+    .ballot-option input[type=radio]{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+    .ballot-option label{display:contents;cursor:pointer}
+    .ballot-option .box{width:1.1rem;height:1.1rem;border:1.5px solid var(--ink);margin-top:.3rem;position:relative}
+    .ballot-option input:checked + label .box::after{content:"";position:absolute;inset:2px;background:var(--crimson)}
+    .ballot-option input:focus-visible + label .box{outline:1.5px solid var(--brass);outline-offset:2px}
+    .ballot-option .text{display:block}
+    .ballot-option .opt-title{display:block;font-family:var(--ff-head);font-size:1.15rem}
+    .ballot-option .opt-desc{display:block;color:var(--stone);font-size:.98rem}
+    .field-label{display:block;font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.12em;font-size:.72rem;color:var(--stone);margin:1.5rem 0 .3rem}
+    .ballot input[type=text],.ballot textarea,.ballot select{width:100%;font-family:var(--ff-body);font-size:1.05rem;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--ink);border-radius:0;padding:.45rem 0}
+    .ballot select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 14px) 55%,calc(100% - 9px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:2rem}
+    .ballot textarea{min-height:6rem;resize:vertical;line-height:1.5}
+    .ballot input::placeholder,.ballot textarea::placeholder{color:var(--stone);opacity:1;font-style:italic}
+    .ballot input:focus,.ballot textarea:focus,.ballot select:focus{outline:none;border-bottom-color:var(--crimson)}
+    .privacy-note{font-size:.95rem;color:var(--stone);margin:1.5rem 0 0;max-width:56ch}
+    .submit{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.14em;font-size:.85rem;background:var(--crimson);color:var(--paper);border:0;border-radius:0;padding:.85rem 1.8rem;margin-top:1.5rem;cursor:pointer}
+    .submit:hover,.submit:focus-visible{background:var(--ink);outline:none}
+    .submit:disabled{background:var(--stone);cursor:not-allowed}
+    .form-status{margin-top:1rem;font-size:1rem;min-height:1.4em}
+    .form-status.ok{color:var(--crimson)}
+    .form-status.err{color:var(--crimson);font-style:italic}
+    .form-status.info{color:var(--stone);font-style:italic}
+
+    /* Results gate (kept for /gentleman/results styling parity) */
+    .gate-box{border:1px solid var(--ink);padding:1.5rem;margin-top:2rem}
+    table.tally{width:100%;border-collapse:collapse;margin-top:1rem}
+    table.tally th,table.tally td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--rule)}
+    table.tally th{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.1em;font-size:.72rem;color:var(--stone)}
+
+    footer.site-footer{margin:4rem 0 0;padding:1.25rem 0 3rem;border-top:1px solid var(--rule);font-size:.9rem;color:var(--stone)}
+
+    @media (max-width:640px){
+      body{font-size:17.5px}
+      .hero{padding-top:3.5rem}
+      .chapter-btn{grid-template-columns:2.5rem 1fr;gap:.75rem}
+      .chapter-btn .mark{grid-column:2;margin-top:.15rem}
+      .ballot{padding:1.25rem 1rem 1.5rem}
+    }
+    @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+  </style>
+  <script type="module" crossorigin src="/gentleman/assets/gentleman-B0jK9Ubr.js"></script>
+  <link rel="modulepreload" crossorigin href="/gentleman/assets/supabaseClient-Rv9Lo6SO.js">
 </head>
 <body>
-  <div class="wrap">
-    <header class="hero">
-      <p class="eyebrow">A Family Film &middot; Extended Trailer</p>
-      <h1 class="title">The Word of a Gentleman</h1>
-      <p class="subtitle">A family finishes a film their grandfather couldn't. This is the demo that decides how far it goes.</p>
-    </header>
 
-    <div class="placeholder-imagery" role="presentation"></div>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">A family film · extended trailer</p>
+      <h1>The Word of a Gentleman</h1>
+      <p class="deck">A family finishes a film their grandfather couldn't.</p>
+      <p class="lede">Fifteen minutes in five movements, made with machines from a 2001 screenplay and a 1978 book. Watch it, then tell us how far it should go.</p>
+      <!-- Set src on the img and data-has-src="true" on the figure to show. Family-owned material only. -->
+      <figure class="hero-image" data-has-src="false">
+        <img src="" alt="" />
+        <figcaption></figcaption>
+      </figure>
+    </div>
+  </header>
 
-    <section aria-labelledby="player-heading">
-      <p class="eyebrow" id="player-heading">Watch</p>
+  <section class="screen" aria-labelledby="player-heading">
+    <div class="wrap">
+      <p class="eyebrow" id="player-heading">The demo</p>
+      <p class="screen-note">Placeholder — the real edit hasn't been assembled yet. The chapter index below is wired and waiting for it.</p>
       <div class="player">
-        <p class="player-note">Placeholder cut — the real edit hasn't been assembled yet. Chapter markers below are wired and ready for the finished film.</p>
         <video id="chapter-video" controls preload="metadata"
-               poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='540'%3E%3Crect width='960' height='540' fill='%23141110'/%3E%3Ctext x='50%25' y='50%25' fill='%23A8843C' font-family='Georgia,serif' font-size='28' text-anchor='middle' dominant-baseline='middle'%3EThe Word of a Gentleman%3C/text%3E%3Ctext x='50%25' y='58%25' fill='%238C8574' font-family='Georgia,serif' font-size='16' text-anchor='middle' dominant-baseline='middle'%3E(placeholder cut)%3C/text%3E%3C/svg%3E">
-          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+               poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'%3E%3Crect width='1600' height='900' fill='%23141110'/%3E%3Ctext x='50%25' y='47%25' fill='%23EFE7D8' font-family='Georgia,serif' font-size='56' text-anchor='middle'%3EThe Word of a Gentleman%3C/text%3E%3Ctext x='50%25' y='57%25' fill='%23A8843C' font-family='Georgia,serif' font-style='italic' font-size='26' text-anchor='middle'%3Ethe cut is not yet assembled%3C/text%3E%3C/svg%3E">
+          <!-- VITE: add the Cloudflare Stream signed source here when the cut exists. No placeholder video source. -->
           Your browser doesn't support embedded video.
         </video>
-        <nav class="chapters" aria-label="Chapters">
-          <button type="button" class="chapter-btn" data-time="0">I &middot; A man called Neil Ransford</button>
-          <button type="button" class="chapter-btn" data-time="10">II &middot; The inheritance</button>
-          <button type="button" class="chapter-btn" data-time="20">III &middot; The grandson, two lenses</button>
-          <button type="button" class="chapter-btn trailer-jump" data-time="30">&#9654; Jump to trailer (IV)</button>
-          <button type="button" class="chapter-btn" data-time="40">V &middot; The question</button>
-        </nav>
       </div>
-    </section>
+      <ol class="chapters" aria-label="Chapters">
+        <li><button type="button" class="chapter-btn" data-time="0"><span class="num">I</span><span class="name">A man called Neil Ransford</span><span class="mark"></span></button></li>
+        <li><button type="button" class="chapter-btn" data-time="10"><span class="num">II</span><span class="name">The inheritance</span><span class="mark"></span></button></li>
+        <li><button type="button" class="chapter-btn" data-time="20"><span class="num">III</span><span class="name">The grandson, two lenses</span><span class="mark"></span></button></li>
+        <li><button type="button" class="chapter-btn trailer-jump" data-time="30"><span class="num">IV</span><span class="name">The trailer</span><span class="mark">jump here</span></button></li>
+        <li><button type="button" class="chapter-btn" data-time="40"><span class="num">V</span><span class="name">The question</span><span class="mark"></span></button></li>
+      </ol>
+    </div>
+  </section>
 
+  <div class="wrap">
     <section class="disclosure" aria-labelledby="disclosure-heading">
       <p class="eyebrow" id="disclosure-heading">A note on the voice you hear</p>
-      <p><strong>Narration uses a synthetic reconstruction of Oliver Ransford's voice, made with his family's consent, reading his own words.</strong></p>
-      <p style="color:var(--stone); font-size:0.92rem; margin-bottom:0;">Every word spoken by that voice is drawn from what he actually wrote &mdash; his books, his thesis, his letters, his 1972 commentary track. It is never scripted new dialogue, and it never speaks as a character.</p>
+      <p class="lead">Narration uses a synthetic reconstruction of Oliver Ransford's voice, made with his family's consent, reading his own words.</p>
+      <p class="fine">Every word spoken by that voice is drawn from what he actually wrote &mdash; his books, his thesis, his letters, his 1972 commentary track. It is never scripted new dialogue, and it never speaks as a character.</p>
     </section>
 
-    <section aria-labelledby="ballot-heading">
-      <h2 id="ballot-heading">So &mdash; how far down the rabbit hole do we go?</h2>
-      <p>Five movements got you here. This is the part where you get a say. Pick one, tell us why, and if you've got advice, a warning, or a contact worth chasing &mdash; we're listening.</p>
+    <p class="journey-link">Before you vote: <a href="/gentleman/journey">how this story travelled before it reached you</a></p>
 
-      <form id="ballot-form" novalidate>
+    <section class="question" aria-labelledby="ballot-heading">
+      <p class="eyebrow">Movement V</p>
+      <h2 id="ballot-heading">How far should this go?</h2>
+      <p class="lede">Five movements got you here. This is the part where you get a say. Pick one, tell us why, and if you have advice, a warning, or a contact worth chasing, we're listening.</p>
+
+      <form id="ballot-form" class="ballot" novalidate>
         <fieldset>
           <legend>Your vote</legend>
 
           <div class="ballot-option">
             <input type="radio" id="opt-act1" name="ballot_choice" value="act1_chapter" required />
-            <label for="opt-act1"><span class="opt-title">Act 1 chapter</span><span class="opt-desc">~30 min, ~$840 &mdash; prove it, then decide again</span></label>
+            <label for="opt-act1"><span class="box"></span><span class="text"><span class="opt-title">Act 1 chapter</span><span class="opt-desc">About 30 minutes, about $840. Prove it, then decide again.</span></span></label>
           </div>
           <div class="ballot-option">
             <input type="radio" id="opt-full" name="ballot_choice" value="full_film" />
-            <label for="opt-full"><span class="opt-title">The full film</span><span class="opt-desc">Straight through, no interim gate</span></label>
+            <label for="opt-full"><span class="box"></span><span class="text"><span class="opt-title">The full film</span><span class="opt-desc">Straight through, no interim gate.</span></span></label>
           </div>
           <div class="ballot-option">
             <input type="radio" id="opt-doc" name="ballot_choice" value="documentary_first" />
-            <label for="opt-doc"><span class="opt-title">Documentary first</span><span class="opt-desc">The family/journey story before the drama</span></label>
+            <label for="opt-doc"><span class="box"></span><span class="text"><span class="opt-title">Documentary first</span><span class="opt-desc">The family and the journey before the drama.</span></span></label>
           </div>
           <div class="ballot-option">
             <input type="radio" id="opt-ride" name="ballot_choice" value="the_ride" />
-            <label for="opt-ride"><span class="opt-title">The ride</span><span class="opt-desc">Fund/follow the motorbike retracing as its own series</span></label>
+            <label for="opt-ride"><span class="box"></span><span class="text"><span class="opt-title">The ride</span><span class="opt-desc">Fund or follow the motorbike retracing as its own series.</span></span></label>
           </div>
           <div class="ballot-option">
             <input type="radio" id="opt-stop" name="ballot_choice" value="stop_here" />
-            <label for="opt-stop"><span class="opt-title">Stop here</span><span class="opt-desc">It was a beautiful test</span></label>
+            <label for="opt-stop"><span class="box"></span><span class="text"><span class="opt-title">Stop here</span><span class="opt-desc">It was a beautiful test.</span></span></label>
           </div>
         </fieldset>
 
         <label class="field-label" for="cut-watched">Which cut did you watch?</label>
         <select id="cut-watched" name="cut_watched" required>
-          <option value="" disabled selected>Choose one&hellip;</option>
-          <option value="full_demo">Full demo (~15 min, all five movements)</option>
+          <option value="" disabled selected>Choose one</option>
+          <option value="full_demo">Full demo (about 15 minutes, all five movements)</option>
           <option value="trailer_only">Trailer only (Movement IV, standalone)</option>
         </select>
 
-        <label class="field-label" for="advice">Advice, warnings, ideas, contacts &mdash; anything</label>
+        <label class="field-label" for="advice">Advice, warnings, ideas, contacts</label>
         <textarea id="advice" name="advice" placeholder="Optional, but this is the part we read closest."></textarea>
 
         <label class="field-label" for="contact">Can we contact you? (optional)</label>
-        <input type="text" id="contact" name="contact" placeholder="Email or phone &mdash; only if you're open to being contacted" />
+        <input type="text" id="contact" name="contact" placeholder="Email or phone, only if you're open to being contacted" />
 
         <p class="privacy-note">Responses go directly to Chris Ransford and the immediate family reviewing this decision &mdash; nobody else reads them, and they are never sold, shared, or used for advertising. No analytics beyond Cloudflare's own basic traffic stats run on this page.</p>
 
@@ -99,7 +219,7 @@
     </section>
 
     <footer class="site-footer">
-      <p>The Word of a Gentleman &mdash; a family film project. Private staging build, not for public distribution.</p>
+      <p>The Word of a Gentleman &mdash; a family film project. Private build, not for public distribution.</p>
     </footer>
   </div>
 

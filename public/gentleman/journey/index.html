@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The story's journey — The Word of a Gentleman</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Thirteen removes sit between a man writing in a tent in 1871 and you watching this film. Here is every one of them.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1E1A16; --paper:#EFE7D8; --crimson:#7A1A1A; --brass:#A8843C;
+    --stone:#8C8574; --panel:#141110; --paper-dim:#E3D9C6;
+    --ff-head:'Playfair Display',Georgia,serif;
+    --ff-label:'Cinzel',Georgia,serif;
+    --ff-body:'EB Garamond',Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ff-body);font-size:19px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--crimson)}
+  .eyebrow{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.14em;font-size:.72rem;color:var(--stone)}
+  .wrap{max-width:68ch;margin:0 auto;padding:0 1.5rem}
+
+  /* Hero */
+  .hero{padding:5.5rem 0 3rem;border-bottom:1px solid var(--paper-dim)}
+  .hero h1{font-family:var(--ff-head);font-weight:400;font-size:clamp(2.2rem,5.5vw,3.6rem);line-height:1.08;margin:.6rem 0 1.2rem;max-width:20ch}
+  .hero p{font-size:1.15rem;max-width:56ch;margin:0 0 1rem}
+  .hero .removes{font-family:var(--ff-head);font-style:italic;color:var(--crimson);font-size:1.2rem}
+
+  /* Journey */
+  .journey{background:var(--panel);color:var(--paper);padding:3.5rem 0 2.5rem;position:relative}
+  .journey .wrap{max-width:none;padding:0}
+  .journey-head{padding:0 1.5rem 1.5rem;max-width:68ch;margin:0 auto}
+  .journey-head p{color:var(--paper-dim);margin:.4rem 0 0;font-size:1.05rem}
+  .track-shell{position:relative}
+  .track{display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;padding:2.5rem 6vw 1.5rem;scrollbar-width:thin;scrollbar-color:var(--brass) transparent;position:relative}
+  .track::-webkit-scrollbar{height:6px}
+  .track::-webkit-scrollbar-thumb{background:var(--brass)}
+  /* the travel line */
+  .track::before{content:"";position:absolute;left:0;right:0;top:calc(2.5rem + 1.35rem);height:1px;background:linear-gradient(90deg,transparent,var(--brass) 4%,var(--brass) 96%,transparent);pointer-events:none}
+  .act{display:flex;flex-shrink:0;position:relative;padding-right:3.5rem}
+  .act::after{content:attr(data-act);position:absolute;left:.5rem;top:-2rem;font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.14em;font-size:.72rem;color:var(--brass);white-space:nowrap}
+  .stop{flex:0 0 16rem;scroll-snap-align:start;position:relative;padding:0 .5rem;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+  .stop .dot{display:block;width:.8rem;height:.8rem;border-radius:50%;background:var(--panel);border:1.5px solid var(--brass);margin:1rem 0 1rem .1rem;transition:background .2s,transform .2s}
+  .stop .year{font-family:var(--ff-label);font-size:.68rem;letter-spacing:.12em;color:var(--stone);display:block;min-height:1.2em}
+  .stop .title{font-family:var(--ff-head);font-size:1.15rem;line-height:1.25;display:block;margin:.3rem 0 .35rem;padding-right:1rem}
+  .stop .who{font-size:.95rem;color:var(--paper-dim);display:block;font-style:italic}
+  .stop:hover .dot,.stop:focus-visible .dot{background:var(--brass)}
+  .stop:focus-visible{outline:1.5px solid var(--brass);outline-offset:4px}
+  .stop[aria-expanded="true"] .dot{background:var(--crimson);border-color:var(--crimson);transform:scale(1.35)}
+  .stop[aria-expanded="true"] .title{color:var(--paper)}
+  .stop.you .dot{background:var(--crimson);border-color:var(--crimson);box-shadow:0 0 0 6px rgba(122,26,26,.25)}
+  .stop.you .year{color:var(--crimson)}
+
+  /* Detail panel */
+  .detail{max-width:68ch;margin:1.5rem auto 0;padding:0 1.5rem;min-height:14rem}
+  .detail-card{border-top:1px solid var(--brass);padding:1.6rem 0 0}
+  .detail-card .eyebrow{color:var(--brass)}
+  .detail-card h3{font-family:var(--ff-head);font-weight:400;font-size:1.75rem;margin:.35rem 0 1rem;line-height:1.15}
+  .detail-card dl{margin:0;display:grid;grid-template-columns:9.5rem 1fr;gap:.6rem 1.2rem}
+  .detail-card dt{font-family:var(--ff-label);font-variant:small-caps;letter-spacing:.1em;font-size:.72rem;color:var(--stone);padding-top:.35rem}
+  .detail-card dd{margin:0;color:var(--paper-dim)}
+  .detail-card dd.distort{color:var(--paper)}
+  .detail-card dd.distort::before{content:"";display:inline-block;width:.45rem;height:.45rem;background:var(--crimson);margin-right:.5rem;vertical-align:middle}
+  .detail-nav{display:flex;justify-content:space-between;gap:1rem;margin-top:1.6rem;font-family:var(--ff-label);font-size:.72rem;letter-spacing:.12em}
+  .detail-nav button{background:none;border:1px solid var(--stone);color:var(--paper-dim);padding:.55rem .9rem;font:inherit;cursor:pointer;letter-spacing:inherit}
+  .detail-nav button:hover,.detail-nav button:focus-visible{border-color:var(--brass);color:var(--paper);outline:none}
+  .detail-nav button[disabled]{opacity:.3;cursor:default}
+  .hint{text-align:center;color:var(--stone);font-size:.95rem;font-style:italic;margin:0 1.5rem}
+
+  /* Closing */
+  .close{padding:4rem 0 5rem}
+  .close h2{font-family:var(--ff-head);font-weight:400;font-size:clamp(1.7rem,3.5vw,2.4rem);line-height:1.15;margin:.5rem 0 1rem;max-width:26ch}
+  .close p{max-width:58ch}
+  .close blockquote{margin:2rem 0;padding-left:1.2rem;border-left:2px solid var(--crimson);font-family:var(--ff-head);font-style:italic;font-size:1.25rem;line-height:1.35;max-width:40ch}
+  .close blockquote cite{display:block;font-family:var(--ff-body);font-style:normal;font-size:.95rem;color:var(--stone);margin-top:.6rem}
+
+  @media (max-width:640px){
+    body{font-size:17.5px}
+    .stop{flex:0 0 13.5rem}
+    .detail-card dl{grid-template-columns:1fr;gap:.15rem .8rem}
+    .detail-card dt{padding-top:.8rem}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .stop .dot{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">The Word of a Gentleman</span>
+    <h1>How this story travelled before it reached you</h1>
+    <p>A man wrote in a tent beside Lake Tanganyika in 1871. You are watching a film about him made by his biographer's grandson, with machines, a century and a half later.</p>
+    <p class="removes">Thirteen removes sit between his pen and your eyes. This page walks every one of them.</p>
+    <p>The film's title asks whether a gentleman's word can be trusted. It is only fair to ask the same of the film.</p>
+  </div>
+</header>
+
+<section class="journey" aria-labelledby="journey-h">
+  <div class="journey-head">
+    <span class="eyebrow">The journey</span>
+    <p id="journey-h">Scroll along the line. Choose any stop to see what it added to the story, and what it may have bent.</p>
+  </div>
+
+  <div class="track-shell">
+    <div class="track" id="track" role="list">
+
+      <div class="act" data-act="Act one · the record" role="presentation">
+        <button class="stop" role="listitem" data-i="0" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">1841 – 1873</span>
+          <span class="title">The diaries and letters</span>
+          <span class="who">Livingstone, Stanley, Kirk, and those around them</span>
+        </button>
+        <button class="stop" role="listitem" data-i="1" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">1871</span>
+          <span class="title">What the camera couldn't hold</span>
+          <span class="who">A few studio portraits. No film, no voice.</span>
+        </button>
+        <button class="stop" role="listitem" data-i="2" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">1874 – today</span>
+          <span class="title">Everyone who wrote about him since</span>
+          <span class="who">Biographers, historians, the web</span>
+        </button>
+      </div>
+
+      <div class="act" data-act="Act two · the making" role="presentation">
+        <button class="stop" role="listitem" data-i="3" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">1972 – 1978</span>
+          <span class="title">Neil's reading of the man</span>
+          <span class="who">Dr Oliver Neil Ransford — doctor, historian, grandfather</span>
+        </button>
+        <button class="stop" role="listitem" data-i="4" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">2001</span>
+          <span class="title">The screenplay</span>
+          <span class="who">Bart Gavigan and André Pieterse, from Neil's story</span>
+        </button>
+        <button class="stop" role="listitem" data-i="5" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year"></span>
+          <span class="title">The family memoir</span>
+          <span class="who">Chris's father, on his father</span>
+        </button>
+        <button class="stop" role="listitem" data-i="6" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">2026</span>
+          <span class="title">Chris picks it up</span>
+          <span class="who">What he found interesting, kept, cut, and ruled on</span>
+        </button>
+        <button class="stop" role="listitem" data-i="7" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">2026</span>
+          <span class="title">The cross-referencing</span>
+          <span class="who">AI reading every source against every other</span>
+        </button>
+        <button class="stop" role="listitem" data-i="8" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">2026</span>
+          <span class="title">The machine's own opinions</span>
+          <span class="who">What the AI was trained to believe</span>
+        </button>
+        <button class="stop" role="listitem" data-i="9" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">2026</span>
+          <span class="title">The film itself</span>
+          <span class="who">Every frame generated, every voice reconstructed</span>
+        </button>
+      </div>
+
+      <div class="act" data-act="Act three · the watching" role="presentation">
+        <button class="stop" role="listitem" data-i="10" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">Your life so far</span>
+          <span class="title">What you bring with you</span>
+          <span class="who">Where you grew up, what you believe, what you already know</span>
+        </button>
+        <button class="stop" role="listitem" data-i="11" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">Today</span>
+          <span class="title">How you are, right now</span>
+          <span class="who">Mood, attention, company</span>
+        </button>
+        <button class="stop you" role="listitem" data-i="12" aria-expanded="false" aria-controls="detail">
+          <span class="dot"></span><span class="year">You are here</span>
+          <span class="title">What you make of it</span>
+          <span class="who">The last interpreter in the chain</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="detail" id="detail" aria-live="polite">
+    <p class="hint">Choose a stop on the line to begin, or start at the tent.</p>
+  </div>
+</section>
+
+<section class="close">
+  <div class="wrap">
+    <span class="eyebrow">Why we're telling you this</span>
+    <h2>Every layer is honest about its own uncertainty. That is the most a gentleman's word can offer.</h2>
+    <p>Nothing on this line is neutral, including the machines and including us. We have kept a written record of every ruling we made, every source we checked, and every place the AI was overruled or caught out. Where the film shows something no source supports, it is because someone chose to show it, and that choice is logged.</p>
+    <blockquote>
+      "The word of a gentleman."
+      <cite>Livingstone's journal, on the promise that held his men together. Quoted in The Dark Interior, p.108.</cite>
+    </blockquote>
+    <p>If you want to check the film against its sources, the research pages, the decision log and the cross-referencing notes are open to anyone at the family screening.</p>
+  </div>
+</section>
+
+<script>
+  const LAYERS = [
+    {act:"Act one · the record", h:"The diaries and letters",
+     is:"Livingstone's journals and letters, Stanley's 1872 despatches for the New York Herald, Kirk's correspondence, and the papers of the men who travelled with them. The only voices from inside the story.",
+     adds:"Dates, places, the weather, illnesses, quarrels, prices paid, prayers said. The raw material every later account draws on.",
+     bends:"A diary is written for two readers: the writer, and posterity. Livingstone knew his journals would be read. Stanley was writing to sell newspapers. Neither is lying, and neither is simply reporting."},
+    {act:"Act one · the record", h:"What the camera couldn't hold",
+     is:"Photography existed in 1871, but only in studios. There are a handful of portraits of Livingstone and Stanley taken years apart in London and New York. There is no moving image, no sound recording, no photograph of Ujiji, of Susi, of Mabruki, of the meeting.",
+     adds:"A face, in stiff formal dress, looking at a lens for a long exposure. That is all.",
+     bends:"Everything you see move, and every voice you hear, is inferred. The film fills a hole the record left empty. Remember that when a scene feels vivid."},
+    {act:"Act one · the record", h:"Everyone who wrote about him since",
+     is:"A century and a half of biographies, histories, mission tracts, debunkings, academic papers, encyclopaedia entries and web pages.",
+     adds:"Context the diarists couldn't see: what Stanley did next, what the slave trade became, how the Victorian mind worked, what modern Africa thinks of him.",
+     bends:"Each author had an argument. The saint, the fraud, the imperial forerunner, the anti-slavery hero. The same facts have been made to serve all of them."},
+    {act:"Act two · the making", h:"Neil's reading of the man",
+     is:"Chris's grandfather, Dr Oliver Neil Ransford, a consultant anaesthetist in Bulawayo who earned a doctorate for a psychological study of Livingstone, published as The Dark Interior in 1978. In 1972 he drove Livingstone's route himself with a cine camera.",
+     adds:"A doctor's diagnosis of another doctor: the illness, the moods, the drive. And the only film footage in this project shot by someone who stood where it happened.",
+     bends:"Neil was reading Livingstone through the psychiatry of the 1970s and the eyes of a white Rhodesian of his generation. He was also, by then, a man who had chosen to spend years with his subject. Admiration leaves fingerprints."},
+    {act:"Act two · the making", h:"The screenplay",
+     is:"In 2001 Bart Gavigan and André Pieterse turned Neil's story into a feature screenplay. It was never filmed.",
+     adds:"Dialogue, scenes, a shape. Where the record says two men met, the screenplay decides what they said. Where months passed, it cuts to the next day.",
+     bends:"This is the largest single act of invention in the chain. The film's spine, its conversations, and most of what its characters say to each other were written by two screenwriters, not recorded by anyone who was there."},
+    {act:"Act two · the making", h:"The family memoir",
+     is:"Chris's father wrote a life of his own father, Neil. It is the family's account of the man behind the book.",
+     adds:"Who Neil was at home, why the story mattered to him, how it was handed down. The reason a grandson is doing this at all.",
+     bends:"A son writing about his father is not a neutral witness. This layer shapes how the family reads every other layer, and it is written with love."},
+    {act:"Act two · the making", h:"Chris picks it up",
+     is:"Chris Ransford inherited the screenplay, the book, the footage and the memoir, and decided in 2026 to put the story on screen using AI production tools.",
+     adds:"A point of view on what is interesting now, and hundreds of small rulings the sources leave open: which arm was injured, what was worn at the meeting, whose voice narrates, what to cut.",
+     bends:"Every ruling was a choice. Some were made from the record, some from the screenplay, some from taste. All of them are written down in a decision log, so the choice is at least visible."},
+    {act:"Act two · the making", h:"The cross-referencing",
+     is:"AI models were used to read the screenplay against Stanley's despatches, against The Dark Interior, against the journals, against the later biographies, and to flag every place they disagree.",
+     adds:"A breadth and depth of checking no single reader could do: ages reconciled to the month, wardrobe traced to a specific despatch, a title line traced to a specific page. Contradictions surfaced instead of buried.",
+     bends:"Cross-referencing finds disagreement; it does not settle it. A model can tell you the sources differ. A person still has to decide which one to believe, and this is the point where Chris did."},
+    {act:"Act two · the making", h:"The machine's own opinions",
+     is:"The AI models used to research and write were trained on a large slice of everything humans have written. That includes every bias about Africa, empire, mission, race and Victorians that exists in print.",
+     adds:"Speed, patience, and the ability to hold a thousand pages in mind at once.",
+     bends:"A model has priors. It may default to the heroic version, or the cynical one, or simply the most-repeated one. It can be confidently wrong. Where the AI was overruled or caught out, we kept the note. Treat this layer as a well-read stranger with opinions, not an oracle."},
+    {act:"Act two · the making", h:"The film itself",
+     is:"Every image was generated by video models. Livingstone's face was fixed from a handful of portraits and held across scenes. The narrator is Neil's own recorded voice from 1972, with a consented clone filling gaps using only his own words, and disclosed wherever it does so.",
+     adds:"Motion, faces, weather, light, a lake at dusk. The thing that makes a story feel lived rather than read.",
+     bends:"Image models have their own idea of what a Victorian explorer, a Swahili porter, or a lakeside village looks like, learned from other pictures, many of them wrong. Every frame contains detail no source supports. A frame is a claim, not a record."},
+    {act:"Act three · the watching", h:"What you bring with you",
+     is:"Where you were raised, what you were taught, what you believe about faith, empire and Africa, and whether you had ever heard of David Livingstone before today.",
+     adds:"The lens without which nothing can be seen at all.",
+     bends:"Two people can watch the same scene and see a saint and a coloniser. Neither is misreading the film. They are reading themselves."},
+    {act:"Act three · the watching", h:"How you are, right now",
+     is:"Whether you are tired, distracted, moved, sceptical, or watching with someone whose reaction you can feel beside you.",
+     adds:"The weather inside you when the story arrives.",
+     bends:"A scene that lands on a good day slides past on a bad one. Nothing in the film changed."},
+    {act:"Act three · the watching", h:"What you make of it",
+     is:"Your mind, doing what minds do: deciding what was true, what mattered, who to trust, and what to carry away.",
+     adds:"Meaning. The only place the story finally exists.",
+     bends:"You are the last interpreter in the chain, and the only one whose rulings are not written down. When you have seen the film, we would like to know what you decided."}
+  ];
+
+  const stops = [...document.querySelectorAll('.stop')];
+  const detail = document.getElementById('detail');
+  let current = -1;
+
+  function render(i){
+    current = i;
+    const L = LAYERS[i];
+    stops.forEach((s,k)=>s.setAttribute('aria-expanded', k===i ? 'true':'false'));
+    detail.innerHTML = `
+      <div class="detail-card">
+        <span class="eyebrow">${L.act} · stop ${i+1} of ${LAYERS.length}</span>
+        <h3>${L.h}</h3>
+        <dl>
+          <dt>What it is</dt><dd>${L.is}</dd>
+          <dt>What it adds</dt><dd>${L.adds}</dd>
+          <dt>What it may bend</dt><dd class="distort">${L.bends}</dd>
+        </dl>
+        <div class="detail-nav">
+          <button type="button" data-go="${i-1}" ${i===0?'disabled':''}>Previous stop</button>
+          <button type="button" data-go="${i+1}" ${i===LAYERS.length-1?'disabled':''}>Next stop</button>
+        </div>
+      </div>`;
+    stops[i].scrollIntoView({block:'nearest', inline:'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto':'smooth'});
+  }
+
+  stops.forEach(s=>s.addEventListener('click',()=>render(+s.dataset.i)));
+  detail.addEventListener('click',e=>{
+    const b=e.target.closest('[data-go]'); if(b && !b.disabled) render(+b.dataset.go);
+  });
+  detail.addEventListener('click',e=>{ if(e.target.closest('.hint')) render(0); });
+  document.addEventListener('keydown',e=>{
+    if(current<0) return;
+    if(e.key==='ArrowRight' && current<LAYERS.length-1) render(current+1);
+    if(e.key==='ArrowLeft' && current>0) render(current-1);
+  });
+</script>
+</body>
+</html>
