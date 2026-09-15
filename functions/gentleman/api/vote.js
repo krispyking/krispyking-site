@@ -94,14 +94,9 @@ export async function onRequestPost({ request, env }) {
     return json(400, { error: `Contact must be ${CONTACT_MAX} characters or fewer.` });
   }
 
-  // TEMP (CK-6234 preview verification only — removed before production
-  // merge): echoes back which failure mode fired, gated on a header no
-  // real ballot submission sends, so a normal visitor never sees it.
-  const DEBUG = request.headers.get('X-CK6234-Debug') === '1';
-
   const token = env.NOTION_TOKEN;
   if (!token) {
-    return json(502, DEBUG ? { error: GENERIC_ERROR, debug: 'NOTION_TOKEN not set in env' } : { error: GENERIC_ERROR });
+    return json(502, { error: GENERIC_ERROR });
   }
 
   const voteLabel = VOTE_LABELS[ballotChoice];
@@ -134,15 +129,11 @@ export async function onRequestPost({ request, env }) {
         properties,
       }),
     });
-  } catch (err) {
-    return json(502, DEBUG ? { error: GENERIC_ERROR, debug: `fetch threw: ${err}` } : { error: GENERIC_ERROR });
+  } catch {
+    return json(502, { error: GENERIC_ERROR });
   }
 
   if (!notionRes.ok) {
-    if (DEBUG) {
-      const bodyText = await notionRes.text();
-      return json(502, { error: GENERIC_ERROR, debug: `notion ${notionRes.status}: ${bodyText.slice(0, 500)}` });
-    }
     return json(502, { error: GENERIC_ERROR });
   }
 
