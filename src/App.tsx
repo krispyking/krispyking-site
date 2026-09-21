@@ -11,6 +11,7 @@ import Connect from './components/Connect'
 import Footer from './components/Footer'
 import AIPage from './pages/AIPage'
 import UnderstudyLabsPage from './pages/UnderstudyLabsPage'
+import FutureTechPage from './pages/FutureTechPage'
 
 function HomePage() {
   return (
@@ -38,6 +39,7 @@ function MainSite() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/ai" element={<AIPage />} />
+        <Route path="/futuretech" element={<FutureTechPage />} />
       </Routes>
     </>
   )

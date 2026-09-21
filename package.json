@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "export:futuretech": "node scripts/export-futuretech.mjs"
   },
   "dependencies": {
     "framer-motion": "^10.16.16",

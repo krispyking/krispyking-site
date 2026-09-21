@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { label: 'Hobbies',  href: '/#hobbies' },
   { label: 'Travel',   href: '/#travel' },
   { label: 'AI',       href: '/ai' },
+  { label: 'Future Tech', href: '/futuretech' },
   { label: 'Now',      href: '/#now' },
   { label: 'Projects', href: '/#projects' },
   { label: 'Connect',  href: '/#connect' },
@@ -42,7 +43,7 @@ export default function Nav() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
           {NAV_LINKS.map(link => {
-            const isActive = link.href === '/ai' && location.pathname === '/ai'
+            const isActive = !link.href.startsWith('/#') && location.pathname === link.href
             return link.href.startsWith('/#') ? (
               <a
                 key={link.href}
