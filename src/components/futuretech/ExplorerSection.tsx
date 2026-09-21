@@ -21,7 +21,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'technology', label: 'Technology (A–Z)' },
 ]
 
-const PAGE_SIZE = 25
+const PAGE_SIZE = 100
 const ALL = 'All'
 
 function scoreOf(row: FutureTechRow, key: SortKey): number {
