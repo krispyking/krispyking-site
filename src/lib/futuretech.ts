@@ -1,5 +1,88 @@
 import type { FutureTechRow } from '../types/futuretech'
 
+// CK-6541: full series names, replacing the cryptic abbreviations the
+// source database stores in "Series / Franchise" for Star Trek rows.
+// Cross-franchise rows already carry a full title in that field and pass
+// through unchanged.
+export const SERIES_NAMES: Record<string, string> = {
+  TOS: 'Star Trek: The Original Series',
+  TAS: 'Star Trek: The Animated Series',
+  TNG: 'Star Trek: The Next Generation',
+  DS9: 'Star Trek: Deep Space Nine',
+  VOY: 'Star Trek: Voyager',
+  ENT: 'Star Trek: Enterprise',
+  DIS: 'Star Trek: Discovery',
+  PIC: 'Star Trek: Picard',
+  LOW: 'Star Trek: Lower Decks',
+  PRO: 'Star Trek: Prodigy',
+  SNW: 'Star Trek: Strange New Worlds',
+}
+
+export function seriesDisplayName(seriesFranchise: string | null | undefined): string {
+  if (!seriesFranchise) return ''
+  return SERIES_NAMES[seriesFranchise] || seriesFranchise
+}
+
+export function airYear(airDate: string | null): number | null {
+  if (!airDate) return null
+  const y = new Date(airDate).getUTCFullYear()
+  return Number.isNaN(y) ? null : y
+}
+
+export function formatAirDate(airDate: string | null): string | null {
+  if (!airDate) return null
+  const d = new Date(airDate)
+  if (Number.isNaN(d.getTime())) return null
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
+}
+
+// Is this row a dated TV episode (has a season) or a film/standalone work
+// (season is blank and episodeNumber/episodeWork carry the release year and
+// title instead)? This distinction is what the old UI got wrong, rendering
+// a film's release year as a fake "Season".
+export function isEpisodic(row: FutureTechRow): boolean {
+  return Boolean(row.season && row.season.trim())
+}
+
+// The origin strip every card/row leads with, e.g.:
+//   "Star Trek: Deep Space Nine · S6 E2 · "Rocks and Shoals" · 1997"
+//   "Blade Runner 2049 · Film · 2017"
+export function formatOrigin(row: FutureTechRow): string {
+  const year = airYear(row.airDate)
+  if (isEpisodic(row)) {
+    const parts = [seriesDisplayName(row.seriesFranchise)]
+    const seasonEp = row.episodeNumber ? `S${row.season} E${row.episodeNumber}` : `S${row.season}`
+    parts.push(seasonEp)
+    if (row.episodeWork) parts.push(`"${row.episodeWork}"`)
+    if (year) parts.push(String(year))
+    return parts.filter(Boolean).join(' · ')
+  }
+  const title = row.episodeWork || seriesDisplayName(row.seriesFranchise) || row.seriesFranchise
+  const parts = [title, 'Film']
+  if (year) parts.push(String(year))
+  return parts.filter(Boolean).join(' · ')
+}
+
+// Outbound reference link for the origin — Memory Alpha for Star Trek rows,
+// Wikipedia for everything else. Never a still, poster, or logo — just a
+// link out. Returns null when there's nothing sensible to link (no title).
+export function referenceLink(row: FutureTechRow): { label: string; url: string } | null {
+  const title = row.episodeWork || (isEpisodic(row) ? '' : row.seriesFranchise)
+  if (!title) return null
+  const slug = title.trim().replace(/\s+/g, '_')
+  if (row.source === 'Star Trek') {
+    return { label: 'Memory Alpha', url: `https://memory-alpha.fandom.com/wiki/${encodeURIComponent(slug)}` }
+  }
+  return { label: 'Wikipedia', url: `https://en.wikipedia.org/wiki/${encodeURIComponent(slug)}` }
+}
+
+// Where-to-watch search link — a search query, never a claim about
+// availability on a specific service.
+export function whereToWatchLink(row: FutureTechRow): string {
+  const q = row.episodeWork || row.seriesFranchise || row.technology
+  return `https://www.justwatch.com/us/search?q=${encodeURIComponent(q)}`
+}
+
 export const VERDICT_STYLES: Record<string, string> = {
   'Solo-AI': 'bg-accent/15 text-accent border-accent/30',
   Transformational: 'bg-blue-500/10 text-blue-300 border-blue-500/25',

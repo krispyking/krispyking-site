@@ -90,6 +90,10 @@ function checkbox(props, name) {
   const v = props[name];
   return !!v?.checkbox;
 }
+function date(props, name) {
+  const v = props[name];
+  return v?.date?.start ?? null;
+}
 function formula(props, name) {
   const f = props[name]?.formula;
   if (!f) return null;
@@ -115,6 +119,10 @@ function mapRow(page) {
     realWorldBenefit: text(p, 'Real-World Benefit'),
     realWorldStatus: sel(p, 'Real-World Status'),
     howItCouldBeBuilt: text(p, 'How It Could Be Built'),
+    // CK-6541 origin-enrichment fields (populated for the 223 scored rows).
+    scene: text(p, 'Scene'),
+    airDate: date(p, 'Air Date'),
+    yearsToReality: num(p, 'Years to Reality'),
     investmentLevel: sel(p, 'Industry Investment Level'),
     investmentNote: text(p, 'Investment Note'),
     scores: {

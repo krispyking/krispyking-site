@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { FutureTechRow } from '../../types/futuretech'
-import { formatScore, INCUMBENT_RISK_STYLES } from '../../lib/futuretech'
+import { formatScore, formatOrigin, INCUMBENT_RISK_STYLES } from '../../lib/futuretech'
 
 interface Props {
   rows: FutureTechRow[]
@@ -52,6 +52,9 @@ export default function ShortlistSection({ rows, onSelect, onViewAll }: Props) {
                 {formatScore(row.scores.soloVenture)}
               </span>
             </div>
+            {formatOrigin(row) && (
+              <p className="text-xs text-text-secondary/80 mb-1.5">{formatOrigin(row)}</p>
+            )}
             <h3 className="font-serif text-lg font-bold text-text-primary mb-1.5 group-hover:text-accent transition-colors">
               {row.technology}
             </h3>

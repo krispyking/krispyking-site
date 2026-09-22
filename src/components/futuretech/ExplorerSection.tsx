@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import type { FutureTechRow } from '../../types/futuretech'
-import { formatScore, uniqueSorted, VERDICT_STYLES } from '../../lib/futuretech'
+import { formatOrigin, formatScore, seriesDisplayName, uniqueSorted, VERDICT_STYLES } from '../../lib/futuretech'
 
 interface Props {
   rows: FutureTechRow[]
   onSelect: (row: FutureTechRow) => void
   initialVerdict?: string
+  initialSeries?: string
 }
 
 type SortKey = 'technology' | 'soloVenture' | 'composite' | 'benefit' | 'aiEnablesTech' | 'roi' | 'easeOfBuilding'
@@ -29,11 +30,11 @@ function scoreOf(row: FutureTechRow, key: SortKey): number {
   return row.scores[key] ?? -Infinity
 }
 
-export default function ExplorerSection({ rows, onSelect, initialVerdict }: Props) {
+export default function ExplorerSection({ rows, onSelect, initialVerdict, initialSeries }: Props) {
   const [search, setSearch] = useState('')
   const [verdict, setVerdict] = useState<string>(initialVerdict || ALL)
   const [status, setStatus] = useState<string>(ALL)
-  const [series, setSeries] = useState<string>(ALL)
+  const [series, setSeries] = useState<string>(initialSeries || ALL)
   const [archetype, setArchetype] = useState<string>(ALL)
   const [sortKey, setSortKey] = useState<SortKey>('soloVenture')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
@@ -42,6 +43,10 @@ export default function ExplorerSection({ rows, onSelect, initialVerdict }: Prop
   useEffect(() => {
     if (initialVerdict) setVerdict(initialVerdict)
   }, [initialVerdict])
+
+  useEffect(() => {
+    if (initialSeries) setSeries(initialSeries)
+  }, [initialSeries])
 
   const verdictOptions = useMemo(() => uniqueSorted(rows, (r) => r.venture.verdict), [rows])
   const statusOptions = useMemo(() => uniqueSorted(rows, (r) => r.realWorldStatus), [rows])
@@ -141,7 +146,7 @@ export default function ExplorerSection({ rows, onSelect, initialVerdict }: Prop
           <select className={selectClass} value={series} onChange={(e) => setSeries(e.target.value)}>
             <option value={ALL}>All series / franchises</option>
             {seriesOptions.map((v) => (
-              <option key={v} value={v}>{v}</option>
+              <option key={v} value={v}>{seriesDisplayName(v)}</option>
             ))}
           </select>
           <select className={selectClass} value={archetype} onChange={(e) => setArchetype(e.target.value)}>
@@ -185,7 +190,12 @@ export default function ExplorerSection({ rows, onSelect, initialVerdict }: Prop
                 onClick={() => onSelect(r)}
                 className="border-b border-border/60 last:border-0 hover:bg-bg-card/40 cursor-pointer transition-colors"
               >
-                <td className="px-4 py-3 text-text-primary font-medium max-w-xs truncate">{r.technology}</td>
+                <td className="px-4 py-3 max-w-xs">
+                  {formatOrigin(r) && (
+                    <p className="text-[11px] text-text-secondary/70 truncate mb-0.5">{formatOrigin(r)}</p>
+                  )}
+                  <p className="text-text-primary font-medium truncate">{r.technology}</p>
+                </td>
                 <td className="px-4 py-3">
                   {r.venture.verdict && (
                     <span className={`text-xs px-2 py-0.5 rounded-full border ${VERDICT_STYLES[r.venture.verdict] || ''}`}>
@@ -213,6 +223,9 @@ export default function ExplorerSection({ rows, onSelect, initialVerdict }: Prop
             onClick={() => onSelect(r)}
             className="w-full text-left rounded-xl border border-border bg-bg-card p-4"
           >
+            {formatOrigin(r) && (
+              <p className="text-xs text-text-secondary/80 mb-1">{formatOrigin(r)}</p>
+            )}
             <div className="flex items-start justify-between gap-3 mb-1.5">
               <p className="font-medium text-text-primary text-sm">{r.technology}</p>
               <span className="shrink-0 text-sm font-serif font-bold text-text-primary">
@@ -225,7 +238,6 @@ export default function ExplorerSection({ rows, onSelect, initialVerdict }: Prop
                   {r.venture.verdict}
                 </span>
               )}
-              <span className="text-xs text-text-secondary">{r.seriesFranchise}</span>
             </div>
           </button>
         ))}

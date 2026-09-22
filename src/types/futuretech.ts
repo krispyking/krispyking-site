@@ -31,6 +31,11 @@ export interface FutureTechRow {
   realWorldBenefit: string
   realWorldStatus: string | null
   howItCouldBeBuilt: string
+  // CK-6541 origin-enrichment fields — populated for the 223 scored rows
+  // (Verdict Solo-AI / Transformational / Neither); null/empty on Park rows.
+  scene: string
+  airDate: string | null
+  yearsToReality: number | null
   investmentLevel: string | null
   investmentNote: string
   scores: FutureTechScores

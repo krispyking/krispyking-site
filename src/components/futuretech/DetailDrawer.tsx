@@ -1,7 +1,15 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { FutureTechRow } from '../../types/futuretech'
-import { formatScore, INCUMBENT_RISK_STYLES, VERDICT_STYLES } from '../../lib/futuretech'
+import {
+  formatAirDate,
+  formatOrigin,
+  formatScore,
+  INCUMBENT_RISK_STYLES,
+  referenceLink,
+  VERDICT_STYLES,
+  whereToWatchLink,
+} from '../../lib/futuretech'
 
 interface Props {
   row: FutureTechRow | null
@@ -65,13 +73,15 @@ export default function DetailDrawer({ row, onClose }: Props) {
           >
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
+                {formatOrigin(row) && (
+                  <p className="text-xs font-semibold uppercase tracking-wide text-accent mb-1.5">
+                    {formatOrigin(row)}
+                  </p>
+                )}
                 <h2 className="font-serif text-2xl font-bold text-text-primary">{row.technology}</h2>
-                <p className="text-sm text-text-secondary mt-1">
-                  {row.seriesFranchise}
-                  {row.season && ` · Season ${row.season}`}
-                  {row.episodeNumber && ` · Ep. ${row.episodeNumber}`}
-                  {row.episodeWork && ` · "${row.episodeWork}"`}
-                </p>
+                {formatAirDate(row.airDate) && (
+                  <p className="text-sm text-text-secondary mt-1">{formatAirDate(row.airDate)}</p>
+                )}
               </div>
               <button
                 onClick={onClose}
@@ -80,6 +90,11 @@ export default function DetailDrawer({ row, onClose }: Props) {
               >
                 ✕
               </button>
+            </div>
+
+            <div className="space-y-5 mb-6">
+              <Field label="Scene" value={row.scene} />
+              <Field label="In the story" value={row.purpose} />
             </div>
 
             <div className="flex flex-wrap items-center gap-2 mb-6">
@@ -111,9 +126,11 @@ export default function DetailDrawer({ row, onClose }: Props) {
             </div>
 
             <div className="space-y-5">
-              <Field label="Purpose (in the fiction)" value={row.purpose} />
-              <Field label="Real-world benefit" value={row.realWorldBenefit} />
               <Field label="Real-world status" value={row.realWorldStatus} />
+              {row.yearsToReality != null && (
+                <Field label="Years to reality" value={`${row.yearsToReality} years`} />
+              )}
+              <Field label="Real-world benefit" value={row.realWorldBenefit} />
               <Field label="How it could be built" value={row.howItCouldBeBuilt} />
               {row.episodeAppearances && <Field label="Episode appearances" value={row.episodeAppearances} />}
 
@@ -147,14 +164,34 @@ export default function DetailDrawer({ row, onClose }: Props) {
               <Field label="Investment note" value={row.investmentNote} />
             </div>
 
-            <a
-              href={row.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-block mt-6 text-xs text-text-secondary/60 hover:text-accent transition-colors"
-            >
-              Source row in Notion ↗
-            </a>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-6">
+              {referenceLink(row) && (
+                <a
+                  href={referenceLink(row)!.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-text-secondary/60 hover:text-accent transition-colors"
+                >
+                  {referenceLink(row)!.label} ↗
+                </a>
+              )}
+              <a
+                href={whereToWatchLink(row)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-text-secondary/60 hover:text-accent transition-colors"
+              >
+                Where to watch ↗
+              </a>
+              <a
+                href={row.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-text-secondary/60 hover:text-accent transition-colors"
+              >
+                Source row in Notion ↗
+              </a>
+            </div>
           </motion.div>
         </>
       )}
