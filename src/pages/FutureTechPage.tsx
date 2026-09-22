@@ -5,6 +5,8 @@ import { useFutureTechData } from '../hooks/useFutureTechData'
 import { trackEvent } from '../lib/analytics'
 import DataBadge from '../components/futuretech/DataBadge'
 import ShortlistSection from '../components/futuretech/ShortlistSection'
+import BrowseByShowSection from '../components/futuretech/BrowseByShowSection'
+import TimelineSection from '../components/futuretech/TimelineSection'
 import ExplorerSection from '../components/futuretech/ExplorerSection'
 import DetailDrawer from '../components/futuretech/DetailDrawer'
 import type { FutureTechRow } from '../types/futuretech'
@@ -40,6 +42,7 @@ export default function FutureTechPage() {
   const { data, error } = useFutureTechData()
   const [selected, setSelected] = useState<FutureTechRow | null>(null)
   const [explorerVerdict, setExplorerVerdict] = useState<string | undefined>(undefined)
+  const [explorerSeries, setExplorerSeries] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     trackEvent('pageview')
@@ -52,6 +55,11 @@ export default function FutureTechPage() {
 
   function scrollToExplorer(verdict?: string) {
     setExplorerVerdict(verdict)
+    document.getElementById('explorer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function scrollToExplorerForSeries(series: string) {
+    setExplorerSeries(series)
     document.getElementById('explorer')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -198,9 +206,24 @@ export default function FutureTechPage() {
         />
       )}
 
+      {/* Fiction-to-reality timeline */}
+      {data && data.rows.length > 0 && (
+        <TimelineSection rows={data.rows} onSelect={selectRow} />
+      )}
+
+      {/* Browse by show */}
+      {data && data.rows.length > 0 && (
+        <BrowseByShowSection rows={data.rows} onSelectSeries={scrollToExplorerForSeries} />
+      )}
+
       {/* Explorer */}
       {data && data.rows.length > 0 && (
-        <ExplorerSection rows={data.rows} onSelect={selectRow} initialVerdict={explorerVerdict} />
+        <ExplorerSection
+          rows={data.rows}
+          onSelect={selectRow}
+          initialVerdict={explorerVerdict}
+          initialSeries={explorerSeries}
+        />
       )}
       </main>
 
