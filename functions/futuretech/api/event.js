@@ -74,7 +74,16 @@ export async function onRequestPost({ request, env }) {
   if (!token) {
     // Analytics is best-effort; never surface a 502 to the beacon caller
     // over a missing secret.
-    return json(204, {});
+    //
+    // CK-6590: this and the return at the end of the handler used to be
+    // `json(204, {})`. 204 is a null-body status, so `new Response(body,
+    // { status: 204 })` throws a TypeError and Cloudflare turns that into
+    // error 1101 — meaning EVERY successful beacon call 500'd and the
+    // analytics database stayed empty from launch (2026-09-21) until this
+    // fix. The error paths above all returned a body with a normal status,
+    // so they worked, which is why the endpoint looked half-alive. Return a
+    // 200 with a body, exactly as functions/gentleman/api/vote.js does.
+    return json(200, { ok: true });
   }
 
   const now = new Date();
@@ -99,5 +108,5 @@ export async function onRequestPost({ request, env }) {
     // Best-effort — a dropped analytics event never affects the visitor.
   }
 
-  return json(204, {});
+  return json(200, { ok: true });
 }
