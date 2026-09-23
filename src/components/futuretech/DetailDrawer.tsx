@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { FutureTechRow } from '../../types/futuretech'
+import type { ContributionType } from '../../lib/contribute'
 import {
   formatAirDate,
   formatOrigin,
@@ -14,6 +15,8 @@ import {
 interface Props {
   row: FutureTechRow | null
   onClose: () => void
+  /** Opens the CK-6590 correction layer for this row. */
+  onContribute: (type: ContributionType) => void
 }
 
 function Field({ label, value }: { label: string; value: string | number | null | undefined }) {
@@ -35,7 +38,7 @@ function ScoreCell({ label, value }: { label: string; value: number | null }) {
   )
 }
 
-export default function DetailDrawer({ row, onClose }: Props) {
+export default function DetailDrawer({ row, onClose, onContribute }: Props) {
   useEffect(() => {
     if (!row) return
     const onKey = (e: KeyboardEvent) => {
@@ -159,6 +162,32 @@ export default function DetailDrawer({ row, onClose }: Props) {
                   )}
                 </div>
               )}
+
+              <div className="rounded-xl border border-border bg-bg-primary/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary/70 mb-1.5">
+                  Know better than this row?
+                </p>
+                <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                  This is a screening pass, not a verdict. If a funded company already owns this wedge, or you
+                  are the buyer it names, that changes the score more than more desk research will.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onContribute('already_taken')}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary hover:border-accent/50 hover:text-accent transition-colors"
+                  >
+                    This wedge is already taken
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onContribute('would_pay')}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary hover:border-accent/50 hover:text-accent transition-colors"
+                  >
+                    I'd pay for this
+                  </button>
+                </div>
+              </div>
 
               <Field label="Industry investment level" value={row.investmentLevel} />
               <Field label="Investment note" value={row.investmentNote} />

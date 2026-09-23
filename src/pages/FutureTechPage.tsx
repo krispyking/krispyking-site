@@ -9,6 +9,8 @@ import BrowseByShowSection from '../components/futuretech/BrowseByShowSection'
 import TimelineSection from '../components/futuretech/TimelineSection'
 import ExplorerSection from '../components/futuretech/ExplorerSection'
 import DetailDrawer from '../components/futuretech/DetailDrawer'
+import ContributeDialog from '../components/futuretech/ContributeDialog'
+import type { ContributionType } from '../lib/contribute'
 import type { FutureTechRow } from '../types/futuretech'
 
 function fadeUp(delay = 0) {
@@ -43,6 +45,11 @@ export default function FutureTechPage() {
   const [selected, setSelected] = useState<FutureTechRow | null>(null)
   const [explorerVerdict, setExplorerVerdict] = useState<string | undefined>(undefined)
   const [explorerSeries, setExplorerSeries] = useState<string | undefined>(undefined)
+  // CK-6590 correction layer. `contributeIntent` doubles as the dialog's open
+  // flag; `contributeRow` is captured when the dialog opens so the drawer can
+  // be closed underneath it without the submission losing its subject.
+  const [contributeIntent, setContributeIntent] = useState<ContributionType | null>(null)
+  const [contributeRow, setContributeRow] = useState<FutureTechRow | null>(null)
 
   useEffect(() => {
     trackEvent('pageview')
@@ -51,6 +58,11 @@ export default function FutureTechPage() {
   function selectRow(row: FutureTechRow) {
     setSelected(row)
     trackEvent('detail_view')
+  }
+
+  function openContribute(type: ContributionType, row: FutureTechRow | null) {
+    setContributeRow(row)
+    setContributeIntent(type)
   }
 
   function scrollToExplorer(verdict?: string) {
@@ -65,7 +77,17 @@ export default function FutureTechPage() {
 
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary">
-      <DetailDrawer row={selected} onClose={() => setSelected(null)} />
+      <DetailDrawer
+        row={selected}
+        onClose={() => setSelected(null)}
+        onContribute={(type) => openContribute(type, selected)}
+      />
+      <ContributeDialog
+        intent={contributeIntent}
+        technology={contributeRow?.technology}
+        rowId={contributeRow?.id}
+        onClose={() => setContributeIntent(null)}
+      />
 
       <main>
       {/* Hero / framing */}
@@ -225,6 +247,33 @@ export default function FutureTechPage() {
           initialSeries={explorerSeries}
         />
       )}
+
+      {/* Correction layer (CK-6590, Option A) */}
+      <section className="max-w-4xl mx-auto px-6 py-16 border-t border-border">
+        <motion.div {...fadeUp()}>
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-3">Correct the record</p>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-text-primary mb-4">
+            This screening is almost certainly wrong somewhere.
+          </h2>
+          <p className="text-text-secondary leading-relaxed mb-4">
+            Incumbent risk here was researched from the outside, and 87% of the shortlist already scores High or
+            Owned. The wedges that matter are the ones where that research missed something — a funded company
+            nobody found, or a buyer who would actually pay. Both are things you might know and Chris cannot.
+          </p>
+          <p className="text-text-secondary leading-relaxed mb-6">
+            Open any row for the two per-row corrections. If a whole prediction is missing from the corpus,
+            start here. No account, no email, nothing collected about you — and nothing you send appears on this
+            page automatically. It goes to a queue Chris reads by hand.
+          </p>
+          <button
+            type="button"
+            onClick={() => openContribute('missing_one', null)}
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-bg-primary hover:opacity-90 transition-opacity"
+          >
+            You're missing one
+          </button>
+        </motion.div>
+      </section>
       </main>
 
       <footer className="border-t border-border">
