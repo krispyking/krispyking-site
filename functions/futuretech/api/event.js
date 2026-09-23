@@ -83,7 +83,7 @@ export async function onRequestPost({ request, env }) {
     // fix. The error paths above all returned a body with a normal status,
     // so they worked, which is why the endpoint looked half-alive. Return a
     // 200 with a body, exactly as functions/gentleman/api/vote.js does.
-    return json(200, { ok: true });
+    return json(200, { ok: true, stored: false, reason: 'no_token' });
   }
 
   const now = new Date();
@@ -94,8 +94,20 @@ export async function onRequestPost({ request, env }) {
     'Occurred At': { date: { start: now.toISOString() } },
   };
 
+  // The visitor's outcome never changes: this endpoint always answers 200 and
+  // never blocks or errors the page. What DOES change is that the response
+  // says whether the row actually landed.
+  //
+  // CK-6590: swallowing the write outcome entirely is what made this endpoint
+  // undiagnosable. After the 204 fix above, a probe got `{ok:true}` and no row
+  // in Notion, and there was no way to tell a missing NOTION_TOKEN (which
+  // returns early, above) from a Notion write that 404s because the
+  // integration was never connected to the database. Both looked like success.
+  // `stored`/`reason` make that distinction readable from a single curl
+  // without giving the visitor an error they cannot act on.
+  let res;
   try {
-    await fetch('https://api.notion.com/v1/pages', {
+    res = await fetch('https://api.notion.com/v1/pages', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -106,7 +118,15 @@ export async function onRequestPost({ request, env }) {
     });
   } catch {
     // Best-effort — a dropped analytics event never affects the visitor.
+    return json(200, { ok: true, stored: false, reason: 'fetch_failed' });
   }
 
-  return json(200, { ok: true });
+  if (!res.ok) {
+    // 404 here almost always means the integration behind NOTION_TOKEN has
+    // not been connected to this database via Notion's "... -> Connections"
+    // menu, not that the id is wrong.
+    return json(200, { ok: true, stored: false, reason: `notion_${res.status}` });
+  }
+
+  return json(200, { ok: true, stored: true });
 }
