@@ -1,0 +1,102 @@
+{
+  "study": "Circular plate with infinity mirror water and suspended hammock perches",
+  "status": "ILLUSTRATIVE_AMENITY_OVERLAY_ONLY; NOT_ENGINEERED_OR_SAFE_TO_BUILD",
+  "plate": {
+    "diameter": 18,
+    "radius": 9,
+    "centre": [
+      0,
+      31.5
+    ],
+    "rearY": 40.5,
+    "frontY": 22.5,
+    "area": 254.46900494077323,
+    "minBoundaryMargin": 0.2632015864967432,
+    "testSurfaceHeightAboveBase": 19.34782973448742,
+    "levelBasis": "Existing model upper path arrival; comparison level, not selected finished elevation",
+    "rearCutCentreline": 0.852020392575028,
+    "frontSurfaceGroundGapCentreline": 8.350712434708797,
+    "groundDropAcrossCentreline": 9.202732827283825,
+    "averageGroundGradient": 51.126293484910136,
+    "angle": 27.078976912427837,
+    "groundCrossing": {
+      "y": 39.09606721858352,
+      "downhillDistance": 1.4039327814164793
+    },
+    "aboveGroundProjectedRun": 16.59606721858352,
+    "conflictsWithEarlierBedroomFootprints": [
+      "L2",
+      "S3"
+    ]
+  },
+  "pool": {
+    "shape": "Downhill circular segment, inset within the 18 m plate",
+    "radius": 8.3,
+    "rearWaterEdgeY": 30,
+    "frontWaterEdgeY": 23.2,
+    "widthAtRear": 16.32666530556684,
+    "maxPlanDepth": 6.800000000000001,
+    "area": 83.44837302920263,
+    "illustrativeWaterDepth": 0.2,
+    "illustrativeWaterVolume": 16.689674605840526,
+    "illustrativeWaterMassTonnes": 16.689674605840526,
+    "frontPlateInset": 0.6999999999999993,
+    "waterSurfaceLevelAboveBase": 19.34782973448742
+  },
+  "posts": [
+    {
+      "id": "P1",
+      "x": -7.3,
+      "y": 34,
+      "illustrativeHeight": 6
+    },
+    {
+      "id": "P2",
+      "x": -4.7,
+      "y": 38,
+      "illustrativeHeight": 6
+    },
+    {
+      "id": "P3",
+      "x": 4.7,
+      "y": 38,
+      "illustrativeHeight": 6
+    },
+    {
+      "id": "P4",
+      "x": 7.3,
+      "y": 34,
+      "illustrativeHeight": 6
+    }
+  ],
+  "hammocks": [
+    {
+      "id": "H1",
+      "a": 0,
+      "b": 1,
+      "width": 1.2
+    },
+    {
+      "id": "H2",
+      "a": 1,
+      "b": 2,
+      "width": 1.8
+    },
+    {
+      "id": "H3",
+      "a": 2,
+      "b": 3,
+      "width": 1.2
+    }
+  ],
+  "sectionConvention": "Actual centreline terrain and pool section; off-axis posts and hammock sling shown as projected elevation features, not structures cut by x=0",
+  "notes": [
+    "Existing terrain, circle and route data are unchanged",
+    "6 m posts and 0.20 m water are scale assumptions, not selected specifications",
+    "Rope anchor locations, access to elevated hammocks, guards, falls, wind and rescue remain undesigned",
+    "Pool retaining basin, overflow catch trough, pumping, water treatment, waterproofing and plant are not sized",
+    "Water is assumed recirculated, not a perpetual/self-sustaining energy system",
+    "0.7 m edge inset is visual layout space, not an approved circulation or safety clearance",
+    "Old bedroom placements and upper access require replanning; rooms have not been moved"
+  ]
+}

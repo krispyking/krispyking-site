@@ -1,0 +1,283 @@
+{
+  "study": "Top terrace: circular plate concept",
+  "status": "SCALE_AND_TERRAIN_TEST_ONLY; NO_STRUCTURAL_APPROVAL",
+  "topZone": {
+    "definition": "Recorded parcel above survey-local y=35 m; not a surveyed flat summit",
+    "polygon": [
+      {
+        "x": 9.983770299216891,
+        "y": 35
+      },
+      {
+        "id": 114,
+        "n": 1782232.476,
+        "e": 512532.879,
+        "z": 119.467,
+        "type": "PI",
+        "x": 9.907208325045861,
+        "y": 41.48683091595968
+      },
+      {
+        "id": 104,
+        "n": 1782252.221,
+        "e": 512535.049,
+        "z": 120.901,
+        "type": "PI",
+        "x": -9.907208325264504,
+        "y": 40.085824919166114
+      },
+      {
+        "x": -9.96721018179788,
+        "y": 35
+      }
+    ],
+    "area": 115.05361399301052,
+    "topBoundaryLength": 19.863884942154396,
+    "leftDepth": 5.0858249191661145,
+    "rightDepth": 6.486830915959679,
+    "centrelineRun": 5.7863279175629,
+    "centrelineDrop": 3.295185607596423,
+    "averageGroundGradient": 56.94778544428394,
+    "angle": 29.66055473334274
+  },
+  "plate": {
+    "diameter": 18,
+    "radius": 9,
+    "centre": [
+      0,
+      31.5
+    ],
+    "rearY": 40.5,
+    "frontY": 22.5,
+    "area": 254.46900494077323,
+    "minBoundaryMargin": 0.2632015864967432,
+    "testSurfaceHeightAboveBase": 19.34782973448742,
+    "levelBasis": "Existing model upper path arrival; comparison level, not selected finished elevation",
+    "rearCutCentreline": 0.852020392575028,
+    "frontSurfaceGroundGapCentreline": 8.350712434708797,
+    "groundDropAcrossCentreline": 9.202732827283825,
+    "averageGroundGradient": 51.126293484910136,
+    "angle": 27.078976912427837,
+    "groundCrossing": {
+      "y": 39.09606721858352,
+      "downhillDistance": 1.4039327814164793
+    },
+    "aboveGroundProjectedRun": 16.59606721858352,
+    "conflictsWithEarlierBedroomFootprints": [
+      "L2",
+      "S3"
+    ]
+  },
+  "profile": [
+    {
+      "y": 40.786327918,
+      "downhillDistance": -0.2863279179999978,
+      "z": 120.18400000025267,
+      "face": 5,
+      "thin": false
+    },
+    {
+      "y": 40.5,
+      "downhillDistance": 0,
+      "z": 120.01023297356252,
+      "face": 5,
+      "thin": false
+    },
+    {
+      "y": 37.435817844,
+      "downhillDistance": 3.064182156000001,
+      "z": 118.15063847015443,
+      "face": 5,
+      "thin": false
+    },
+    {
+      "y": 36.592205067,
+      "downhillDistance": 3.907794932999998,
+      "z": 117.70854132814456,
+      "face": 6,
+      "thin": false
+    },
+    {
+      "y": 33.838784536,
+      "downhillDistance": 6.661215464000001,
+      "z": 116.29097708249608,
+      "face": 88,
+      "thin": false
+    },
+    {
+      "y": 32.137127921,
+      "downhillDistance": 8.362872078999999,
+      "z": 115.42396831228356,
+      "face": 89,
+      "thin": false
+    },
+    {
+      "y": 30.73395994,
+      "downhillDistance": 9.766040060000002,
+      "z": 114.74771604609637,
+      "face": 114,
+      "thin": false
+    },
+    {
+      "y": 29.559482086,
+      "downhillDistance": 10.940517914,
+      "z": 114.19510233152981,
+      "face": 114,
+      "thin": false
+    },
+    {
+      "y": 28.328806219,
+      "downhillDistance": 12.171193781,
+      "z": 113.42595891831675,
+      "face": 103,
+      "thin": false
+    },
+    {
+      "y": 27.542254308,
+      "downhillDistance": 12.957745692,
+      "z": 113.05647418915657,
+      "face": 102,
+      "thin": false
+    },
+    {
+      "y": 23.770495413,
+      "downhillDistance": 16.729504587,
+      "z": 111.467216871452,
+      "face": 49,
+      "thin": false
+    },
+    {
+      "y": 23.193679053,
+      "downhillDistance": 17.306320947,
+      "z": 111.19643553962977,
+      "face": 48,
+      "thin": false
+    },
+    {
+      "y": 22.5,
+      "downhillDistance": 18,
+      "z": 110.8075001462787,
+      "face": 48,
+      "thin": false
+    },
+    {
+      "y": 22.098078722,
+      "downhillDistance": 18.401921278,
+      "z": 110.58214894145416,
+      "face": 48,
+      "thin": false
+    },
+    {
+      "y": 20,
+      "downhillDistance": 20.5,
+      "z": 109.41833363477211,
+      "face": 60,
+      "thin": false
+    }
+  ],
+  "stations": [
+    {
+      "distance": 0,
+      "y": 40.5,
+      "groundAboveBase": 20.199850127062447,
+      "surfaceToGroundGap": -0.852020392575028,
+      "thin": false
+    },
+    {
+      "distance": 3,
+      "y": 37.5,
+      "groundAboveBase": 18.379206566659093,
+      "surfaceToGroundGap": 0.9686231678283264,
+      "thin": false
+    },
+    {
+      "distance": 6,
+      "y": 34.5,
+      "groundAboveBase": 16.821012777183,
+      "surfaceToGroundGap": 2.526816957304419,
+      "thin": false
+    },
+    {
+      "distance": 9,
+      "y": 31.5,
+      "groundAboveBase": 15.306523726739414,
+      "surfaceToGroundGap": 4.041306007748005,
+      "thin": false
+    },
+    {
+      "distance": 12,
+      "y": 28.5,
+      "groundAboveBase": 13.722568150396157,
+      "surfaceToGroundGap": 5.6252615840912625,
+      "thin": false
+    },
+    {
+      "distance": 15,
+      "y": 25.5,
+      "groundAboveBase": 12.385573029053702,
+      "surfaceToGroundGap": 6.962256705433717,
+      "thin": false
+    },
+    {
+      "distance": 18,
+      "y": 22.5,
+      "groundAboveBase": 10.997117299778623,
+      "surfaceToGroundGap": 8.350712434708797,
+      "thin": false
+    }
+  ],
+  "intervals": [
+    {
+      "start": 0,
+      "end": 3,
+      "drop": 1.8206435604033544,
+      "gradientPercent": 60.68811868011181,
+      "angleDegrees": 31.252775899669427
+    },
+    {
+      "start": 3,
+      "end": 6,
+      "drop": 1.5581937894760927,
+      "gradientPercent": 51.939792982536424,
+      "angleDegrees": 27.447271219571956
+    },
+    {
+      "start": 6,
+      "end": 9,
+      "drop": 1.5144890504435864,
+      "gradientPercent": 50.48296834811955,
+      "angleDegrees": 26.785999619191955
+    },
+    {
+      "start": 9,
+      "end": 12,
+      "drop": 1.5839555763432571,
+      "gradientPercent": 52.798519211441906,
+      "angleDegrees": 27.833390470774354
+    },
+    {
+      "start": 12,
+      "end": 15,
+      "drop": 1.3369951213424542,
+      "gradientPercent": 44.56650404474847,
+      "angleDegrees": 24.020861840640112
+    },
+    {
+      "start": 15,
+      "end": 18,
+      "drop": 1.3884557292750799,
+      "gradientPercent": 46.28185764250266,
+      "angleDegrees": 24.835576161228058
+    }
+  ],
+  "baseDefinition": "Lower path arrival = 0 m",
+  "limitations": [
+    "Terrain section is at local x=0 only, not all parts of the circle",
+    "No beam/deck thickness, foundation, columns, anchorage, retaining or drainage design",
+    "Above-ground projection is not an unsupported cantilever length",
+    "Top-zone plan area is not natural level area or approved building envelope",
+    "Geotechnical assessment, rock heights/root zones and local approvals remain unknown",
+    "Circle changes the upper path/bedroom arrangement; the earlier placements are paused",
+    "Sea-level datum remains unverified; relative heights used"
+  ]
+}

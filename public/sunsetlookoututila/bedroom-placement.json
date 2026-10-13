@@ -1,0 +1,397 @@
+{
+  "study": "Five-bedroom test A: two large and three compact",
+  "status": "CONCEPT_ONLY; HARD_ENVELOPE_SCREEN_NOT_PHYSICAL_FIT",
+  "selection": {
+    "B3": 2,
+    "B1": 3
+  },
+  "grossRoomArea": 127.67999999999999,
+  "base": "Lower path arrival = 0 m",
+  "rooms": [
+    {
+      "room": "S1",
+      "module": "B1",
+      "zone": "lower-right",
+      "x": 5.75,
+      "y": 7.0,
+      "rotation": 0.0,
+      "width": 4,
+      "depth": 5.8,
+      "area": 23.2,
+      "corners": [
+        [
+          3.75,
+          4.1
+        ],
+        [
+          7.75,
+          4.1
+        ],
+        [
+          7.75,
+          9.9
+        ],
+        [
+          3.75,
+          9.9
+        ]
+      ],
+      "boundaryMargin": 2.5298413064868006,
+      "routeOuterMargin": 4.757820768311566,
+      "score": 0.006499999999999977,
+      "groundRangeAboveBase": [
+        1.297036109277684,
+        4.248437491378482
+      ],
+      "groundRelief": 2.951401382100798,
+      "thinTerrainFaces": [],
+      "rockConflicts": [],
+      "treeConflicts": [],
+      "entry": [
+        6.28,
+        9.9
+      ],
+      "viewDirection": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "room": "S2",
+      "module": "B1",
+      "zone": "lower-left middle",
+      "x": -6.75,
+      "y": 17.5,
+      "rotation": 0.0,
+      "width": 4,
+      "depth": 5.8,
+      "area": 23.2,
+      "corners": [
+        [
+          -8.75,
+          14.6
+        ],
+        [
+          -4.75,
+          14.6
+        ],
+        [
+          -4.75,
+          20.4
+        ],
+        [
+          -8.75,
+          20.4
+        ]
+      ],
+      "boundaryMargin": 1.3893622664847087,
+      "routeOuterMargin": 0.40000000000000213,
+      "score": 186.56438621854517,
+      "groundRangeAboveBase": [
+        6.521653972759836,
+        10.321087066258372
+      ],
+      "groundRelief": 3.7994330934985356,
+      "thinTerrainFaces": [],
+      "rockConflicts": [
+        {
+          "record": 71,
+          "shortfall": 1.3131661086375361
+        },
+        {
+          "record": 72,
+          "shortfall": 1.524
+        },
+        {
+          "record": 73,
+          "shortfall": 1.2669457427919122
+        },
+        {
+          "record": 74,
+          "shortfall": 0.8267774489554047
+        }
+      ],
+      "treeConflicts": [
+        {
+          "record": 98,
+          "shortfall": 0.30481833909654554
+        }
+      ],
+      "entry": [
+        -6.22,
+        20.4
+      ],
+      "viewDirection": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "room": "L1",
+      "module": "B3",
+      "zone": "central middle",
+      "x": 0.75,
+      "y": 17.0,
+      "rotation": 0.0,
+      "width": 4.4,
+      "depth": 6.6,
+      "area": 29.04,
+      "corners": [
+        [
+          -1.4500000000000002,
+          13.7
+        ],
+        [
+          2.95,
+          13.7
+        ],
+        [
+          2.95,
+          20.3
+        ],
+        [
+          -1.4500000000000002,
+          20.3
+        ]
+      ],
+      "boundaryMargin": 7.206767715025277,
+      "routeOuterMargin": 0.5,
+      "score": 143.9519119979287,
+      "groundRangeAboveBase": [
+        5.938631022035381,
+        9.800802662461734
+      ],
+      "groundRelief": 3.8621716404263537,
+      "thinTerrainFaces": [],
+      "rockConflicts": [
+        {
+          "record": 78,
+          "shortfall": 0.4931180039416221
+        }
+      ],
+      "treeConflicts": [
+        {
+          "record": 99,
+          "shortfall": 0.1730655846343856
+        }
+      ],
+      "entry": [
+        1.28,
+        20.3
+      ],
+      "viewDirection": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "room": "L2",
+      "module": "B3",
+      "zone": "upper-left middle",
+      "x": -6.75,
+      "y": 30.75,
+      "rotation": 0.0,
+      "width": 4.4,
+      "depth": 6.6,
+      "area": 29.04,
+      "corners": [
+        [
+          -8.95,
+          27.45
+        ],
+        [
+          -4.55,
+          27.45
+        ],
+        [
+          -4.55,
+          34.05
+        ],
+        [
+          -8.95,
+          34.05
+        ]
+      ],
+      "boundaryMargin": 1.0283465848988615,
+      "routeOuterMargin": 2.75,
+      "score": 0.2795755711788854,
+      "groundRangeAboveBase": [
+        13.713614426647766,
+        17.611386924418284
+      ],
+      "groundRelief": 3.897772497770518,
+      "thinTerrainFaces": [
+        72
+      ],
+      "rockConflicts": [],
+      "treeConflicts": [],
+      "entry": [
+        -6.22,
+        34.05
+      ],
+      "viewDirection": [
+        0.0,
+        -1.0
+      ]
+    },
+    {
+      "room": "S3",
+      "module": "B1",
+      "zone": "central upper pocket",
+      "x": 0.5,
+      "y": 26.75,
+      "rotation": -14.999999999999998,
+      "width": 4,
+      "depth": 5.8,
+      "area": 23.2,
+      "corners": [
+        [
+          -2.1824268833754465,
+          24.466453193966743
+        ],
+        [
+          1.6812764217808265,
+          23.43117701355666
+        ],
+        [
+          3.1824268833754465,
+          29.033546806033257
+        ],
+        [
+          -0.6812764217808265,
+          30.06882298644334
+        ]
+      ],
+      "boundaryMargin": 6.871284960188621,
+      "routeOuterMargin": 0.3276828517215735,
+      "score": 77.15392023584744,
+      "groundRangeAboveBase": [
+        11.30998999258621,
+        14.717060411714755
+      ],
+      "groundRelief": 3.4070704191285444,
+      "thinTerrainFaces": [],
+      "rockConflicts": [
+        {
+          "record": 68,
+          "shortfall": 0.263361349056495
+        },
+        {
+          "record": 70,
+          "shortfall": 1.524
+        }
+      ],
+      "treeConflicts": [],
+      "entry": [
+        1.7625159187305164,
+        29.414010802333962
+      ],
+      "viewDirection": [
+        -0.25881904510252074,
+        -0.9659258262890683
+      ]
+    }
+  ],
+  "pairGaps": [
+    {
+      "rooms": [
+        "S1",
+        "S2"
+      ],
+      "gap": 9.712878049270463
+    },
+    {
+      "rooms": [
+        "S1",
+        "L1"
+      ],
+      "gap": 3.8832975677895187
+    },
+    {
+      "rooms": [
+        "S1",
+        "L2"
+      ],
+      "gap": 19.413719375740445
+    },
+    {
+      "rooms": [
+        "S1",
+        "S3"
+      ],
+      "gap": 13.688402705037722
+    },
+    {
+      "rooms": [
+        "S2",
+        "L1"
+      ],
+      "gap": 3.3
+    },
+    {
+      "rooms": [
+        "S2",
+        "L2"
+      ],
+      "gap": 7.050000000000001
+    },
+    {
+      "rooms": [
+        "S2",
+        "S3"
+      ],
+      "gap": 4.809207137141782
+    },
+    {
+      "rooms": [
+        "L1",
+        "L2"
+      ],
+      "gap": 7.793105927677359
+    },
+    {
+      "rooms": [
+        "L1",
+        "S3"
+      ],
+      "gap": 3.131177013556659
+    },
+    {
+      "rooms": [
+        "L2",
+        "S3"
+      ],
+      "gap": 3.0590987543315595
+    }
+  ],
+  "assumptions": {
+    "boundaryReservation": 0.6,
+    "pathOuterHalfWidth": 1,
+    "additionalPathClearance": 0.25,
+    "minimumInterRoomGap": 3,
+    "rockTestRadius": 1.524,
+    "treePointTestRadius": 0.5,
+    "maximumBedroomUpslopeCoordinate": 35,
+    "preference": "Prioritise rock-clear larger rooms; keep at least 3 m between bedroom rectangles"
+  },
+  "optimisation": {
+    "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+    "candidateCounts": [
+      100,
+      60,
+      95,
+      92,
+      6
+    ],
+    "objective": 407.9562940235002
+  },
+  "limitations": [
+    "Candidate result is optimised within retained sampled positions, not all physically possible designs",
+    "Rotations aim schematically downhill, not a verified sunset bearing",
+    "No floor platforms/supports/cut-fill/access spurs have been designed",
+    "Rock envelopes and tree buffers are assumptions; actual outlines/heights/root zones are unknown",
+    "Existing route clearance failures/off-plot dependencies remain",
+    "No acoustic/privacy/view/engineering/local-code approval",
+    "Upper strip is unallocated, not proven available for amenities"
+  ]
+}
