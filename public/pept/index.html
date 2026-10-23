@@ -58,6 +58,8 @@ details[open] > summary .hint{display:none}
 #match .zone .zshape{fill:url(#ms-dots);stroke:rgba(159,199,191,.45);stroke-width:1.2;transition:stroke .15s,fill .15s}
 #match .zone:hover .zshape,#match .zone:focus-visible .zshape{stroke:#E8B35A;stroke-width:2;fill:url(#ms-dots-amber)}
 #match .zone.on .zshape{stroke:#E8B35A;stroke-width:2.4;fill:url(#ms-dots-amber)}
+#match .zone .det{fill:none;stroke:rgba(190,232,221,.5);stroke-width:1.1;stroke-linecap:round;pointer-events:none}
+#match .zone:hover .det,#match .zone:focus-visible .det,#match .zone.on .det{stroke:rgba(232,179,90,.8)}
 #match .zone .zlab{font:500 9.5px 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;fill:#9FC7BF;text-transform:uppercase}
 #match .zone:hover .zlab,#match .zone:focus-visible .zlab,#match .zone.on .zlab{fill:#E8B35A}
 #match .zone .lead{stroke:rgba(159,199,191,.45);stroke-width:1;stroke-dasharray:2 3}
@@ -257,15 +259,24 @@ details[open] > summary .hint{display:none}
 
   // the body: same mint point-cloud and amber scan as the hero figure
   var SHAPES = {
-    head: ['M170 18 C196 18 206 40 204 58 C202 78 188 88 170 88 C152 88 138 78 136 58 C134 40 144 18 170 18 Z', 'M158 86 L182 86 L184 104 L156 104 Z'],
-    chest: ['M118 104 Q170 96 222 104 L248 122 L238 178 Q234 202 214 214 L126 214 Q106 202 102 178 L92 122 Z'],
-    core: ['M128 214 L212 214 Q208 250 204 272 L136 272 Q132 250 128 214 Z'],
-    pelvis: ['M136 272 L204 272 L214 318 Q192 336 170 330 Q148 336 126 318 Z'],
-    arms: ['M92 122 L70 134 Q56 176 54 222 L48 292 L66 298 L82 234 Q96 192 102 178 Z', 'M248 122 L270 134 Q284 176 286 222 L292 292 L274 298 L258 234 Q244 192 238 178 Z'],
-    legs: ['M126 318 Q112 392 128 462 L132 566 L158 566 L164 462 Q172 392 168 332 Z', 'M214 318 Q228 392 212 462 L208 566 L182 566 L176 462 Q168 392 172 332 Z']
+    head: ['M170 16 C192 16 204 34 203 56 C202 74 190 90 176 94 L164 94 C150 90 138 74 137 56 C136 34 148 16 170 16 Z', 'M154 90 L186 90 L194 106 L146 106 Z'],
+    chest: ['M148 104 L192 104 Q215 106 238 114 Q256 122 258 142 L252 170 Q246 196 226 208 Q198 222 170 218 Q142 222 114 208 Q94 196 88 170 L82 142 Q84 122 102 114 Q125 106 148 104 Z'],
+    core: ['M118 208 Q142 222 170 220 Q198 222 222 208 L210 248 Q204 268 200 282 L140 282 Q136 268 130 248 Z'],
+    pelvis: ['M140 282 L200 282 L218 322 Q196 346 170 342 Q144 346 122 322 Z'],
+    arms: ['M84 126 Q62 134 58 168 Q56 196 62 222 Q56 252 50 286 Q44 306 52 318 L66 316 Q74 300 80 268 Q88 240 92 214 Q98 190 100 168 Z', 'M 256 126 Q 278 134 282 168 Q 284 196 278 222 Q 284 252 290 286 Q 296 306 288 318 L 274 316 Q 266 300 260 268 Q 252 240 248 214 Q 242 190 240 168 Z'],
+    legs: ['M122 322 Q106 390 120 452 Q124 474 130 490 Q122 524 128 556 L130 590 L160 590 L162 556 Q168 524 162 490 Q170 452 172 400 L170 344 Z', 'M 218 322 Q 234 390 220 452 Q 216 474 210 490 Q 218 524 212 556 L 210 590 L 180 590 L 178 556 Q 172 524 178 490 Q 170 452 168 400 L 170 344 Z']
+  };
+  // fine anatomical lines drawn over each zone: pecs, abs, obliques, quads, tousled hair
+  var DETAIL = {
+    head: ['M150 22 L146 12', 'M160 17 L158 7', 'M172 15 L175 6', 'M184 18 L190 10', 'M196 25 L205 19'],
+    chest: ['M170 110 L170 214', 'M104 178 Q134 206 170 196', 'M236 178 Q206 206 170 196', 'M120 112 Q146 124 168 118', 'M220 112 Q194 124 172 118', 'M88 130 Q98 150 102 174', 'M252 130 Q242 150 238 174'],
+    core: ['M170 222 L170 282', 'M146 238 L194 238', 'M143 254 L197 254', 'M141 270 L199 270', 'M124 230 Q133 258 147 282', 'M216 230 Q207 258 193 282'],
+    pelvis: ['M142 286 Q158 318 170 338', 'M198 286 Q182 318 170 338'],
+    arms: ['M72 152 Q66 188 72 224', 'M268 152 Q274 188 268 224', 'M64 250 Q62 274 58 298', 'M276 250 Q278 274 282 298'],
+    legs: ['M140 362 Q133 412 140 458', 'M200 362 Q207 412 200 458', 'M130 492 Q146 486 162 492', 'M210 492 Q194 486 178 492']
   };
   // zone centres in final svg coordinates, for the leader lines
-  var ANCHOR = { head: [147, 49], chest: [221, 133], arms: [262, 186], core: [141, 197], pelvis: [200, 244], legs: [133, 359] };
+  var ANCHOR = { head: [144, 50], chest: [236, 130], arms: [255, 185], core: [140, 200], pelvis: [203, 248], legs: [126, 340] };
 
   function bodyMap(selectedZone, onPick) {
     var svg = document.createElementNS(SVGNS, 'svg');
@@ -274,8 +285,8 @@ details[open] > summary .hint{display:none}
     svg.style.cssText = 'width:100%;height:auto;display:block;background:#0E2826;border-radius:18px;';
     var defs = s('defs', {}, svg);
     [['ms-dots', '#BEE8DD', 0.75], ['ms-dots-amber', '#E8B35A', 0.95]].forEach(function (p) {
-      var pat = s('pattern', { id: p[0], width: 5, height: 5, patternUnits: 'userSpaceOnUse' }, defs);
-      s('circle', { cx: 2.5, cy: 2.5, r: 1, fill: p[1], 'fill-opacity': p[2] }, pat);
+      var pat = s('pattern', { id: p[0], width: 4, height: 4, patternUnits: 'userSpaceOnUse' }, defs);
+      s('circle', { cx: 2, cy: 2, r: 0.85, fill: p[1], 'fill-opacity': p[2] }, pat);
     });
     var grp = {};
     ZONES.forEach(function (z) {
@@ -284,6 +295,7 @@ details[open] > summary .hint{display:none}
       grp[z.id] = g;
       var sh = s('g', { transform: 'translate(37 8) scale(.78)' }, g);
       SHAPES[z.id].forEach(function (d) { s('path', { 'class': 'zshape', d: d }, sh); });
+      DETAIL[z.id].forEach(function (d) { s('path', { 'class': 'det', d: d, 'pointer-events': 'none' }, sh); });
       var open = function () { onPick(z.id); };
       g.addEventListener('click', open);
       g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
