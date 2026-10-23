@@ -47,14 +47,29 @@ details[open] > summary .hint{display:none}
 </div>
 <a href="#start" style="margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; border-radius: 999px; background: #F6F3EC; color: #12302D; font-weight: 600; font-size: 15px; text-decoration: none;">Scroll the atlas
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></a>
-<a href="#match" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px; border: 1px solid #9FC7BF; color: #F6F3EC; font-weight: 600; font-size: 15px; text-decoration: none;">Find my peptides: 5 questions</a>
+<a href="#match" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px; border: 1px solid #9FC7BF; color: #F6F3EC; font-weight: 600; font-size: 15px; text-decoration: none;">Find my peptides: tap the body</a>
 </header>
 
-<!-- FIND MY MATCH (LSC-6689 v3): asks five questions, then ranks entries already on this page -->
-<section id="match" aria-labelledby="match-h" style="padding: 40px 24px 28px; background: #EFEBE3; border-bottom: 1px solid #DDD6C8; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 0;">
-<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #0E5A52;">Find your match · 5 quick questions</div>
-<h2 id="match-h" style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.05; color: #12302D;">Not sure where to start? <span style="font-style: italic; color: #B9822B;">Answer five questions.</span></h2>
-<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3A4745;">We will shortlist the entries below that fit your goal, how strong you need the evidence to be, and how you would rather take it. It is a reading list, not advice: it never says what to take or how much.</p>
+<!-- FIND MY MATCH v2 (LSC-6689): the body is the root. Tap a body zone, narrow to a goal, answer four questions, get a shortlist -->
+<section id="match" aria-labelledby="match-h" style="padding: 40px 24px 28px; background: #EFEBE3; border-bottom: 1px solid #DDD6C8; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 0; touch-action: pan-y;">
+<style>
+#match button{-webkit-tap-highlight-color:transparent}
+#match .zone{cursor:pointer;outline:none}
+#match .zone .zshape{fill:url(#ms-dots);stroke:rgba(159,199,191,.45);stroke-width:1.2;transition:stroke .15s,fill .15s}
+#match .zone:hover .zshape,#match .zone:focus-visible .zshape{stroke:#E8B35A;stroke-width:2;fill:url(#ms-dots-amber)}
+#match .zone.on .zshape{stroke:#E8B35A;stroke-width:2.4;fill:url(#ms-dots-amber)}
+#match .zone .zlab{font:500 9.5px 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;fill:#9FC7BF;text-transform:uppercase}
+#match .zone:hover .zlab,#match .zone:focus-visible .zlab,#match .zone.on .zlab{fill:#E8B35A}
+#match .zone .lead{stroke:rgba(159,199,191,.45);stroke-width:1;stroke-dasharray:2 3}
+#match .zone:hover .lead,#match .zone:focus-visible .lead,#match .zone.on .lead{stroke:#E8B35A}
+#match .zone .pulse{fill:none;stroke:#E8B35A;stroke-width:1.2;opacity:0}
+#match .zone:hover .pulse,#match .zone:focus-visible .pulse{opacity:.9}
+#match .scanline{animation:ms-scan 5.5s ease-in-out infinite alternate}
+@keyframes ms-scan{from{transform:translateY(8px)}to{transform:translateY(440px)}}
+@media (prefers-reduced-motion:reduce){#match .scanline{animation:none;transform:translateY(240px)}}
+</style>
+<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #0E5A52;">Find your match · start with your body</div>
+<h2 id="match-h" style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.05; color: #12302D;">Where do you want help? <span style="font-style: italic; color: #B9822B;">Tap the body.</span></h2>
 <div id="match-app" aria-live="polite" style="display: flex; flex-direction: column; gap: 14px;"></div>
 <noscript><p style="margin:0;font-size:14px;color:#5E4309;">The matcher needs JavaScript. You can still browse every entry below.</p></noscript>
 </section>
@@ -68,7 +83,7 @@ details[open] > summary .hint{display:none}
     'Approved': ['#0E5A52', '#FFFFFF'], 'Human trials': ['#CFE6E0', '#0B3F39'],
     'Early / mixed': ['#F1E3C4', '#5E4309'], 'Animal only': ['#F3D6CF', '#6E2413']
   };
-  // Goal -> the atlas categories (c1..c14) that serve it; the first is the strongest fit.
+  // Specific goals -> the atlas categories (c1..c14) that serve them; the first is the strongest fit.
   var GOALS = [
     { id: 'repair', label: 'Recover from injury or wear and tear', cats: ['c2', 'c14'] },
     { id: 'bones', label: 'Bones and joints', cats: ['c14', 'c2'] },
@@ -82,6 +97,15 @@ details[open] > summary .hint{display:none}
     { id: 'heart', label: 'Heart and circulation', cats: ['c8', 'c3'] },
     { id: 'sex', label: 'Libido and sexual health', cats: ['c9'] },
     { id: 'age', label: 'Slow the ageing process itself', cats: ['c4', 'c12', 'c3'] }
+  ];
+  // Body zones, top (mind) to bottom (strength and stamina). Each zone offers specific goals.
+  var ZONES = [
+    { id: 'head', name: 'Mind & head', lab: ['MIND', '& HEAD'], side: 'L', y: 49, goals: ['brain', 'sleep', 'skin'] },
+    { id: 'chest', name: 'Heart & immune', lab: ['HEART', '& IMMUNE'], side: 'R', y: 133, goals: ['heart', 'immune'] },
+    { id: 'arms', name: 'Muscle, joints & recovery', lab: ['MUSCLE &', 'JOINTS'], side: 'R', y: 186, goals: ['repair', 'bones'] },
+    { id: 'core', name: 'Gut & metabolism', lab: ['GUT &', 'METABOLISM'], side: 'L', y: 197, goals: ['gut', 'body'] },
+    { id: 'pelvis', name: 'Sexual health', lab: ['SEXUAL', 'HEALTH'], side: 'R', y: 244, goals: ['sex'] },
+    { id: 'legs', name: 'Strength & stamina', lab: ['STRENGTH', '& STAMINA'], side: 'L', y: 359, goals: ['energy', 'repair', 'bones'] }
   ];
   var EVID = [
     { id: 4, label: 'Only approved medicines' },
@@ -106,15 +130,20 @@ details[open] > summary .hint{display:none}
     { id: 'meds', label: 'I take prescription medicine' },
     { id: 'sport', label: 'I compete in tested sport' }
   ];
-  var STEPS = [
-    { key: 'goal', q: 'What do you most want help with?', opts: GOALS, multi: false },
+  // q steps 1..4 are questions 2..5 (question 1 is the body map plus the goal list)
+  var QS = [
+    null,
     { key: 'evid', q: 'How strong does the evidence need to be?', opts: EVID, multi: false },
     { key: 'needle', q: 'How would you rather take it?', opts: NEEDLE, multi: false },
     { key: 'why', q: 'What is this for?', opts: WHY, multi: false },
     { key: 'safe', q: 'Do any of these apply to you? Pick all that do.', opts: SAFE, multi: true }
   ];
 
-  var state = { step: 0, a: {}, safe: [] };
+  var state = { a: {}, safe: [], zone: null };
+  var view = { v: 'map' };
+  var depth = 0;
+
+  function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0]; }
 
   // ---- read the atlas cards that are already on this page --------------------------------
   function text(el) { return el ? el.textContent.replace(/\s+/g, ' ').trim() : ''; }
@@ -123,7 +152,7 @@ details[open] > summary .hint{display:none}
     var cards = document.querySelectorAll('section[id^="c"] details');
     Array.prototype.forEach.call(cards, function (d) {
       var sum = d.querySelector(':scope > summary');
-      if (!sum || !sum.querySelector('.hint')) return;           // top-level cards only
+      if (!sum || !sum.querySelector('.hint')) return;
       var head = sum.children[0], solves = sum.children[1];
       if (!head || !head.children[1]) return;
       var content = d.querySelector(':scope > div');
@@ -151,7 +180,7 @@ details[open] > summary .hint{display:none}
 
   // ---- ranking: hard filters first, then score; relax filters if nothing fits -------------
   function rank(entries, a) {
-    var goal = GOALS.filter(function (g) { return g.id === a.goal; })[0];
+    var goal = byId(GOALS, a.goal);
     function run(minEvid, needleOn, whyOn) {
       return entries.map(function (e) {
         var ci = goal.cats.indexOf(e.cat);
@@ -172,12 +201,46 @@ details[open] > summary .hint{display:none}
     return { list: res.slice(0, 5), note: note, total: res.length };
   }
 
+  // ---- history: every step is a real browser-history entry, so swipe-back and the Back button work ----
+  function mark(v, d) { try { history.replaceState({ lm: 1, view: v, d: d }, '', location.href); } catch (e) {} }
+  function nav(v) {
+    depth++;
+    try { history.pushState({ lm: 1, view: v, d: depth }, '', '#match'); } catch (e) {}
+    view = v; render();
+  }
+  function goBack() { if (depth > 0) history.back(); else { view = { v: 'map' }; render(); } }
+  function goRoot() {
+    state = { a: {}, safe: [], zone: null };
+    if (depth > 0) history.go(-depth); else { view = { v: 'map' }; render(); }
+  }
+  window.addEventListener('popstate', function (e) {
+    var st = e.state;
+    if (!(st && st.lm)) return;                      // page anchors and other entries are not ours
+    view = st.view; depth = st.d || 0;
+    if (view.v !== 'map' && view.v !== 'zone' && !state.a.goal) view = { v: 'map' };
+    render();
+  });
+  mark({ v: 'map' }, 0);
+
+  // swipe right (not from the very screen edge, which the browser owns) = back
+  var tx = 0, ty = 0, tt = 0, tracking = false;
+  var sec = document.getElementById('match');
+  sec.addEventListener('touchstart', function (e) { var t = e.touches[0]; tx = t.clientX; ty = t.clientY; tt = Date.now(); tracking = e.touches.length === 1 && tx > 28; }, { passive: true });
+  sec.addEventListener('touchend', function (e) {
+    if (!tracking) return; tracking = false;
+    var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    if (view.v !== 'map' && dx > 90 && Math.abs(dy) < 55 && Math.abs(dx) > Math.abs(dy) * 2 && Date.now() - tt < 700) goBack();
+  }, { passive: true });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && view.v !== 'map' && sec.contains(document.activeElement)) goRoot(); });
+
   // ---- UI -------------------------------------------------------------------------------
   var BTN = 'display:flex;align-items:center;gap:12px;min-height:52px;width:100%;box-sizing:border-box;padding:12px 16px;border-radius:14px;border:1px solid #CFC7B7;background:#FFFFFF;color:#18201F;font:inherit;font-size:15px;line-height:1.3;text-align:left;cursor:pointer;';
   var BTN_ON = 'background:#12302D;color:#F6F3EC;border-color:#12302D;';
   var PRIMARY = 'display:flex;align-items:center;justify-content:center;min-height:52px;width:100%;box-sizing:border-box;border-radius:999px;border:0;background:#0E5A52;color:#FFFFFF;font:inherit;font-weight:600;font-size:15px;cursor:pointer;';
   var GHOST = 'display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #CFC7B7;background:transparent;color:#12302D;font:inherit;font-size:14px;cursor:pointer;';
+  var ICONBTN = 'display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border-radius:999px;border:1px solid #CFC7B7;background:#FFFFFF;color:#12302D;font:inherit;font-size:20px;line-height:1;cursor:pointer;padding:0;';
   var MONO = "font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;";
+  var SVGNS = 'http://www.w3.org/2000/svg';
 
   function el(tag, css, txt) { var n = document.createElement(tag); if (css) n.style.cssText = css; if (txt != null) n.textContent = txt; return n; }
   function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
@@ -186,45 +249,150 @@ details[open] > summary .hint{display:none}
     if (attrs) Object.keys(attrs).forEach(function (k) { b.setAttribute(k, attrs[k]); });
     return b;
   }
-
-  function renderStep() {
-    clear();
-    var s = STEPS[state.step];
-    var bar = el('div', 'display:flex;gap:6px;');
-    STEPS.forEach(function (_, i) { bar.appendChild(el('div', 'flex:1;height:4px;border-radius:2px;background:' + (i <= state.step ? '#0E5A52' : '#D9D2C3') + ';')); });
-    app.appendChild(bar);
-    app.appendChild(el('div', MONO + 'color:#5A6663;', 'Question ' + (state.step + 1) + ' of ' + STEPS.length));
-    var h = el('h3', "margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.15;color:#12302D;", s.q);
-    h.setAttribute('tabindex', '-1'); app.appendChild(h);
-    var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
-    list.setAttribute('role', s.multi ? 'group' : 'radiogroup'); list.setAttribute('aria-label', s.q);
-    s.opts.forEach(function (o) {
-      var on = s.multi ? state.safe.indexOf(o.id) >= 0 : state.a[s.key] === o.id;
-      var b = btn(o.label, BTN + (on ? BTN_ON : ''), function () {
-        if (s.multi) {
-          var i = state.safe.indexOf(o.id); if (i >= 0) state.safe.splice(i, 1); else state.safe.push(o.id);
-          renderStep();
-        } else { state.a[s.key] = o.id; next(); }
-      }, { 'aria-pressed': on ? 'true' : 'false', 'data-opt': o.id });
-      list.appendChild(b);
-    });
-    app.appendChild(list);
-    var row = el('div', 'display:flex;gap:10px;align-items:center;');
-    if (state.step > 0) row.appendChild(btn('Back', GHOST, function () { state.step--; renderStep(); }));
-    if (s.multi) { var go = btn(state.safe.length ? 'Show my shortlist' : 'None of these: show my shortlist', PRIMARY, next); go.setAttribute('data-go', '1'); go.style.flex = '1'; row.appendChild(go); }
-    app.appendChild(row);
+  function s(tag, attrs, parent) {
+    var n = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (parent) parent.appendChild(n); return n;
   }
 
-  function next() { if (state.step < STEPS.length - 1) { state.step++; renderStep(); focusHead(); } else { renderResults(); focusHead(); } }
-  function focusHead() { var h = app.querySelector('h3'); if (h) h.focus({ preventScroll: true }); var r = app.getBoundingClientRect(); if (r.top < 0 || r.top > 200) window.scrollTo({ top: window.scrollY + r.top - 70 }); }
+  // the body: same mint point-cloud and amber scan as the hero figure
+  var SHAPES = {
+    head: ['M170 18 C196 18 206 40 204 58 C202 78 188 88 170 88 C152 88 138 78 136 58 C134 40 144 18 170 18 Z', 'M158 86 L182 86 L184 104 L156 104 Z'],
+    chest: ['M118 104 Q170 96 222 104 L248 122 L238 178 Q234 202 214 214 L126 214 Q106 202 102 178 L92 122 Z'],
+    core: ['M128 214 L212 214 Q208 250 204 272 L136 272 Q132 250 128 214 Z'],
+    pelvis: ['M136 272 L204 272 L214 318 Q192 336 170 330 Q148 336 126 318 Z'],
+    arms: ['M92 122 L70 134 Q56 176 54 222 L48 292 L66 298 L82 234 Q96 192 102 178 Z', 'M248 122 L270 134 Q284 176 286 222 L292 292 L274 298 L258 234 Q244 192 238 178 Z'],
+    legs: ['M126 318 Q112 392 128 462 L132 566 L158 566 L164 462 Q172 392 168 332 Z', 'M214 318 Q228 392 212 462 L208 566 L182 566 L176 462 Q168 392 172 332 Z']
+  };
+  // zone centres in final svg coordinates, for the leader lines
+  var ANCHOR = { head: [147, 49], chest: [221, 133], arms: [262, 186], core: [141, 197], pelvis: [200, 244], legs: [133, 359] };
+
+  function bodyMap(selectedZone, onPick) {
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 340 470'); svg.setAttribute('role', 'group');
+    svg.setAttribute('aria-label', 'Body map. Choose the part of the body you want help with.');
+    svg.style.cssText = 'width:100%;height:auto;display:block;background:#0E2826;border-radius:18px;';
+    var defs = s('defs', {}, svg);
+    [['ms-dots', '#BEE8DD', 0.75], ['ms-dots-amber', '#E8B35A', 0.95]].forEach(function (p) {
+      var pat = s('pattern', { id: p[0], width: 5, height: 5, patternUnits: 'userSpaceOnUse' }, defs);
+      s('circle', { cx: 2.5, cy: 2.5, r: 1, fill: p[1], 'fill-opacity': p[2] }, pat);
+    });
+    var grp = {};
+    ZONES.forEach(function (z) {
+      var g = s('g', { 'class': 'zone' + (selectedZone === z.id ? ' on' : ''), tabindex: 0, role: 'button', 'data-zone': z.id,
+        'aria-label': z.name + ': ' + z.goals.map(function (id) { return byId(GOALS, id).label; }).join(', ') }, null);
+      grp[z.id] = g;
+      var sh = s('g', { transform: 'translate(37 8) scale(.78)' }, g);
+      SHAPES[z.id].forEach(function (d) { s('path', { 'class': 'zshape', d: d }, sh); });
+      var open = function () { onPick(z.id); };
+      g.addEventListener('click', open);
+      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    });
+    // labels and leader lines live in final coordinates, outside the scaled group
+    ZONES.forEach(function (z) {
+      var g = grp[z.id], left = z.side === 'L', lx = left ? 70 : 272, an = ANCHOR[z.id];
+      s('line', { 'class': 'lead', x1: lx + (left ? 2 : -2), y1: z.y + 4, x2: an[0], y2: an[1] }, g);
+      var tx2 = s('text', { 'class': 'zlab', x: left ? lx - 2 : lx + 2, y: z.y - 3, 'text-anchor': left ? 'end' : 'start' }, g);
+      tx2.textContent = z.lab[0];
+      var t2 = s('text', { 'class': 'zlab', x: left ? lx - 2 : lx + 2, y: z.y + 9, 'text-anchor': left ? 'end' : 'start' }, g);
+      t2.textContent = z.lab[1];
+      // generous touch target behind the label
+      s('rect', { x: left ? 0 : 268, y: z.y - 16, width: 72, height: 34, fill: 'transparent' }, g);
+      svg.appendChild(g);
+    });
+    var scan = s('g', { 'class': 'scanline', 'aria-hidden': 'true', 'pointer-events': 'none' }, svg);
+    s('rect', { x: 50, y: 0, width: 240, height: 1.2, fill: '#E8B35A', 'fill-opacity': 0.7 }, scan);
+    return svg;
+  }
+
+  function topbar(label) {
+    var bar = el('div', 'display:flex;align-items:center;gap:8px;');
+    var x = btn('✕', ICONBTN, goRoot, { 'aria-label': 'Close and return to the body map', 'data-act': 'root' });
+    var back = btn('←', ICONBTN, goBack, { 'aria-label': 'Back one step', 'data-act': 'back' });
+    bar.appendChild(x); bar.appendChild(back);
+    bar.appendChild(el('div', MONO + 'color:#5A6663;margin-left:6px;', label));
+    return bar;
+  }
+  function progress(n) {
+    var bar = el('div', 'display:flex;gap:6px;');
+    for (var i = 1; i <= 5; i++) bar.appendChild(el('div', 'flex:1;height:4px;border-radius:2px;background:' + (i <= n ? '#0E5A52' : '#D9D2C3') + ';'));
+    return bar;
+  }
+  function heading(t) {
+    var h = el('h3', "margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.15;color:#12302D;", t);
+    h.setAttribute('tabindex', '-1'); return h;
+  }
+
+  function render() {
+    clear();
+    if (view.v === 'map') return renderMap();
+    if (view.v === 'zone') return renderZone();
+    if (view.v === 'q') return renderQ();
+    if (view.v === 'res') return renderResults();
+  }
+  function afterRender(skipScroll) {
+    var h = app.querySelector('h3'); if (h) h.focus({ preventScroll: true });
+    if (skipScroll) return;
+    var r = sec.getBoundingClientRect(); if (r.top < -20 || r.top > 300) window.scrollTo({ top: window.scrollY + r.top - 8 });
+  }
+
+  function renderMap() {
+    app.appendChild(progress(1));
+    app.appendChild(el('div', MONO + 'color:#5A6663;', 'Question 1 of 5 · where in the body?'));
+    app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.5;color:#3A4745;', 'Read the body from top to bottom: mind and head at the top, strength and stamina at the bottom. Tap where you want help. It is a reading list, not advice: it never says what to take or how much.'));
+    app.appendChild(bodyMap(null, function (zid) { state.zone = zid; nav({ v: 'zone', z: zid }); }));
+    app.appendChild(btn('Whole body: slow the ageing process', BTN, function () { state.a.goal = 'age'; state.zone = null; nav({ v: 'q', i: 1 }); afterRender(); }, { 'data-goal': 'age' }));
+  }
+
+  function renderZone() {
+    var z = byId(ZONES, view.z);
+    state.zone = z.id;
+    app.appendChild(topbar('Question 1 of 5'));
+    app.appendChild(progress(1));
+    app.appendChild(heading(z.name + ': what exactly?'));
+    var mini = el('div', 'max-width:200px;align-self:center;width:60%;');
+    mini.appendChild(bodyMap(z.id, function (zid) { state.zone = zid; nav({ v: 'zone', z: zid }); }));
+    app.appendChild(mini);
+    var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
+    list.setAttribute('role', 'radiogroup'); list.setAttribute('aria-label', z.name);
+    z.goals.forEach(function (gid) {
+      var g = byId(GOALS, gid), on = state.a.goal === gid;
+      list.appendChild(btn(g.label, BTN + (on ? BTN_ON : ''), function () { state.a.goal = gid; nav({ v: 'q', i: 1 }); afterRender(); }, { 'aria-pressed': on ? 'true' : 'false', 'data-goal': gid }));
+    });
+    app.appendChild(list);
+    afterRender();
+  }
+
+  function renderQ() {
+    var q = QS[view.i];
+    app.appendChild(topbar('Question ' + (view.i + 1) + ' of 5'));
+    app.appendChild(progress(view.i + 1));
+    var g = byId(GOALS, state.a.goal);
+    if (g) app.appendChild(el('div', 'font-size:13px;color:#5A6663;', 'Your goal: ' + g.label));
+    app.appendChild(heading(q.q));
+    var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
+    list.setAttribute('role', q.multi ? 'group' : 'radiogroup'); list.setAttribute('aria-label', q.q);
+    q.opts.forEach(function (o) {
+      var on = q.multi ? state.safe.indexOf(o.id) >= 0 : state.a[q.key] === o.id;
+      list.appendChild(btn(o.label, BTN + (on ? BTN_ON : ''), function () {
+        if (q.multi) { var i = state.safe.indexOf(o.id); if (i >= 0) state.safe.splice(i, 1); else state.safe.push(o.id); render(); }
+        else { state.a[q.key] = o.id; nav({ v: 'q', i: view.i + 1 }); afterRender(); }
+      }, { 'aria-pressed': on ? 'true' : 'false', 'data-opt': o.id }));
+    });
+    app.appendChild(list);
+    if (q.multi) {
+      var go = btn(state.safe.length ? 'Show my shortlist' : 'None of these: show my shortlist', PRIMARY, function () { nav({ v: 'res' }); afterRender(); });
+      go.setAttribute('data-go', '1'); app.appendChild(go);
+    }
+    afterRender(true);
+  }
 
   function renderResults() {
-    clear();
     var entries = readEntries();
     var res = rank(entries, state.a);
-    var goal = GOALS.filter(function (g) { return g.id === state.a.goal; })[0];
-    app.appendChild(el('div', MONO + 'color:#0E5A52;', 'Your shortlist'));
-    app.appendChild(el('h3', "margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:28px;line-height:1.12;color:#12302D;", goal.label));
+    var goal = byId(GOALS, state.a.goal);
+    app.appendChild(topbar('Your shortlist'));
+    app.appendChild(heading(goal.label));
 
     var caution = [];
     if (state.safe.length) caution.push('You flagged something above. Talk to a qualified clinician before starting anything on this page.');
@@ -239,10 +407,8 @@ details[open] > summary .hint{display:none}
     });
     app.appendChild(box);
     if (res.note) app.appendChild(el('p', 'margin:0;font-size:14px;line-height:1.5;color:#3A4745;', res.note));
+    if (!res.list.length) app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.55;color:#3A4745;', 'Nothing in the atlas fits that goal. Go back to the body map and try another area.'));
 
-    if (!res.list.length) {
-      app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.55;color:#3A4745;', 'Nothing in the atlas fits that goal. Try another goal, or browse the categories below.'));
-    }
     res.list.forEach(function (r, i) {
       var e = r.e, bc = BADGE[e.badge] || ['#EEE', '#333'];
       var card = el('div', 'background:#FFFFFF;border:1px solid #DDD6C8;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;');
@@ -255,16 +421,15 @@ details[open] > summary .hint{display:none}
       if (e.evidence) card.appendChild(el('div', 'font-size:14px;line-height:1.45;color:#3A4745;', 'Evidence: ' + e.evidence));
       if (e.chips.length) card.appendChild(el('div', 'font-size:13px;color:#5A6663;', e.chips.join(' · ')));
       if (e.safety) card.appendChild(el('div', 'font-size:13px;line-height:1.45;color:#5E4309;background:#FBF4E6;border-radius:10px;padding:8px 10px;', 'Safety: ' + e.safety));
-      card.appendChild(btn('Open the full entry', GHOST + 'align-self:flex-start;', function () {
-        e.el.open = true; e.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }));
+      card.appendChild(btn('Open the full entry', GHOST + 'align-self:flex-start;', function () { e.el.open = true; e.el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
       app.appendChild(card);
     });
     if (res.total > res.list.length) app.appendChild(el('p', 'margin:0;font-size:13px;color:#5A6663;', 'Showing the top ' + res.list.length + ' of ' + res.total + ' matches. Browse the categories below for the rest.'));
-    app.appendChild(btn('Start again', GHOST + 'align-self:flex-start;', function () { state = { step: 0, a: {}, safe: [] }; renderStep(); }));
+    app.appendChild(btn('Start again from the body map', GHOST + 'align-self:flex-start;', goRoot, { 'data-act': 'again' }));
+    afterRender(true);
   }
 
-  renderStep();
+  render();
 })();
 </script>
 
@@ -2317,14 +2482,19 @@ details[open] > summary .hint{display:none}
 function lsFigure(canvas) {
   var rnd = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(11);
   var skin = [], bones = [], joints = [];
-  function capsule(A, B, r1, r2) {
+  var tiltA = 0.2, tca = Math.cos(tiltA), tsa = Math.sin(tiltA), tyaw = -0.12, yca = Math.cos(tyaw), ysa = Math.sin(tyaw);
+  function tiltHead(p) {   // head tipped forward and turned slightly, pivoting at the neck
+    var ry = p[1] - 1.58, y2 = ry * tca - p[2] * tsa, z2 = ry * tsa + p[2] * tca;
+    return [p[0] * yca + z2 * ysa, 1.58 + y2, -p[0] * ysa + z2 * yca];
+  }
+  function capsule(A, B, r1, r2, bump, at) {
     var dx = B[0] - A[0], dy = B[1] - A[1], dz = B[2] - A[2];
     var len = Math.sqrt(dx * dx + dy * dy + dz * dz), steps = Math.max(2, Math.round(len / 0.012));
     var ux = dx / len, uy = dy / len, uz = dz / len;
     var px = -uy, py = ux, pz = 0, pl = Math.sqrt(px * px + py * py) || 1; px /= pl; py /= pl;
     var qx = uy * pz - uz * py, qy = uz * px - ux * pz, qz = ux * py - uy * px;
     for (var i = 0; i <= steps; i++) {
-      var k = i / steps, r = r1 + (r2 - r1) * k, n = Math.max(6, Math.round(r * 260));
+      var k = i / steps, r = r1 + (r2 - r1) * k + (bump ? bump * Math.exp(-Math.pow((k - at) / 0.28, 2)) : 0), n = Math.max(6, Math.round(r * 260));
       var cx = A[0] + dx * k, cy = A[1] + dy * k, cz = A[2] + dz * k;
       for (var j = 0; j < n; j++) {
         var t = (j + rnd() * 0.6) / n * Math.PI * 2, c = Math.cos(t) * r, s = Math.sin(t) * r;
@@ -2332,7 +2502,9 @@ function lsFigure(canvas) {
       }
     }
   }
-  var T = [[0.90, .16, .11], [0.98, .172, .115], [1.07, .142, .098], [1.19, .152, .108], [1.32, .184, .124], [1.44, .205, .112], [1.50, .125, .085], [1.535, .055, .05]];
+  var T = [[0.90, .155, .105], [0.98, .146, .102], [1.05, .114, .086], [1.13, .134, .094], [1.22, .178, .112], [1.32, .206, .124], [1.41, .226, .118], [1.47, .185, .098], [1.51, .12, .085], [1.535, .055, .05]];
+  function gs(v, m, w) { var d = (v - m) / w; return Math.exp(-d * d); }
+  function sm(v, a, b) { var k = Math.min(1, Math.max(0, (v - a) / (b - a))); return k * k * (3 - 2 * k); }
   function torso(y) {
     for (var i = 0; i < T.length - 1; i++) {
       var a = T[i], b = T[i + 1];
@@ -2342,25 +2514,46 @@ function lsFigure(canvas) {
   }
   for (var y = 0.90; y <= 1.535; y += 0.011) {
     var ab = torso(y), n = Math.round(210 * (ab[0] + ab[1]));
-    for (var i = 0; i < n; i++) { var t = (i + rnd() * 0.6) / n * Math.PI * 2; skin.push([Math.cos(t) * ab[0], y, Math.sin(t) * ab[1] + (y > 1.25 && y < 1.42 && Math.sin(t) > 0 ? 0.012 * Math.sin(t) : 0)]); }
+    for (var i = 0; i < n; i++) {
+      var t = (i + rnd() * 0.6) / n * Math.PI * 2, cx = Math.cos(t), sz = Math.sin(t), ax = Math.abs(cx), front = Math.max(0, sz), back = Math.max(0, -sz);
+      var dz = 0, wx = 1;
+      dz += front * 0.038 * gs(y, 1.335, .05) * sm(ax, .1, .3) * (1 - sm(ax, .8, .98));            // pecs
+      dz -= front * 0.014 * gs(y, 1.3, .08) * (1 - sm(ax, .06, .14));                               // sternum groove
+      if (y > 1.0 && y < 1.245) {                                                                         // abs
+        var blocks = 0.5 + 0.5 * Math.cos((y - 1.015) / .056 * Math.PI * 2);
+        dz += front * 0.034 * blocks * (1 - sm(ax, .5, .72)) * (1 - gs(ax, 0, .05) * 1.6);
+      }
+      dz += front * 0.016 * gs(y, 1.14, .08) * sm(ax, .5, .8) * (1 - sm(ax, .9, .99));                   // obliques
+      if (y > 1.2 && y < 1.3) dz += front * 0.013 * (0.5 + 0.5 * Math.cos((y - 1.2) / .028 * Math.PI * 2)) * sm(ax, .42, .6) * (1 - sm(ax, .86, .98));   // ribs / serratus
+      if (y > 0.95 && y < 1.1) { var gl = Math.abs(ax - (0.46 + (1.1 - y) * 2.4)); dz -= front * 0.02 * Math.max(0, 1 - gl / .09); }        // V-line grooves into the hips
+      wx += 0.075 * gs(y, 1.33, .075) * (1 - sm(ax, .35, .75) * 0.2);                                       // lat flare
+      dz += back * 0.014 * gs(y, 1.36, .07) * (1 - gs(ax, 0, .05) * 1.2);                                  // upper back
+      skin.push([cx * ab[0] * wx, y, sz * ab[1] + dz, dz]);
+    }
   }
   for (var hi = 1; hi < 24; hi++) {
     var v = hi / 24 * Math.PI, ry = Math.cos(v), rr = Math.sin(v), hn = Math.max(5, Math.round(30 * rr));
-    for (var hj = 0; hj < hn; hj++) { var ht = (hj + rnd() * 0.6) / hn * Math.PI * 2; skin.push([Math.cos(ht) * rr * .085, 1.665 + ry * .115, Math.sin(ht) * rr * .095]); }
+    for (var hj = 0; hj < hn; hj++) { var ht = (hj + rnd() * 0.6) / hn * Math.PI * 2; skin.push(tiltHead([Math.cos(ht) * rr * .085, 1.665 + ry * .115, Math.sin(ht) * rr * .095])); }
   }
-  capsule([0, 1.52, 0], [0, 1.575, 0.005], .052, .046);
+  for (var hk = 0; hk < 170; hk++) {   // short tousled hair: loose tufts standing off the crown
+    var hv = rnd() * 1.15, hu = rnd() * Math.PI * 2, hr = 1.04 + rnd() * 0.34 + (rnd() < .18 ? .22 : 0);
+    skin.push(tiltHead([Math.cos(hu) * Math.sin(hv) * .088 * hr, 1.665 + Math.cos(hv) * .118 * hr, Math.sin(hu) * Math.sin(hv) * .098 * hr - .008]));
+  }
+  capsule([0, 1.52, 0], [0, 1.575, 0.005], .054, .046); [-1, 1].forEach(function (sd) { capsule([sd * .05, 1.535, -.008], [sd * .18, 1.465, 0], .036, .048); });
   [-1, 1].forEach(function (sd) {
-    var S = [sd * .205, 1.45, 0], E = [sd * .262, 1.17, -.012], W = [sd * .298, .925, .03], H = [sd * .312, .8, .048];
-    capsule([sd * .185, 1.475, 0], [sd * .228, 1.395, 0], .062, .05); capsule(S, E, .05, .04); capsule(E, W, .04, .031); capsule(W, H, .03, .024);
-    var Hp = [sd * .088, .93, 0], K = [sd * .1, .52, .012], A = [sd * .096, .09, -.012], F = [sd * .1, .03, .12];
-    capsule(Hp, K, .082, .054); var C = [sd * .1, .38, -.012]; capsule(K, C, .054, .058); capsule(C, A, .058, .033); capsule([sd * .096, .05, -.03], F, .034, .026);
+    var S = [sd * .255, 1.44, 0], E = [sd * .3, 1.17, -.01], W = [sd * .328, .93, .03], H = [sd * .338, .8, .048];
+    if (sd === 1) { E = [.292, 1.17, -.025]; W = [.255, .985, .085]; H = [.2, .93, .105]; }
+    else { E = [-.3, 1.17, .015]; W = [-.318, .93, .06]; H = [-.322, .805, .085]; }
+    capsule([sd * .19, 1.47, 0], [sd * .262, 1.39, 0], .07, .062); capsule(S, E, .054, .039, .014, .42); capsule(E, W, .042, .029, .011, .3); capsule(W, H, .032, .025);
+    var Hp = [sd * .095, .93, 0], K = [sd * .108, .52, .012], A = [sd * .1, .09, -.012], F = [sd * .104, .03, .12];
+    capsule(Hp, K, .08, .05, .011, .38); var C = [sd * .108, .38, -.012]; capsule(K, C, .058, .06); capsule(C, A, .052, .03, .012, .22); capsule([sd * .096, .05, -.03], F, .034, .026);
     bones.push([S, E, W, H]); bones.push([Hp, K, A, F]);
     bones.push([[S[0] * 0.92, S[1] - .03, .022], [E[0] * 0.96, E[1] + .03, .012]]);
     bones.push([[Hp[0] * 1.2, Hp[1] - .05, .03], [K[0] * 1.1, K[1] + .05, .03]]);
     joints.push(S, E, W, Hp, K, A);
   });
   bones.push([[0, .93, -.035], [0, 1.1, -.045], [0, 1.3, -.05], [0, 1.56, -.03]]);
-  bones.push([[-.19, 1.465, .01], [0, 1.49, .03], [.19, 1.465, .01]]);
+  bones.push([[-.235, 1.465, .01], [0, 1.49, .03], [.235, 1.465, .01]]);
   function ring(cx, cy, cz, a, b, plane, arc) {
     var pts = [], m = 28, span = arc || Math.PI * 2;
     for (var i = 0; i <= m; i++) {
@@ -2373,12 +2566,12 @@ function lsFigure(canvas) {
   }
   [1.19, 1.25, 1.31, 1.37, 1.42].forEach(function (ry2) { var t2 = torso(ry2); bones.push(ring(0, ry2, -.005, t2[0] * .78, t2[1] * .78, 'xz')); });
   bones.push(ring(0, .965, 0, .13, .08, 'xz'));
-  bones.push(ring(0, 1.665, 0, .068, .075, 'xz'));
-  bones.push(ring(0, 1.67, 0, .068, .09, 'xy'));
-  bones.push(ring(0, 1.67, 0, .075, .09, 'zy'));
+  bones.push(ring(0, 1.665, 0, .068, .075, 'xz').map(tiltHead));
+  bones.push(ring(0, 1.67, 0, .068, .09, 'xy').map(tiltHead));
+  bones.push(ring(0, 1.67, 0, .075, .09, 'zy').map(tiltHead));
   var visor = ring(0, 1.685, 0, .075, .082, 'xz'); visor = visor.filter(function (p) { return p[2] > 0.035; });
-  bones.push(visor);
-  joints.push([0, 1.56, -.03], [0, 1.665, 0], [0, .965, -.03]);
+  bones.push(visor.map(tiltHead));
+  joints.push([0, 1.56, -.03], tiltHead([0, 1.665, 0]), [0, .965, -.03]);
 
   var ctx = canvas.getContext('2d'), raf = 0, t0 = performance.now();
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2398,6 +2591,7 @@ function lsFigure(canvas) {
     for (var i = 0; i < skin.length; i++) {
       var p = skin[i], d = Math.abs(p[1] - scan), q = P(p);
       var a = 0.18 + 0.62 * Math.min(1, Math.max(0, (q[2] + 0.2) / 0.4));
+      if (p[3]) a *= Math.max(0.12, 1 + p[3] * 55);   // ridges glow, grooves recede
       if (d < bw) a *= Math.pow(d / bw, 2.2);
       if (a < 0.02) continue;
       ctx.fillStyle = 'rgba(190,232,221,' + a.toFixed(3) + ')'; ctx.fillRect(q[0], q[1], 1.5, 1.5);
