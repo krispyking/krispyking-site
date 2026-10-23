@@ -325,7 +325,6 @@ details[open] > summary .hint{display:none}
     app.appendChild(topbar('Question 1 of 5'));
     app.appendChild(progress(1));
     app.appendChild(heading(z.name + ': what exactly?'));
-    app.appendChild(bodyMap(true));
     var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
     list.setAttribute('role', 'radiogroup'); list.setAttribute('aria-label', z.name);
     z.goals.forEach(function (gid) {
@@ -333,6 +332,7 @@ details[open] > summary .hint{display:none}
       list.appendChild(btn(g.label, BTN + (on ? BTN_ON : ''), function () { state.a.goal = gid; nav({ v: 'q', i: 1 }); afterRender(); }, { 'aria-pressed': on ? 'true' : 'false', 'data-goal': gid }));
     });
     app.appendChild(list);
+    app.appendChild(bodyMap(true));
     afterRender();
   }
 
@@ -2638,6 +2638,12 @@ function lsFigure(canvas, opts) {
         var an = proj([lb.ax, lb.ay, 0]), lx = left ? x0 + w + 5 : x0 - 5;
         ctx.strokeStyle = on ? 'rgba(232,179,90,0.9)' : 'rgba(159,199,191,0.45)'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
         ctx.beginPath(); ctx.moveTo(lx, ly + 2); ctx.lineTo(an[0], an[1]); ctx.stroke(); ctx.setLineDash([]);
+        var ang = Math.atan2(an[1] - (ly + 2), an[0] - lx), hs = on ? 9 : 6;
+        ctx.fillStyle = on ? 'rgba(232,179,90,1)' : 'rgba(159,199,191,0.8)';
+        ctx.beginPath(); ctx.moveTo(an[0], an[1]);
+        ctx.lineTo(an[0] - hs * Math.cos(ang - 0.45), an[1] - hs * Math.sin(ang - 0.45));
+        ctx.lineTo(an[0] - hs * Math.cos(ang + 0.45), an[1] - hs * Math.sin(ang + 0.45));
+        ctx.closePath(); ctx.fill();
         ctx.fillStyle = col; ctx.textAlign = left ? 'left' : 'right';
         var tx = left ? x0 : x0 + w;
         ctx.fillText(lb.t[0], tx, ly - 2); ctx.fillText(lb.t[1], tx, ly + 10);
