@@ -47,7 +47,226 @@ details[open] > summary .hint{display:none}
 </div>
 <a href="#start" style="margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; border-radius: 999px; background: #F6F3EC; color: #12302D; font-weight: 600; font-size: 15px; text-decoration: none;">Scroll the atlas
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="m19 12-7 7-7-7"></path></svg></a>
+<a href="#match" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 999px; border: 1px solid #9FC7BF; color: #F6F3EC; font-weight: 600; font-size: 15px; text-decoration: none;">Find my peptides: 5 questions</a>
 </header>
+
+<!-- FIND MY MATCH (LSC-6689 v3): asks five questions, then ranks entries already on this page -->
+<section id="match" aria-labelledby="match-h" style="padding: 40px 24px 28px; background: #EFEBE3; border-bottom: 1px solid #DDD6C8; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 0;">
+<div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #0E5A52;">Find your match · 5 quick questions</div>
+<h2 id="match-h" style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.05; color: #12302D;">Not sure where to start? <span style="font-style: italic; color: #B9822B;">Answer five questions.</span></h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #3A4745;">We will shortlist the entries below that fit your goal, how strong you need the evidence to be, and how you would rather take it. It is a reading list, not advice: it never says what to take or how much.</p>
+<div id="match-app" aria-live="polite" style="display: flex; flex-direction: column; gap: 14px;"></div>
+<noscript><p style="margin:0;font-size:14px;color:#5E4309;">The matcher needs JavaScript. You can still browse every entry below.</p></noscript>
+</section>
+<script>
+(function () {
+  var app = document.getElementById('match-app');
+  if (!app) return;
+
+  var RANK = { 'Approved': 4, 'Human trials': 3, 'Early / mixed': 2, 'Animal only': 1 };
+  var BADGE = {
+    'Approved': ['#0E5A52', '#FFFFFF'], 'Human trials': ['#CFE6E0', '#0B3F39'],
+    'Early / mixed': ['#F1E3C4', '#5E4309'], 'Animal only': ['#F3D6CF', '#6E2413']
+  };
+  // Goal -> the atlas categories (c1..c14) that serve it; the first is the strongest fit.
+  var GOALS = [
+    { id: 'repair', label: 'Recover from injury or wear and tear', cats: ['c2', 'c14'] },
+    { id: 'bones', label: 'Bones and joints', cats: ['c14', 'c2'] },
+    { id: 'energy', label: 'Energy and stamina', cats: ['c3', 'c1'] },
+    { id: 'body', label: 'Weight, body composition and metabolism', cats: ['c6', 'c1'] },
+    { id: 'sleep', label: 'Sleep and body clock', cats: ['c11'] },
+    { id: 'brain', label: 'Memory, focus and mood', cats: ['c7'] },
+    { id: 'skin', label: 'Skin, hair and looks', cats: ['c10', 'c2'] },
+    { id: 'immune', label: 'Immune health', cats: ['c5', 'c12'] },
+    { id: 'gut', label: 'Gut health', cats: ['c13', 'c2'] },
+    { id: 'heart', label: 'Heart and circulation', cats: ['c8', 'c3'] },
+    { id: 'sex', label: 'Libido and sexual health', cats: ['c9'] },
+    { id: 'age', label: 'Slow the ageing process itself', cats: ['c4', 'c12', 'c3'] }
+  ];
+  var EVID = [
+    { id: 4, label: 'Only approved medicines' },
+    { id: 3, label: 'Approved, or tested in people' },
+    { id: 2, label: 'Include early or mixed evidence' },
+    { id: 1, label: 'Show everything, even animal-only' }
+  ];
+  var NEEDLE = [
+    { id: 'any', label: 'Needles are fine' },
+    { id: 'none', label: 'No needles: oral, nasal or topical only' }
+  ];
+  var WHY = [
+    { id: 'Medical', label: 'A medical condition or recovery' },
+    { id: 'Life Quality', label: 'Everyday quality of life' },
+    { id: 'Longevity', label: 'Long-term healthspan' },
+    { id: 'any', label: 'No preference' }
+  ];
+  var SAFE = [
+    { id: 'preg', label: 'Pregnant, breastfeeding or trying to conceive' },
+    { id: 'minor', label: 'Under 18' },
+    { id: 'cancer', label: 'Cancer now, or in the past' },
+    { id: 'meds', label: 'I take prescription medicine' },
+    { id: 'sport', label: 'I compete in tested sport' }
+  ];
+  var STEPS = [
+    { key: 'goal', q: 'What do you most want help with?', opts: GOALS, multi: false },
+    { key: 'evid', q: 'How strong does the evidence need to be?', opts: EVID, multi: false },
+    { key: 'needle', q: 'How would you rather take it?', opts: NEEDLE, multi: false },
+    { key: 'why', q: 'What is this for?', opts: WHY, multi: false },
+    { key: 'safe', q: 'Do any of these apply to you? Pick all that do.', opts: SAFE, multi: true }
+  ];
+
+  var state = { step: 0, a: {}, safe: [] };
+
+  // ---- read the atlas cards that are already on this page --------------------------------
+  function text(el) { return el ? el.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function readEntries() {
+    var out = [];
+    var cards = document.querySelectorAll('section[id^="c"] details');
+    Array.prototype.forEach.call(cards, function (d) {
+      var sum = d.querySelector(':scope > summary');
+      if (!sum || !sum.querySelector('.hint')) return;           // top-level cards only
+      var head = sum.children[0], solves = sum.children[1];
+      if (!head || !head.children[1]) return;
+      var content = d.querySelector(':scope > div');
+      var evidence = '', taken = '', chips = [], safety = '';
+      Array.prototype.forEach.call(content.children, function (c) {
+        if (c.tagName === 'DETAILS') {
+          var s = text(c.querySelector(':scope > summary'));
+          if (/How strong is the evidence/i.test(s)) evidence = text(c.querySelector(':scope > div'));
+          if (/How is it taken/i.test(s)) taken = text(c.querySelector(':scope > div'));
+        } else if (c.tagName === 'DIV') {
+          var spans = c.querySelectorAll(':scope > span');
+          if (spans.length) chips = Array.prototype.map.call(spans, text);
+          else if (/Safety:/i.test(text(c))) safety = text(c).replace(/^.*?Safety:\s*/i, '');
+        }
+      });
+      out.push({
+        el: d, cat: d.closest('section').id, name: text(head.children[0]), badge: text(head.children[1]),
+        solves: text(solves), evidence: evidence, chips: chips, safety: safety,
+        needleFree: /oral|nasal|topical/i.test(taken + ' ' + chips.join(' ')),
+        segs: chips.filter(function (t) { return /^(Medical|Life Quality|Longevity)$/.test(t); })
+      });
+    });
+    return out;
+  }
+
+  // ---- ranking: hard filters first, then score; relax filters if nothing fits -------------
+  function rank(entries, a) {
+    var goal = GOALS.filter(function (g) { return g.id === a.goal; })[0];
+    function run(minEvid, needleOn, whyOn) {
+      return entries.map(function (e) {
+        var ci = goal.cats.indexOf(e.cat);
+        if (ci < 0) return null;
+        var r = RANK[e.badge] || 1;
+        if (r < minEvid) return null;
+        if (needleOn && !e.needleFree) return null;
+        var segHit = whyOn && e.segs.indexOf(a.why) >= 0;
+        if (whyOn && !segHit) return null;
+        return { e: e, score: (ci === 0 ? 10 : 6) + r * 2 + (segHit ? 3 : 0) };
+      }).filter(Boolean).sort(function (x, y) { return y.score - x.score; });
+    }
+    var needleOn = a.needle === 'none', whyOn = a.why !== 'any', note = '';
+    var res = run(a.evid, needleOn, whyOn);
+    if (!res.length && whyOn) { res = run(a.evid, needleOn, false); if (res.length) note = 'Nothing matched your “what is this for” answer exactly, so this ignores it.'; }
+    if (!res.length && needleOn) { res = run(a.evid, false, false); if (res.length) note = 'Nothing needle-free fits that goal at this evidence level. These all involve an injection.'; }
+    if (!res.length) { res = run(1, false, false); if (res.length) note = 'Nothing meets your evidence bar for that goal. These are the closest, with weaker evidence.'; }
+    return { list: res.slice(0, 5), note: note, total: res.length };
+  }
+
+  // ---- UI -------------------------------------------------------------------------------
+  var BTN = 'display:flex;align-items:center;gap:12px;min-height:52px;width:100%;box-sizing:border-box;padding:12px 16px;border-radius:14px;border:1px solid #CFC7B7;background:#FFFFFF;color:#18201F;font:inherit;font-size:15px;line-height:1.3;text-align:left;cursor:pointer;';
+  var BTN_ON = 'background:#12302D;color:#F6F3EC;border-color:#12302D;';
+  var PRIMARY = 'display:flex;align-items:center;justify-content:center;min-height:52px;width:100%;box-sizing:border-box;border-radius:999px;border:0;background:#0E5A52;color:#FFFFFF;font:inherit;font-weight:600;font-size:15px;cursor:pointer;';
+  var GHOST = 'display:flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #CFC7B7;background:transparent;color:#12302D;font:inherit;font-size:14px;cursor:pointer;';
+  var MONO = "font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;";
+
+  function el(tag, css, txt) { var n = document.createElement(tag); if (css) n.style.cssText = css; if (txt != null) n.textContent = txt; return n; }
+  function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
+  function btn(label, css, fn, attrs) {
+    var b = el('button', css, label); b.type = 'button'; b.addEventListener('click', fn);
+    if (attrs) Object.keys(attrs).forEach(function (k) { b.setAttribute(k, attrs[k]); });
+    return b;
+  }
+
+  function renderStep() {
+    clear();
+    var s = STEPS[state.step];
+    var bar = el('div', 'display:flex;gap:6px;');
+    STEPS.forEach(function (_, i) { bar.appendChild(el('div', 'flex:1;height:4px;border-radius:2px;background:' + (i <= state.step ? '#0E5A52' : '#D9D2C3') + ';')); });
+    app.appendChild(bar);
+    app.appendChild(el('div', MONO + 'color:#5A6663;', 'Question ' + (state.step + 1) + ' of ' + STEPS.length));
+    var h = el('h3', "margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:26px;line-height:1.15;color:#12302D;", s.q);
+    h.setAttribute('tabindex', '-1'); app.appendChild(h);
+    var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
+    list.setAttribute('role', s.multi ? 'group' : 'radiogroup'); list.setAttribute('aria-label', s.q);
+    s.opts.forEach(function (o) {
+      var on = s.multi ? state.safe.indexOf(o.id) >= 0 : state.a[s.key] === o.id;
+      var b = btn(o.label, BTN + (on ? BTN_ON : ''), function () {
+        if (s.multi) {
+          var i = state.safe.indexOf(o.id); if (i >= 0) state.safe.splice(i, 1); else state.safe.push(o.id);
+          renderStep();
+        } else { state.a[s.key] = o.id; next(); }
+      }, { 'aria-pressed': on ? 'true' : 'false', 'data-opt': o.id });
+      list.appendChild(b);
+    });
+    app.appendChild(list);
+    var row = el('div', 'display:flex;gap:10px;align-items:center;');
+    if (state.step > 0) row.appendChild(btn('Back', GHOST, function () { state.step--; renderStep(); }));
+    if (s.multi) { var go = btn(state.safe.length ? 'Show my shortlist' : 'None of these: show my shortlist', PRIMARY, next); go.setAttribute('data-go', '1'); go.style.flex = '1'; row.appendChild(go); }
+    app.appendChild(row);
+  }
+
+  function next() { if (state.step < STEPS.length - 1) { state.step++; renderStep(); focusHead(); } else { renderResults(); focusHead(); } }
+  function focusHead() { var h = app.querySelector('h3'); if (h) h.focus({ preventScroll: true }); var r = app.getBoundingClientRect(); if (r.top < 0 || r.top > 200) window.scrollTo({ top: window.scrollY + r.top - 70 }); }
+
+  function renderResults() {
+    clear();
+    var entries = readEntries();
+    var res = rank(entries, state.a);
+    var goal = GOALS.filter(function (g) { return g.id === state.a.goal; })[0];
+    app.appendChild(el('div', MONO + 'color:#0E5A52;', 'Your shortlist'));
+    app.appendChild(el('h3', "margin:0;font-family:'Instrument Serif',Georgia,serif;font-weight:400;font-size:28px;line-height:1.12;color:#12302D;", goal.label));
+
+    var caution = [];
+    if (state.safe.length) caution.push('You flagged something above. Talk to a qualified clinician before starting anything on this page.');
+    if (state.safe.indexOf('preg') >= 0) caution.push('Little or no safety data exists for pregnancy or breastfeeding for most of these.');
+    if (state.safe.indexOf('minor') >= 0) caution.push('Most of these have not been studied in under-18s.');
+    if (state.safe.indexOf('cancer') >= 0) caution.push('Several entries raise growth or cancer questions. Read each safety box and ask your oncology team.');
+    if (state.safe.indexOf('meds') >= 0) caution.push('Interactions with prescription medicine are mostly unstudied. Ask your prescriber or pharmacist.');
+    if (state.safe.indexOf('sport') >= 0) caution.push('Several are prohibited in competitive sport. Check your anti-doping rules first.');
+    var box = el('div', 'border-radius:14px;background:#FBF4E6;color:#5E4309;padding:14px 16px;font-size:14px;line-height:1.5;display:flex;flex-direction:column;gap:6px;');
+    (caution.length ? caution : ['This is a reading list, not advice. Always talk to a qualified clinician before starting anything.']).forEach(function (t, i) {
+      box.appendChild(el('div', i === 0 ? 'font-weight:600;' : '', t));
+    });
+    app.appendChild(box);
+    if (res.note) app.appendChild(el('p', 'margin:0;font-size:14px;line-height:1.5;color:#3A4745;', res.note));
+
+    if (!res.list.length) {
+      app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.55;color:#3A4745;', 'Nothing in the atlas fits that goal. Try another goal, or browse the categories below.'));
+    }
+    res.list.forEach(function (r, i) {
+      var e = r.e, bc = BADGE[e.badge] || ['#EEE', '#333'];
+      var card = el('div', 'background:#FFFFFF;border:1px solid #DDD6C8;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;');
+      card.setAttribute('data-result', e.name);
+      var top = el('div', 'display:flex;justify-content:space-between;gap:10px;align-items:flex-start;');
+      top.appendChild(el('div', "font-family:'Instrument Serif',Georgia,serif;font-size:24px;line-height:1.1;color:#12302D;", (i + 1) + '. ' + e.name));
+      top.appendChild(el('span', 'flex-shrink:0;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600;background:' + bc[0] + ';color:' + bc[1] + ';', e.badge));
+      card.appendChild(top);
+      card.appendChild(el('div', 'font-size:15px;line-height:1.45;color:#18201F;', e.solves));
+      if (e.evidence) card.appendChild(el('div', 'font-size:14px;line-height:1.45;color:#3A4745;', 'Evidence: ' + e.evidence));
+      if (e.chips.length) card.appendChild(el('div', 'font-size:13px;color:#5A6663;', e.chips.join(' · ')));
+      if (e.safety) card.appendChild(el('div', 'font-size:13px;line-height:1.45;color:#5E4309;background:#FBF4E6;border-radius:10px;padding:8px 10px;', 'Safety: ' + e.safety));
+      card.appendChild(btn('Open the full entry', GHOST + 'align-self:flex-start;', function () {
+        e.el.open = true; e.el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }));
+      app.appendChild(card);
+    });
+    if (res.total > res.list.length) app.appendChild(el('p', 'margin:0;font-size:13px;color:#5A6663;', 'Showing the top ' + res.list.length + ' of ' + res.total + ' matches. Browse the categories below for the rest.'));
+    app.appendChild(btn('Start again', GHOST + 'align-self:flex-start;', function () { state = { step: 0, a: {}, safe: [] }; renderStep(); }));
+  }
+
+  renderStep();
+})();
+</script>
 
 <!-- STICKY CATEGORY NAV -->
 <nav aria-label="Categories" style="position: sticky; top: 0; z-index: 5; background: #F6F3EC; border-bottom: 1px solid #DDD6C8;">
