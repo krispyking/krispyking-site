@@ -2514,7 +2514,7 @@ function lsFigure(canvas) {
       }
     }
   }
-  var T = [[0.90, .155, .105], [0.98, .146, .102], [1.05, .114, .086], [1.13, .134, .094], [1.22, .178, .112], [1.32, .206, .124], [1.41, .226, .118], [1.47, .185, .098], [1.51, .12, .085], [1.535, .055, .05]];
+  var T = [[0.66, .07, .07], [0.72, .108, .084], [0.78, .136, .097], [0.84, .15, .104], [0.90, .155, .105], [0.98, .146, .102], [1.05, .114, .086], [1.13, .134, .094], [1.22, .178, .112], [1.32, .206, .124], [1.41, .226, .118], [1.47, .185, .098], [1.51, .12, .085], [1.535, .055, .05]];
   function gs(v, m, w) { var d = (v - m) / w; return Math.exp(-d * d); }
   function sm(v, a, b) { var k = Math.min(1, Math.max(0, (v - a) / (b - a))); return k * k * (3 - 2 * k); }
   function torso(y) {
@@ -2524,23 +2524,27 @@ function lsFigure(canvas) {
     }
     return [T[T.length - 1][1], T[T.length - 1][2]];
   }
-  for (var y = 0.90; y <= 1.535; y += 0.011) {
+  for (var y = 0.66; y <= 1.535; y += 0.011) {
     var ab = torso(y), n = Math.round(210 * (ab[0] + ab[1]));
     for (var i = 0; i < n; i++) {
       var t = (i + rnd() * 0.6) / n * Math.PI * 2, cx = Math.cos(t), sz = Math.sin(t), ax = Math.abs(cx), front = Math.max(0, sz), back = Math.max(0, -sz);
-      var dz = 0, wx = 1;
+      var dz = 0, wx = 1, mean = 0;
       dz += front * 0.038 * gs(y, 1.335, .05) * sm(ax, .1, .3) * (1 - sm(ax, .8, .98));            // pecs
       dz -= front * 0.014 * gs(y, 1.3, .08) * (1 - sm(ax, .06, .14));                               // sternum groove
       if (y > 1.0 && y < 1.245) {                                                                         // abs
         var blocks = 0.5 + 0.5 * Math.cos((y - 1.015) / .056 * Math.PI * 2);
-        dz += front * 0.034 * blocks * (1 - sm(ax, .5, .72)) * (1 - gs(ax, 0, .05) * 1.6);
+        var env = (1 - sm(ax, .5, .72)) * (1 - gs(ax, 0, .05) * 1.6);
+        dz += front * 0.036 * blocks * env; mean += front * 0.018 * env;
       }
       dz += front * 0.016 * gs(y, 1.14, .08) * sm(ax, .5, .8) * (1 - sm(ax, .9, .99));                   // obliques
-      if (y > 1.2 && y < 1.3) dz += front * 0.013 * (0.5 + 0.5 * Math.cos((y - 1.2) / .028 * Math.PI * 2)) * sm(ax, .42, .6) * (1 - sm(ax, .86, .98));   // ribs / serratus
+      if (y > 1.2 && y < 1.3) { var renv = sm(ax, .42, .6) * (1 - sm(ax, .86, .98)); dz += front * 0.016 * (0.5 + 0.5 * Math.cos((y - 1.2) / .028 * Math.PI * 2)) * renv; mean += front * 0.008 * renv; }   // ribs / serratus
       if (y > 0.95 && y < 1.1) { var gl = Math.abs(ax - (0.46 + (1.1 - y) * 2.4)); dz -= front * 0.02 * Math.max(0, 1 - gl / .09); }        // V-line grooves into the hips
       wx += 0.075 * gs(y, 1.33, .075) * (1 - sm(ax, .35, .75) * 0.2);                                       // lat flare
       dz += back * 0.014 * gs(y, 1.36, .07) * (1 - gs(ax, 0, .05) * 1.2);                                  // upper back
-      skin.push([cx * ab[0] * wx, y, sz * ab[1] + dz, dz]);
+      dz += back * 0.026 * gs(y, 0.86, .055) * sm(ax, .08, .4) * (1 - sm(ax, .8, .98));                     // glutes
+      dz -= back * 0.012 * gs(ax, 0, .05) * (y > 0.95 && y < 1.45 ? 1 : 0);                                // spine groove
+      if (y < 0.93) mean += 0.012 * (1 - sm(y, 0.76, 0.93));   // fade the hip block into the thighs
+      skin.push([cx * ab[0] * wx, y, sz * ab[1] + dz, dz - mean]);
     }
   }
   for (var hi = 1; hi < 24; hi++) {
@@ -2556,9 +2560,9 @@ function lsFigure(canvas) {
     var S = [sd * .255, 1.44, 0], E = [sd * .3, 1.17, -.01], W = [sd * .328, .93, .03], H = [sd * .338, .8, .048];
     if (sd === 1) { E = [.292, 1.17, -.025]; W = [.255, .985, .085]; H = [.2, .93, .105]; }
     else { E = [-.3, 1.17, .015]; W = [-.318, .93, .06]; H = [-.322, .805, .085]; }
-    capsule([sd * .19, 1.47, 0], [sd * .262, 1.39, 0], .07, .062); capsule(S, E, .054, .039, .014, .42); capsule(E, W, .042, .029, .011, .3); capsule(W, H, .032, .025);
+    capsule([sd * .19, 1.47, 0], [sd * .262, 1.39, 0], .07, .062); capsule(S, E, .054, .039, .02, .42); capsule(E, W, .043, .029, .014, .28); capsule(W, H, .032, .025);
     var Hp = [sd * .095, .93, 0], K = [sd * .108, .52, .012], A = [sd * .1, .09, -.012], F = [sd * .104, .03, .12];
-    capsule(Hp, K, .08, .05, .011, .38); var C = [sd * .108, .38, -.012]; capsule(K, C, .058, .06); capsule(C, A, .052, .03, .012, .22); capsule([sd * .096, .05, -.03], F, .034, .026);
+    capsule(Hp, K, .08, .05, .011, .38); var C = [sd * .108, .38, -.012]; capsule(K, C, .058, .06); capsule(C, A, .054, .03, .02, .2); capsule([sd * .108, .53, .02], [sd * .108, .5, .022], .052, .05); capsule([sd * .096, .05, -.03], F, .034, .026);
     bones.push([S, E, W, H]); bones.push([Hp, K, A, F]);
     bones.push([[S[0] * 0.92, S[1] - .03, .022], [E[0] * 0.96, E[1] + .03, .012]]);
     bones.push([[Hp[0] * 1.2, Hp[1] - .05, .03], [K[0] * 1.1, K[1] + .05, .03]]);
@@ -2603,7 +2607,7 @@ function lsFigure(canvas) {
     for (var i = 0; i < skin.length; i++) {
       var p = skin[i], d = Math.abs(p[1] - scan), q = P(p);
       var a = 0.18 + 0.62 * Math.min(1, Math.max(0, (q[2] + 0.2) / 0.4));
-      if (p[3]) a *= Math.max(0.12, 1 + p[3] * 55);   // ridges glow, grooves recede
+      if (p[3]) a *= Math.min(2.2, Math.max(0.1, 1 + p[3] * 75));   // ridges glow, grooves recede
       if (d < bw) a *= Math.pow(d / bw, 2.2);
       if (a < 0.02) continue;
       ctx.fillStyle = 'rgba(190,232,221,' + a.toFixed(3) + ')'; ctx.fillRect(q[0], q[1], 1.5, 1.5);
