@@ -54,21 +54,7 @@ details[open] > summary .hint{display:none}
 <section id="match" aria-labelledby="match-h" style="padding: 40px 24px 28px; background: #EFEBE3; border-bottom: 1px solid #DDD6C8; display: flex; flex-direction: column; gap: 16px; scroll-margin-top: 0; touch-action: pan-y;">
 <style>
 #match button{-webkit-tap-highlight-color:transparent}
-#match .zone{cursor:pointer;outline:none}
-#match .zone .zshape{fill:url(#ms-dots);stroke:rgba(159,199,191,.45);stroke-width:1.2;transition:stroke .15s,fill .15s}
-#match .zone:hover .zshape,#match .zone:focus-visible .zshape{stroke:#E8B35A;stroke-width:2;fill:url(#ms-dots-amber)}
-#match .zone.on .zshape{stroke:#E8B35A;stroke-width:2.4;fill:url(#ms-dots-amber)}
-#match .zone .det{fill:none;stroke:rgba(190,232,221,.5);stroke-width:1.1;stroke-linecap:round;pointer-events:none}
-#match .zone:hover .det,#match .zone:focus-visible .det,#match .zone.on .det{stroke:rgba(232,179,90,.8)}
-#match .zone .zlab{font:500 9.5px 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.08em;fill:#9FC7BF;text-transform:uppercase}
-#match .zone:hover .zlab,#match .zone:focus-visible .zlab,#match .zone.on .zlab{fill:#E8B35A}
-#match .zone .lead{stroke:rgba(159,199,191,.45);stroke-width:1;stroke-dasharray:2 3}
-#match .zone:hover .lead,#match .zone:focus-visible .lead,#match .zone.on .lead{stroke:#E8B35A}
-#match .zone .pulse{fill:none;stroke:#E8B35A;stroke-width:1.2;opacity:0}
-#match .zone:hover .pulse,#match .zone:focus-visible .pulse{opacity:.9}
-#match .scanline{animation:ms-scan 5.5s ease-in-out infinite alternate}
-@keyframes ms-scan{from{transform:translateY(8px)}to{transform:translateY(440px)}}
-@media (prefers-reduced-motion:reduce){#match .scanline{animation:none;transform:translateY(240px)}}
+#match canvas{outline:none}
 </style>
 <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #0E5A52;">Find your match · start with your body</div>
 <h2 id="match-h" style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 34px; line-height: 1.05; color: #12302D;">Where do you want help? <span style="font-style: italic; color: #B9822B;">Tap the body.</span></h2>
@@ -254,7 +240,7 @@ details[open] > summary .hint{display:none}
   var SVGNS = 'http://www.w3.org/2000/svg';
 
   function el(tag, css, txt) { var n = document.createElement(tag); if (css) n.style.cssText = css; if (txt != null) n.textContent = txt; return n; }
-  function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
+  function clear() { stopFigs(); while (app.firstChild) app.removeChild(app.firstChild); }
   function btn(label, css, fn, attrs) {
     var b = el('button', css, label); b.type = 'button'; b.addEventListener('click', fn);
     if (attrs) Object.keys(attrs).forEach(function (k) { b.setAttribute(k, attrs[k]); });
@@ -266,65 +252,32 @@ details[open] > summary .hint{display:none}
     if (parent) parent.appendChild(n); return n;
   }
 
-  // the body: same mint point-cloud and amber scan as the hero figure
-  var SHAPES = {
-    head: ['M170 16 C192 16 204 34 203 56 C202 74 190 90 176 94 L164 94 C150 90 138 74 137 56 C136 34 148 16 170 16 Z', 'M154 90 L186 90 L194 106 L146 106 Z'],
-    chest: ['M148 104 L192 104 Q215 106 238 114 Q256 122 258 142 L252 170 Q246 196 226 208 Q198 222 170 218 Q142 222 114 208 Q94 196 88 170 L82 142 Q84 122 102 114 Q125 106 148 104 Z'],
-    core: ['M118 208 Q142 222 170 220 Q198 222 222 208 L210 248 Q204 268 200 282 L140 282 Q136 268 130 248 Z'],
-    pelvis: ['M140 282 L200 282 L218 322 Q196 346 170 342 Q144 346 122 322 Z'],
-    arms: ['M84 126 Q62 134 58 168 Q56 196 62 222 Q56 252 50 286 Q44 306 52 318 L66 316 Q74 300 80 268 Q88 240 92 214 Q98 190 100 168 Z', 'M 256 126 Q 278 134 282 168 Q 284 196 278 222 Q 284 252 290 286 Q 296 306 288 318 L 274 316 Q 266 300 260 268 Q 252 240 248 214 Q 242 190 240 168 Z'],
-    legs: ['M122 322 Q106 390 120 452 Q124 474 130 490 Q122 524 128 556 L130 590 L160 590 L162 556 Q168 524 162 490 Q170 452 172 400 L170 344 Z', 'M 218 322 Q 234 390 220 452 Q 216 474 210 490 Q 218 524 212 556 L 210 590 L 180 590 L 178 556 Q 172 524 178 490 Q 170 452 168 400 L 170 344 Z']
-  };
-  // fine anatomical lines drawn over each zone: pecs, abs, obliques, quads, tousled hair
-  var DETAIL = {
-    head: ['M150 22 L146 12', 'M160 17 L158 7', 'M172 15 L175 6', 'M184 18 L190 10', 'M196 25 L205 19'],
-    chest: ['M170 110 L170 214', 'M104 178 Q134 206 170 196', 'M236 178 Q206 206 170 196', 'M120 112 Q146 124 168 118', 'M220 112 Q194 124 172 118', 'M88 130 Q98 150 102 174', 'M252 130 Q242 150 238 174'],
-    core: ['M170 222 L170 282', 'M146 238 L194 238', 'M143 254 L197 254', 'M141 270 L199 270', 'M124 230 Q133 258 147 282', 'M216 230 Q207 258 193 282'],
-    pelvis: ['M142 286 Q158 318 170 338', 'M198 286 Q182 318 170 338'],
-    arms: ['M72 152 Q66 188 72 224', 'M268 152 Q274 188 268 224', 'M64 250 Q62 274 58 298', 'M276 250 Q278 274 282 298'],
-    legs: ['M140 362 Q133 412 140 458', 'M200 362 Q207 412 200 458', 'M130 492 Q146 486 162 492', 'M210 492 Q194 486 178 492']
-  };
-  // zone centres in final svg coordinates, for the leader lines
-  var ANCHOR = { head: [144, 50], chest: [236, 130], arms: [255, 185], core: [140, 200], pelvis: [203, 248], legs: [126, 340] };
-
-  function bodyMap(selectedZone, onPick) {
-    var svg = document.createElementNS(SVGNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 340 470'); svg.setAttribute('role', 'group');
-    svg.setAttribute('aria-label', 'Body map. Choose the part of the body you want help with.');
-    svg.style.cssText = 'width:100%;height:auto;display:block;background:#0E2826;border-radius:18px;';
-    var defs = s('defs', {}, svg);
-    [['ms-dots', '#BEE8DD', 0.75], ['ms-dots-amber', '#E8B35A', 0.95]].forEach(function (p) {
-      var pat = s('pattern', { id: p[0], width: 4, height: 4, patternUnits: 'userSpaceOnUse' }, defs);
-      s('circle', { cx: 2, cy: 2, r: 0.85, fill: p[1], 'fill-opacity': p[2] }, pat);
-    });
-    var grp = {};
-    ZONES.forEach(function (z) {
-      var g = s('g', { 'class': 'zone' + (selectedZone === z.id ? ' on' : ''), tabindex: 0, role: 'button', 'data-zone': z.id,
-        'aria-label': z.name + ': ' + z.goals.map(function (id) { return byId(GOALS, id).label; }).join(', ') }, null);
-      grp[z.id] = g;
-      var sh = s('g', { transform: 'translate(37 8) scale(.78)' }, g);
-      SHAPES[z.id].forEach(function (d) { s('path', { 'class': 'zshape', d: d }, sh); });
-      DETAIL[z.id].forEach(function (d) { s('path', { 'class': 'det', d: d, 'pointer-events': 'none' }, sh); });
-      var open = function () { onPick(z.id); };
-      g.addEventListener('click', open);
-      g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
-    });
-    // labels and leader lines live in final coordinates, outside the scaled group
-    ZONES.forEach(function (z) {
-      var g = grp[z.id], left = z.side === 'L', lx = left ? 70 : 272, an = ANCHOR[z.id];
-      s('line', { 'class': 'lead', x1: lx + (left ? 2 : -2), y1: z.y + 4, x2: an[0], y2: an[1] }, g);
-      var tx2 = s('text', { 'class': 'zlab', x: left ? lx - 2 : lx + 2, y: z.y - 3, 'text-anchor': left ? 'end' : 'start' }, g);
-      tx2.textContent = z.lab[0];
-      var t2 = s('text', { 'class': 'zlab', x: left ? lx - 2 : lx + 2, y: z.y + 9, 'text-anchor': left ? 'end' : 'start' }, g);
-      t2.textContent = z.lab[1];
-      // generous touch target behind the label
-      s('rect', { x: left ? 0 : 268, y: z.y - 16, width: 72, height: 34, fill: 'transparent' }, g);
-      svg.appendChild(g);
-    });
-    var scan = s('g', { 'class': 'scanline', 'aria-hidden': 'true', 'pointer-events': 'none' }, svg);
-    s('rect', { x: 50, y: 0, width: 240, height: 1.2, fill: '#E8B35A', 'fill-opacity': 0.7 }, scan);
-    return svg;
+  // the body map IS the hero figure: the same interactive point-cloud model, linked through window.LSZ
+  var figStops = [];
+  function setSel() { window.LSZ = window.LSZ || { sel: null, hover: null }; window.LSZ.sel = (view.v !== 'map' && state.zone) ? state.zone : null; }
+  function bodyMap(compact) {
+    var wrap = el('div', 'position:relative;border-radius:18px;overflow:hidden;background:#0E2826;' + (compact ? 'max-width:250px;width:68%;align-self:center;' : ''));
+    var cv = document.createElement('canvas');
+    cv.style.cssText = 'display:block;width:100%;height:' + (compact ? '320' : '470') + 'px;';
+    cv.setAttribute('role', 'img');
+    cv.setAttribute('aria-label', 'The body map. Tap a part of the body, or use the buttons below.');
+    cv.setAttribute('data-bodymap', compact ? 'mini' : 'main');
+    wrap.appendChild(cv);
+    figStops.push(window.lsFigure(cv, { interactive: true, labels: !compact }));
+    return wrap;
   }
+  function zonePills() {
+    var row = el('div', 'display:flex;flex-wrap:wrap;gap:8px;');
+    row.setAttribute('aria-label', 'Or choose a body area here');
+    ZONES.forEach(function (z) {
+      row.appendChild(btn(z.name, 'min-height:44px;padding:0 14px;border-radius:999px;border:1px solid #CFC7B7;background:#FFFFFF;color:#12302D;font:inherit;font-size:14px;cursor:pointer;',
+        function () { pick(z.id); }, { 'data-zone': z.id }));
+    });
+    return row;
+  }
+  function pick(zid) { if (!byId(ZONES, zid)) return; state.zone = zid; nav({ v: 'zone', z: zid }); }
+  window.addEventListener('ls-zone-pick', function (e) { pick(e.detail); });
+  function stopFigs() { figStops.forEach(function (f) { try { f(); } catch (e) {} }); figStops = []; }
 
   function topbar(label) {
     var bar = el('div', 'display:flex;align-items:center;gap:8px;');
@@ -345,7 +298,7 @@ details[open] > summary .hint{display:none}
   }
 
   function render() {
-    clear();
+    clear(); setSel();
     if (view.v === 'map') return renderMap();
     if (view.v === 'zone') return renderZone();
     if (view.v === 'q') return renderQ();
@@ -360,8 +313,9 @@ details[open] > summary .hint{display:none}
   function renderMap() {
     app.appendChild(progress(1));
     app.appendChild(el('div', MONO + 'color:#5A6663;', 'Question 1 of 5 · where in the body?'));
-    app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.5;color:#3A4745;', 'Read the body from top to bottom: mind and head at the top, strength and stamina at the bottom. Tap where you want help. It is a reading list, not advice: it never says what to take or how much.'));
-    app.appendChild(bodyMap(null, function (zid) { state.zone = zid; nav({ v: 'zone', z: zid }); }));
+    app.appendChild(el('p', 'margin:0;font-size:15px;line-height:1.5;color:#3A4745;', 'Read the body from top to bottom: mind and head at the top, strength and stamina at the bottom. Tap where you want help, here or on the figure at the top of the page: they are the same body. It is a reading list, not advice: it never says what to take or how much.'));
+    app.appendChild(bodyMap(false));
+    app.appendChild(zonePills());
     app.appendChild(btn('Whole body: slow the ageing process', BTN, function () { state.a.goal = 'age'; state.zone = null; nav({ v: 'q', i: 1 }); afterRender(); }, { 'data-goal': 'age' }));
   }
 
@@ -371,9 +325,7 @@ details[open] > summary .hint{display:none}
     app.appendChild(topbar('Question 1 of 5'));
     app.appendChild(progress(1));
     app.appendChild(heading(z.name + ': what exactly?'));
-    var mini = el('div', 'max-width:200px;align-self:center;width:60%;');
-    mini.appendChild(bodyMap(z.id, function (zid) { state.zone = zid; nav({ v: 'zone', z: zid }); }));
-    app.appendChild(mini);
+    app.appendChild(bodyMap(true));
     var list = el('div', 'display:flex;flex-direction:column;gap:8px;');
     list.setAttribute('role', 'radiogroup'); list.setAttribute('aria-label', z.name);
     z.goals.forEach(function (gid) {
@@ -450,7 +402,7 @@ details[open] > summary .hint{display:none}
     afterRender(true);
   }
 
-  render();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
 })();
 </script>
 
@@ -2500,10 +2452,14 @@ details[open] > summary .hint{display:none}
 
 </div>
 <script>
-function lsFigure(canvas) {
+function lsFigure(canvas, opts) {
+  opts = opts || {};
+  var Zs = (window.LSZ = window.LSZ || { sel: null, hover: null });
+  var curTag = 'torso';
   var rnd = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(11);
   var skin = [], bones = [], joints = [];
   var tiltA = 0.2, tca = Math.cos(tiltA), tsa = Math.sin(tiltA), tyaw = -0.12, yca = Math.cos(tyaw), ysa = Math.sin(tyaw);
+  function hp(p) { var q = tiltHead(p); q[3] = 0; q[4] = 'head'; return q; }
   function tiltHead(p) {   // head tipped forward and turned slightly, pivoting at the neck
     var ry = p[1] - 1.58, y2 = ry * tca - p[2] * tsa, z2 = ry * tsa + p[2] * tca;
     return [p[0] * yca + z2 * ysa, 1.58 + y2, -p[0] * ysa + z2 * yca];
@@ -2519,7 +2475,7 @@ function lsFigure(canvas) {
       var cx = A[0] + dx * k, cy = A[1] + dy * k, cz = A[2] + dz * k;
       for (var j = 0; j < n; j++) {
         var t = (j + rnd() * 0.6) / n * Math.PI * 2, c = Math.cos(t) * r, s = Math.sin(t) * r;
-        skin.push([cx + px * c + qx * s, cy + py * c + qy * s, cz + pz * c + qz * s]);
+        skin.push([cx + px * c + qx * s, cy + py * c + qy * s, cz + pz * c + qz * s, 0, curTag]);
       }
     }
   }
@@ -2553,25 +2509,25 @@ function lsFigure(canvas) {
       dz += back * 0.026 * gs(y, 0.86, .055) * sm(ax, .08, .4) * (1 - sm(ax, .8, .98));                     // glutes
       dz -= back * 0.012 * gs(ax, 0, .05) * (y > 0.95 && y < 1.45 ? 1 : 0);                                // spine groove
       if (y < 0.93) mean += 0.012 * (1 - sm(y, 0.76, 0.93));   // fade the hip block into the thighs
-      skin.push([cx * ab[0] * wx, y, sz * ab[1] + dz, dz - mean]);
+      skin.push([cx * ab[0] * wx, y, sz * ab[1] + dz, dz - mean, y > 1.5 ? 'head' : y >= 1.22 ? 'chest' : y >= 1.0 ? 'core' : 'pelvis']);
     }
   }
   for (var hi = 1; hi < 24; hi++) {
     var v = hi / 24 * Math.PI, ry = Math.cos(v), rr = Math.sin(v), hn = Math.max(5, Math.round(30 * rr));
-    for (var hj = 0; hj < hn; hj++) { var ht = (hj + rnd() * 0.6) / hn * Math.PI * 2; skin.push(tiltHead([Math.cos(ht) * rr * .085, 1.665 + ry * .115, Math.sin(ht) * rr * .095])); }
+    for (var hj = 0; hj < hn; hj++) { var ht = (hj + rnd() * 0.6) / hn * Math.PI * 2; skin.push(hp([Math.cos(ht) * rr * .085, 1.665 + ry * .115, Math.sin(ht) * rr * .095])); }
   }
   for (var hk = 0; hk < 170; hk++) {   // short tousled hair: loose tufts standing off the crown
     var hv = rnd() * 1.15, hu = rnd() * Math.PI * 2, hr = 1.04 + rnd() * 0.34 + (rnd() < .18 ? .22 : 0);
-    skin.push(tiltHead([Math.cos(hu) * Math.sin(hv) * .088 * hr, 1.665 + Math.cos(hv) * .118 * hr, Math.sin(hu) * Math.sin(hv) * .098 * hr - .008]));
+    skin.push(hp([Math.cos(hu) * Math.sin(hv) * .088 * hr, 1.665 + Math.cos(hv) * .118 * hr, Math.sin(hu) * Math.sin(hv) * .098 * hr - .008]));
   }
-  capsule([0, 1.52, 0], [0, 1.575, 0.005], .054, .046); [-1, 1].forEach(function (sd) { capsule([sd * .05, 1.535, -.008], [sd * .18, 1.465, 0], .036, .048); });
+  curTag = 'head'; capsule([0, 1.52, 0], [0, 1.575, 0.005], .054, .046); curTag = 'chest'; [-1, 1].forEach(function (sd) { capsule([sd * .05, 1.535, -.008], [sd * .18, 1.465, 0], .036, .048); });
   [-1, 1].forEach(function (sd) {
     var S = [sd * .255, 1.44, 0], E = [sd * .3, 1.17, -.01], W = [sd * .328, .93, .03], H = [sd * .338, .8, .048];
     if (sd === 1) { E = [.292, 1.17, -.025]; W = [.255, .985, .085]; H = [.2, .93, .105]; }
     else { E = [-.3, 1.17, .015]; W = [-.318, .93, .06]; H = [-.322, .805, .085]; }
-    capsule([sd * .19, 1.47, 0], [sd * .262, 1.39, 0], .07, .062); capsule(S, E, .054, .039, .02, .42); capsule(E, W, .043, .029, .014, .28); capsule(W, H, .032, .025);
+    curTag = 'arms'; capsule([sd * .19, 1.47, 0], [sd * .262, 1.39, 0], .07, .062); capsule(S, E, .054, .039, .02, .42); capsule(E, W, .043, .029, .014, .28); capsule(W, H, .032, .025);
     var Hp = [sd * .095, .93, 0], K = [sd * .108, .52, .012], A = [sd * .1, .09, -.012], F = [sd * .104, .03, .12];
-    capsule(Hp, K, .08, .05, .011, .38); var C = [sd * .108, .38, -.012]; capsule(K, C, .058, .06); capsule(C, A, .054, .03, .02, .2); capsule([sd * .108, .53, .02], [sd * .108, .5, .022], .052, .05); capsule([sd * .096, .05, -.03], F, .034, .026);
+    curTag = 'legs'; capsule(Hp, K, .08, .05, .011, .38); var C = [sd * .108, .38, -.012]; capsule(K, C, .058, .06); capsule(C, A, .054, .03, .02, .2); capsule([sd * .108, .53, .02], [sd * .108, .5, .022], .052, .05); capsule([sd * .096, .05, -.03], F, .034, .026);
     bones.push([S, E, W, H]); bones.push([Hp, K, A, F]);
     bones.push([[S[0] * 0.92, S[1] - .03, .022], [E[0] * 0.96, E[1] + .03, .012]]);
     bones.push([[Hp[0] * 1.2, Hp[1] - .05, .03], [K[0] * 1.1, K[1] + .05, .03]]);
@@ -2598,43 +2554,91 @@ function lsFigure(canvas) {
   bones.push(visor.map(tiltHead));
   joints.push([0, 1.56, -.03], tiltHead([0, 1.665, 0]), [0, .965, -.03]);
 
-  var ctx = canvas.getContext('2d'), raf = 0, t0 = performance.now();
+  var ctx = canvas.getContext('2d'), raf = 0, t0 = performance.now(), last = t0, visible = true, pointerIn = false, angNow = 0.5, touchTimer = 0;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = null, fixedAng = null, forceNoScan = false, hitRects = {};
+  var LABELS = [
+    { id: 'head', t: ['MIND', '& HEAD'], side: 'L', ax: 0, ay: 1.665 },
+    { id: 'chest', t: ['HEART', '& IMMUNE'], side: 'R', ax: .1, ay: 1.36 },
+    { id: 'arms', t: ['MUSCLE &', 'JOINTS'], side: 'R', ax: .3, ay: 1.16 },
+    { id: 'core', t: ['GUT &', 'METABOLISM'], side: 'L', ax: -.08, ay: 1.12 },
+    { id: 'pelvis', t: ['SEXUAL', 'HEALTH'], side: 'R', ax: .08, ay: .94 },
+    { id: 'legs', t: ['STRENGTH', '& STAMINA'], side: 'L', ax: -.1, ay: .48 }
+  ];
+  function proj(p) { var x = p[0] * cur.ca + p[2] * cur.sa, z = -p[0] * cur.sa + p[2] * cur.ca, f = 3.4 / (3.4 - z); return [cur.W / 2 + x * cur.scale * f, cur.H * 0.5 - (p[1] - 0.9) * cur.scale * f, z]; }
+  function hit(mx, my) {
+    if (!cur) return null;
+    var id, r;
+    for (id in hitRects) { r = hitRects[id]; if (mx >= r.x - 6 && mx <= r.x + r.w + 6 && my >= r.y - 8 && my <= r.y + r.h + 8) return id; }
+    var best = null, bd = 18 * 18, q, dx, dy, d;
+    for (var i = 0; i < skin.length; i++) {
+      q = proj(skin[i]); dx = q[0] - mx; dy = q[1] - my; d = dx * dx + dy * dy;
+      if (d < bd) { bd = d; best = skin[i][4]; }
+    }
+    return best;
+  }
   function frame(now) {
+    if (!visible) { last = now; raf = requestAnimationFrame(frame); return; }
+    var dt = Math.min(0.1, (now - last) / 1000); last = now;
     var dpr = window.devicePixelRatio || 1, W = canvas.clientWidth, H = canvas.clientHeight;
     if (!W || !H) { raf = requestAnimationFrame(frame); return; }
     if (canvas.width !== Math.round(W * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    var tt = (now - t0) / 1000, ang = reduce ? 0.5 : tt * 0.55, ca = Math.cos(ang), sa = Math.sin(ang);
+    var sel = Zs.sel, hov = Zs.hover, hold = !!opts.interactive && (pointerIn || !!sel);
+    if (fixedAng !== null) angNow = fixedAng;
+    else if (reduce) angNow = 0;
+    else if (hold) { var diff = Math.atan2(Math.sin(-angNow), Math.cos(-angNow)); angNow += diff * Math.min(1, dt * 5); }
+    else angNow += dt * 0.55;
+    var tt = (now - t0) / 1000, ca = Math.cos(angNow), sa = Math.sin(angNow);
     var scan = reduce ? 1.0 : 0.9 + 0.98 * Math.sin(tt * 0.45), bw = 0.2;
-    var scale = H / 2.1, D = 3.4;
-    function P(p) { var x = p[0] * ca + p[2] * sa, z = -p[0] * sa + p[2] * ca, f = D / (D - z); return [W / 2 + x * scale * f, H * 0.5 - (p[1] - 0.9) * scale * f, z]; }
-    var fy = P([0, 0, 0]);
+    if (hold || forceNoScan || (opts.interactive && sel)) scan = -5;
+    var scale = H / 2.1;
+    cur = { W: W, H: H, ca: ca, sa: sa, scale: scale };
+    var fy = proj([0, 0, 0]);
     ctx.strokeStyle = 'rgba(159,199,191,0.35)'; ctx.lineWidth = 1; ctx.beginPath();
     ctx.ellipse(W / 2, fy[1] + 4, scale * 0.34, scale * 0.07, 0, 0, Math.PI * 2); ctx.stroke();
     ctx.beginPath(); ctx.ellipse(W / 2, fy[1] + 4, scale * 0.22, scale * 0.045, 0, 0, Math.PI * 2); ctx.stroke();
     for (var i = 0; i < skin.length; i++) {
-      var p = skin[i], d = Math.abs(p[1] - scan), q = P(p);
+      var p = skin[i], d = Math.abs(p[1] - scan), q = proj(p);
       var a = 0.18 + 0.62 * Math.min(1, Math.max(0, (q[2] + 0.2) / 0.4));
       if (p[3]) a *= Math.min(2.2, Math.max(0.1, 1 + p[3] * 75));   // ridges glow, grooves recede
       if (d < bw) a *= Math.pow(d / bw, 2.2);
+      var zn = p[4], isSel = sel && zn === sel, isHov = hov && zn === hov && !isSel;
+      if (sel && !isSel) a *= 0.55;
       if (a < 0.02) continue;
-      ctx.fillStyle = 'rgba(190,232,221,' + a.toFixed(3) + ')'; ctx.fillRect(q[0], q[1], 1.5, 1.5);
+      ctx.fillStyle = isSel ? 'rgba(232,179,90,' + Math.min(1, a * 1.3).toFixed(3) + ')' : isHov ? 'rgba(245,208,140,' + Math.min(1, a * 1.15).toFixed(3) + ')' : 'rgba(190,232,221,' + a.toFixed(3) + ')';
+      ctx.fillRect(q[0], q[1], 1.5, 1.5);
     }
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     for (var b = 0; b < bones.length; b++) {
       var L = bones[b];
-      for (var s = 0; s < L.length - 1; s++) {
-        var my = (L[s][1] + L[s + 1][1]) / 2, dd = Math.abs(my - scan), g = Math.max(0, 1 - dd / bw);
-        var al = 0.1 + 0.9 * g; var A2 = P(L[s]), B2 = P(L[s + 1]);
+      for (var s2 = 0; s2 < L.length - 1; s2++) {
+        var my = (L[s2][1] + L[s2 + 1][1]) / 2, dd = Math.abs(my - scan), g = Math.max(0, 1 - dd / bw);
+        var al = 0.1 + 0.9 * g; var A2 = proj(L[s2]), B2 = proj(L[s2 + 1]);
         ctx.strokeStyle = 'rgba(232,179,90,' + al.toFixed(3) + ')'; ctx.lineWidth = 1.2 + 1.3 * g;
         ctx.beginPath(); ctx.moveTo(A2[0], A2[1]); ctx.lineTo(B2[0], B2[1]); ctx.stroke();
       }
     }
     for (var j = 0; j < joints.length; j++) {
-      var J = joints[j], gd = Math.max(0, 1 - Math.abs(J[1] - scan) / bw), Q = P(J);
+      var J = joints[j], gd = Math.max(0, 1 - Math.abs(J[1] - scan) / bw), Q = proj(J);
       ctx.strokeStyle = 'rgba(232,179,90,' + (0.15 + 0.85 * gd).toFixed(3) + ')'; ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.arc(Q[0], Q[1], 3 + 2 * gd, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (opts.labels) {
+      ctx.font = "500 9.5px 'IBM Plex Mono', ui-monospace, monospace"; ctx.textBaseline = 'alphabetic';
+      hitRects = {};
+      LABELS.forEach(function (lb) {
+        var on = sel === lb.id || hov === lb.id, col = on ? 'rgba(232,179,90,1)' : 'rgba(159,199,191,0.95)';
+        var ly = H * 0.5 - (lb.ay - 0.9) * scale, w1 = ctx.measureText(lb.t[0]).width, w2 = ctx.measureText(lb.t[1]).width, w = Math.max(w1, w2);
+        var left = lb.side === 'L', x0 = left ? 10 : W - 10 - w;
+        var an = proj([lb.ax, lb.ay, 0]), lx = left ? x0 + w + 5 : x0 - 5;
+        ctx.strokeStyle = on ? 'rgba(232,179,90,0.9)' : 'rgba(159,199,191,0.45)'; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(lx, ly + 2); ctx.lineTo(an[0], an[1]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = col; ctx.textAlign = left ? 'left' : 'right';
+        var tx = left ? x0 : x0 + w;
+        ctx.fillText(lb.t[0], tx, ly - 2); ctx.fillText(lb.t[1], tx, ly + 10);
+        hitRects[lb.id] = { x: x0, y: ly - 12, w: w, h: 26 };
+      });
     }
     var sy = H * 0.5 - (scan - 0.9) * scale;
     var grd = ctx.createLinearGradient(0, 0, W, 0);
@@ -2643,10 +2647,31 @@ function lsFigure(canvas) {
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
-  return function () { cancelAnimationFrame(raf); };
+  var io = null;
+  if (window.IntersectionObserver) { io = new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }); io.observe(canvas); }
+  if (opts.interactive) {
+    canvas.style.cursor = 'pointer'; canvas.style.touchAction = 'manipulation';
+    var pos = function (e) { var r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    canvas.addEventListener('pointermove', function (e) { if (e.pointerType !== 'mouse') return; pointerIn = true; var c = pos(e); Zs.hover = hit(c[0], c[1]); });
+    canvas.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'mouse') return; pointerIn = false; Zs.hover = null; });
+    canvas.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse') return;
+      pointerIn = true; clearTimeout(touchTimer); touchTimer = setTimeout(function () { pointerIn = false; Zs.hover = null; }, 1800);
+    });
+    canvas.addEventListener('click', function (e) {
+      var c = pos(e), id = hit(c[0], c[1]);
+      if (id) window.dispatchEvent(new CustomEvent('ls-zone-pick', { detail: id }));
+    });
+  }
+  canvas.__ls = {   // small hooks used by the tests
+    setAngle: function (a) { fixedAng = a; }, noScan: function (v) { forceNoScan = !!v; },
+    anchor: function (id) { var lb = LABELS.filter(function (l) { return l.id === id; })[0]; var p = proj([lb.ax, lb.ay, 0]); return [p[0], p[1]]; },
+    labelRect: function (id) { return hitRects[id] || null; }
+  };
+  return function () { cancelAnimationFrame(raf); clearTimeout(touchTimer); if (io) io.disconnect(); };
 }
 
-var c=document.getElementById("ls-figure");if(c)lsFigure(c);
+var c=document.getElementById("ls-figure");if(c)lsFigure(c,{interactive:true,labels:true});
 </script>
 </body>
 </html>
