@@ -26,6 +26,20 @@ details[open] > summary .chev{transform:rotate(180deg)}
 details[open] > summary .hint{display:none}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}nav[aria-label="Categories"]{top:env(safe-area-inset-top,0px)!important}</style>
+<style>
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;align-items:start}
+.tiles>details{margin:0!important;border-radius:16px!important;overflow:hidden;border-top-width:4px!important;border-top-style:solid}
+.tiles>details.ev-a{border-top-color:#0E5A52!important}.tiles>details.ev-h{border-top-color:#7FB8AC!important}.tiles>details.ev-e{border-top-color:#D9B567!important}.tiles>details.ev-n{border-top-color:#D98B78!important}
+.tiles>details>summary{padding:12px 12px 10px!important;gap:6px!important}
+.tiles>details>summary>span:first-child{flex-direction:column-reverse!important;align-items:flex-start!important;gap:6px!important}
+.tiles>details>summary>span:first-child>span:first-child{font-size:21px!important}
+.tiles>details>summary>span:first-child>span:last-child{padding:3px 8px!important;font-size:11px!important}
+.tiles>details>summary>span:nth-child(2){font-size:13px!important;line-height:1.35!important;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tiles>details>summary>span:last-child{min-height:20px!important}.tiles>details>summary .hint{display:none!important}
+.tiles>details[open]{grid-column:1/-1}
+.tiles>details[open]>summary>span:nth-child(2){-webkit-line-clamp:unset;display:block}
+.tiles>details[open]>summary>span:first-child{flex-direction:row!important;align-items:flex-start!important}
+</style>
 </head>
 <body>
 <div style="width: 100%; max-width: 430px; margin: 0 auto; background: #F6F3EC; box-sizing: border-box; display: flex; flex-direction: column;">
@@ -524,11 +538,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Cognitive &amp; neurological</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Focus, mood, memory and brain recovery.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: head" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Semax</span>
@@ -579,7 +594,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Selank</span>
@@ -628,7 +643,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-n" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Dihexa</span>
@@ -679,7 +694,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Cerebrolysin</span>
@@ -738,11 +753,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Sleep &amp; circadian rhythm</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Also see Epitalon above.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: head" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">DSIP (Delta sleep-inducing peptide)</span>
@@ -803,11 +819,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Skin, hair &amp; aesthetic</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Also see GHK-Cu above.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: head" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Melanotan II</span>
@@ -856,7 +873,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Argireline / Snap-8</span>
@@ -917,11 +934,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Cardiovascular &amp; cardioprotective</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Also see SS-31 and Hexarelin above.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: chest" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Apelin-13</span>
@@ -980,11 +998,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Immune system modulation</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Rebalance an ageing or overworked immune system.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: chest" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Thymosin Alpha-1</span>
@@ -1035,7 +1054,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">LL-37 (Cathelicidin)</span>
@@ -1094,11 +1113,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Gut &amp; microbiome</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Also see BPC-157 above.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: core" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Larazotide</span>
@@ -1157,11 +1177,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Metabolic &amp; GLP-1 axis</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">The best-evidenced peptides on the list.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: core" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Semaglutide</span>
@@ -1212,7 +1233,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Tirzepatide</span>
@@ -1271,11 +1292,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Sexual health &amp; hormonal</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Desire, arousal and the hormone cascade.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: pelvis" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#E8B35A"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">PT-141 (Bremelanotide)</span>
@@ -1326,7 +1348,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Kisspeptin-10</span>
@@ -1385,11 +1407,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Bone &amp; musculoskeletal</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Build bone and cartilage.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: legs" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#3E5E58"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#E8B35A"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Teriparatide (PTH 1-34)</span>
@@ -1438,7 +1461,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">BMP-7</span>
@@ -1499,11 +1522,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Tissue repair &amp; regeneration</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Signals that support healing in gut, tendon, skin and muscle.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: arms" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#3E5E58"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#3E5E58"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#E8B35A"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#3E5E58"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#3E5E58"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#3E5E58"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-n" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">BPC-157</span>
@@ -1554,7 +1578,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">TB-500 (Thymosin β4 fragment)</span>
@@ -1605,7 +1629,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">GHK-Cu (copper peptide)</span>
@@ -1658,7 +1682,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">AOD-9604</span>
@@ -1721,11 +1745,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Growth hormone secretagogues</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Nudge the pituitary to release its own growth hormone. Used for body composition, recovery and sleep.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: whole body" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#E8B35A"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#E8B35A"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#E8B35A"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">CJC-1295</span>
@@ -1778,7 +1803,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Ipamorelin</span>
@@ -1831,7 +1856,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Sermorelin</span>
@@ -1882,7 +1907,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Tesamorelin</span>
@@ -1931,7 +1956,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Hexarelin</span>
@@ -1982,7 +2007,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-h" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">MK-677 (Ibutamoren)</span>
@@ -2043,11 +2068,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Mitochondrial &amp; cellular energy</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Target the cell’s power plants — the most direct line to energy and ageing.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: whole body" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#E8B35A"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#E8B35A"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#E8B35A"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-a" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">SS-31 (Elamipretide)</span>
@@ -2098,7 +2124,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">MOTS-c</span>
@@ -2151,7 +2177,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Humanin</span>
@@ -2212,11 +2238,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Telomere &amp; epigenetic ageing</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Aimed at the clocks inside our cells.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: whole body" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#E8B35A"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#E8B35A"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#E8B35A"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Epitalon (Epithalon)</span>
@@ -2275,11 +2302,12 @@ details[open] > summary .hint{display:none}
 <h2 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 32px; line-height: 1.05;">Inflammation &amp; senescence</h2>
 <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5A5448;">Calm chronic inflammation and clear &quot;zombie&quot; cells.</p>
 </div>
+<svg class="zicon" viewBox="0 0 60 104" width="44" height="76" role="img" aria-label="Body area: whole body" style="flex-shrink:0;margin-left:auto;background:#12302D;border-radius:12px;padding:4px;"><ellipse cx="30" cy="12" rx="8" ry="10" fill="#E8B35A"/><path d="M18 26 Q30 22 42 26 L40 52 Q30 56 20 52Z" fill="#E8B35A"/><path d="M16 28 L9 62 L14 63 L20 34Z M44 28 L51 62 L46 63 L40 34Z" fill="#E8B35A"/><path d="M20 52 Q30 56 40 52 L39 66 L21 66Z" fill="#E8B35A"/><path d="M21 66 L39 66 L40 70 L30 74 L20 70Z" fill="#E8B35A"/><path d="M21 72 L29 72 L28 100 L22 100Z M31 72 L39 72 L38 100 L32 100Z" fill="#E8B35A"/></svg>
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px 0 38px; border-left: 2px solid #D3CBBB; margin-left: 22px;">
+<div class="tiles">
 
-<details style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-e" style="margin-right: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">Thymulin</span>
@@ -2328,7 +2356,7 @@ details[open] > summary .hint{display:none}
 </div>
 </details>
 
-<details style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
+<details class="ev-n" style="margin-left: 14px; background: #FFFFFF; border: 1px solid #E4DDD0; border-radius: 18px;">
 <summary style="display: flex; flex-direction: column; gap: 10px; padding: 18px 20px;">
 <span style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
 <span style="font-family: 'Instrument Serif', Georgia, serif; font-size: 28px; line-height: 1.05;">FOXO4-DRI</span>
