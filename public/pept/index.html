@@ -210,14 +210,23 @@ details[open] > summary .hint{display:none}
     try { history.pushState({ lm: 1, view: v, d: depth }, '', '#match'); } catch (e) {}
     view = v; render();
   }
-  function goBack() { if (depth > 0) history.back(); else { view = { v: 'map' }; render(); } }
+  var backPending = false;
+  function goBack() {
+    if (depth > 0) { backPending = true; history.back(); }
+    else { view = { v: 'map' }; render(); }
+  }
+  // the cross is a normal forward step to the map: instant, and it cannot land on the wrong screen
+  // even if the reader tapped a category chip (a page anchor, which adds its own history entry) in between
   function goRoot() {
     state = { a: {}, safe: [], zone: null };
-    if (depth > 0) history.go(-depth); else { view = { v: 'map' }; render(); }
+    if (view.v === 'map') { render(); return; }
+    nav({ v: 'map' });
   }
   window.addEventListener('popstate', function (e) {
     var st = e.state;
     if (!(st && st.lm)) return;                      // page anchors and other entries are not ours
+    if (backPending && (st.d || 0) === depth) { history.back(); return; }   // stepped back onto the same screen from an anchor entry: go one more
+    backPending = false;
     view = st.view; depth = st.d || 0;
     if (view.v !== 'map' && view.v !== 'zone' && !state.a.goal) view = { v: 'map' };
     render();
