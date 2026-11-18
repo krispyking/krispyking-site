@@ -1,0 +1,63 @@
+.films-jump {
+  margin: calc(-1 * var(--space-4)) 0 var(--space-8);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.site-films {
+  padding-block: var(--space-12);
+  border-block: 1px solid var(--color-border);
+  margin-top: var(--space-10);
+}
+
+.site-films h2 {
+  margin-block: var(--space-2) var(--space-3);
+  font-size: var(--text-xl);
+  letter-spacing: -.025em;
+}
+
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.film-card {
+  min-width: 0;
+}
+
+.film-card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  background: var(--color-text);
+}
+
+.film-card figcaption {
+  max-width: none;
+  padding: var(--space-4);
+}
+
+.film-card h3 {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.film-meta {
+  margin-bottom: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.film-credits {
+  margin-top: var(--space-6);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 760px) {
+  .films-jump { margin-top: 0; }
+  .film-grid { grid-template-columns: minmax(0, 1fr); }
+}
