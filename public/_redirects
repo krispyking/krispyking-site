@@ -22,4 +22,9 @@
 /pept   /pept/             301
 /pept/  /pept/index.html   200
 
+/Familytree   /Familytree/            301
+/Familytree/  /Familytree/index.html  200
+/familytree   /Familytree/            301
+/familytree/  /Familytree/            301
+
 /* /index.html 200
