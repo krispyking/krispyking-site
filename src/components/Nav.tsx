@@ -9,8 +9,13 @@ const NAV_LINKS = [
   { label: 'Future Tech', href: '/futuretech' },
   { label: 'Now',      href: '/#now' },
   { label: 'Projects', href: '/#projects' },
+  { label: 'Family Tree', href: '/Familytree/' },
   { label: 'Connect',  href: '/#connect' },
 ]
+
+// In-page anchors and the static /Familytree/ page are plain links (full page load);
+// everything else is a client-side route.
+const isPlainLink = (href: string) => href.startsWith('/#') || href === '/Familytree/'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -43,8 +48,8 @@ export default function Nav() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6">
           {NAV_LINKS.map(link => {
-            const isActive = !link.href.startsWith('/#') && location.pathname === link.href
-            return link.href.startsWith('/#') ? (
+            const isActive = !isPlainLink(link.href) && location.pathname === link.href
+            return isPlainLink(link.href) ? (
               <a
                 key={link.href}
                 href={link.href}
@@ -93,7 +98,7 @@ export default function Nav() {
         >
           <nav className="flex flex-col px-6 py-4 gap-1">
             {NAV_LINKS.map(link =>
-              link.href.startsWith('/#') ? (
+              isPlainLink(link.href) ? (
                 <a
                   key={link.href}
                   href={link.href}
